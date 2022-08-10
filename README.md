@@ -1,3 +1,3 @@
-# nemulator - To Be Changed, another project with this name already exists
+# lbnes
 
 A Nintendo NES emulator in the works.
