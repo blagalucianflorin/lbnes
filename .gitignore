@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+# Vim Swap
+*.swp
+
+# Project
+Makefile
+cmake-build*
+roms*
+nemulator
+CMakeFiles
+cmake_install.cmake
