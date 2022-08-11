@@ -1,3 +1,16 @@
 # lbnes
 
 A Nintendo NES emulator in the works.
+
+## Requirements
+```bash
+sudo apt install cmake g++ libsdl2-dev
+```
+
+## Clone & Build
+```bash
+git clone https://github.com/blagalucianflorin/lbnes
+cd lbnes
+cmake . && make
+./lbnes <path/to/rom.nes>
+```
