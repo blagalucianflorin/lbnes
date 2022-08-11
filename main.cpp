@@ -5,7 +5,7 @@ int main (int argc, char **argv)
 {
     std::string  rom_file = argc > 1 ? argv[1] : "";
 
-    rom_file = "../roms/smb.ines";
+    rom_file = "roms/smb.nes";
 
     nes my_nes (rom_file);
 //    my_nes.start ();
@@ -32,8 +32,6 @@ int main (int argc, char **argv)
     }
 
     my_nes.toggle_joypad (1);
-
-//    my_nes.start ();
 
     return (0);
 }
