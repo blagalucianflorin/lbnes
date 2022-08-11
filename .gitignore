@@ -41,3 +41,10 @@ roms*
 nemulator
 CMakeFiles
 cmake_install.cmake
+
+# Clion
+.idea
+
+# Libs
+!lib/googletest-master/.gitignore
+lib/googletest-master/*
