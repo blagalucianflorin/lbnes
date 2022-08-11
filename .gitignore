@@ -41,6 +41,7 @@ roms*
 nemulator
 CMakeFiles
 cmake_install.cmake
+testing
 
 # Clion
 .idea
