@@ -87,7 +87,7 @@ if (NES_DEBUGGER)
 endif ()
 
 add_executable (lbnes main.cpp ${SOURCES} ${INCLUDES})
-add_executable (lbnes-tests testing/main-testing.cpp ${SOURCES} ${TESTS} ${INCLUDES})
+# add_executable (lbnes-tests testing/main-testing.cpp ${SOURCES} ${TESTS} ${INCLUDES})
 
 if(WIN32)
     include_directories($ENV{SDL_PATH}/include})
@@ -102,13 +102,13 @@ elseif(APPLE)
 endif()
 
 # Define G_TESTING at compile time for tests executable
-target_compile_definitions (lbnes-tests PUBLIC G_TESTING)
+# target_compile_definitions (lbnes-tests PUBLIC G_TESTING)
 
 SET (GCC_WARNINGS_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
 SET (CMAKE_CXX_FLAGS  "${GCC_WARNINGS_COMPILE_FLAGS}")
 
 # Include and link GTEST
-add_subdirectory (lib/googletest-master)
-include_directories (lib/googletest-master/googletest/include)
-include_directories (lib/googletest-master/googlemock/include)
-target_link_libraries (lbnes-tests gtest gtest_main gmock)
+# add_subdirectory (lib/googletest-master)
+# include_directories (lib/googletest-master/googletest/include)
+# include_directories (lib/googletest-master/googlemock/include)
+# target_link_libraries (lbnes-tests gtest gtest_main gmock)
