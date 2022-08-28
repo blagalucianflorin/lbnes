@@ -240,6 +240,7 @@ public:
 
     inline void attach (class cartridge *new_cartridge) { this -> cartridge = new_cartridge; }
 
+    inline bool is_odd_frame () { return (this -> odd_frame); }
 
     void      draw_nametable ();
 
