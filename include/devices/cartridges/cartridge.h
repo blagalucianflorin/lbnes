@@ -16,6 +16,7 @@
 #include <map>
 #include <cstring>
 #include <algorithm>
+#include <memory>
 
 class cartridge : public device
 {
@@ -40,9 +41,9 @@ public:
 #else
     private:
 #endif
-    uint8_t *program_memory   = nullptr;
-    uint8_t *character_memory = nullptr;
-    uint8_t *sram             = nullptr;
+    std::vector<uint8_t> program_memory;
+    std::vector<uint8_t> character_memory;
+    std::vector<uint8_t> sram;
 
     MAPPER         mapper         = NROM;
     MIRRORING_TYPE mirroring_type = HORIZONTAL;
@@ -59,7 +60,7 @@ public:
 public:
     explicit cartridge (const std::string &file_path);
 
-    ~cartridge () noexcept override;
+    ~cartridge () override = default;
 
     void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
 

@@ -9,7 +9,7 @@ cartridge::cartridge (const std::string &file_path): device (0x4020, 0xFFFF)
 {
     std::string file_format  = file_path.substr (file_path.rfind ('.'));
 
-    this -> sram = new uint8_t[0x2000];
+    (this -> sram).reserve (0x2000);
     for (int i = 0; i < 0x2000; i++) (this -> sram)[i] = 0x00;
 
     if (supported_formats.find (file_format) == supported_formats.end ())
@@ -17,13 +17,6 @@ cartridge::cartridge (const std::string &file_path): device (0x4020, 0xFFFF)
 
     read_file_function read_file = supported_formats[file_format];
     (this ->* read_file) (file_path);
-}
-
-cartridge::~cartridge () noexcept
-{
-    delete [](this -> sram);
-    delete [](this -> program_memory);
-    delete [](this -> character_memory);
 }
 
 /*
@@ -34,7 +27,7 @@ cartridge::~cartridge () noexcept
 void cartridge::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLINT
 {
     if (IS_BETWEEN (0x6000, address, 0x7FFF))
-        (this -> sram)[address - 0x6000] = data;
+        ((this -> sram))[address - 0x6000] = data;
 }
 
 /*
