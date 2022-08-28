@@ -5,12 +5,6 @@
 #include "include/bus/bus.h"
 #include "include/misc/macros.h"
 
-bus::~bus ()
-{
-    for (auto device : this -> devices)
-        delete device;
-}
-
 void bus::add_device (device *new_device)
 {
     (this -> devices).push_back (new_device);
