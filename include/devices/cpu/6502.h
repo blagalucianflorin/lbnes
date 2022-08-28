@@ -65,7 +65,7 @@ private:
 
     uint8_t set_flag (FLAG flag, uint8_t value);
 
-    uint8_t get_flag (FLAG flag);
+    uint8_t get_flag (FLAG flag) const;
 
     void    push_to_stack (uint8_t value);
 

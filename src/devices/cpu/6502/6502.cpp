@@ -31,7 +31,7 @@ uint8_t cpu::set_flag (cpu::FLAG flag, uint8_t value)
     return (this -> flags_register);
 }
 
-uint8_t cpu::get_flag (cpu::FLAG flag)
+uint8_t cpu::get_flag (cpu::FLAG flag) const
 {
     return (((this -> flags_register) >> flag) & 1);
 }
