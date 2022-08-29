@@ -9,32 +9,15 @@
 
 ppu::ppu (SDL_Renderer *renderer) : device (0x2000, 0x3FFF)
 {
-    this -> renderer         = renderer;
-    this -> nametable_memory = new uint8_t[2048];
-    this -> palette_memory   = new uint8_t[33];
-    this -> oam              = new uint8_t[0xFF];
-
-    this -> pixels         = new uint32_t[240 * 256 * sizeof (uint32_t)];
+    this -> renderer       = renderer;
     this -> screen_surface = SDL_CreateRGBSurface (0, 256, 240, 24, 0, 0, 0, 0);
     this -> screen         = SDL_CreateTextureFromSurface (this -> renderer, this -> screen_surface);
-
-    for (int i = 0; i < 256 * 240; i++)
-        (this -> pixels)[i] = 0x00000000;
-
-    for (int i = 0; i < 2048; i++) (this -> nametable_memory)[i] = 0x00;
-    for (int i = 0; i < 33; i++)   (this -> palette_memory)[i] = 0x00;
-    for (int i = 0; i < 256; i++)  (this -> oam)[i] = 0x00;
 
     populate_palette_2C02();
 }
 
 ppu::~ppu ()
 {
-    delete [](this -> nametable_memory);
-    delete [](this -> palette_memory);
-    delete [](this -> oam);
-    delete [](this -> pixels);
-
     SDL_FreeSurface (this -> screen_surface);
     SDL_DestroyTexture (this -> screen);
 }

@@ -21,15 +21,10 @@
 
 class ppu : public device
 {
-#ifdef PUBLIC
-public:
-#else
-    private:
-#endif
-
-    uint8_t *nametable_memory;
-    uint8_t *palette_memory;
-    uint8_t *oam;
+private:
+    uint8_t nametable_memory[2048];
+    uint8_t palette_memory[33];
+    uint8_t oam[256];
 
     uint8_t control_register     = 0x0000;
     uint8_t mask_register        = 0x0000;
@@ -141,8 +136,8 @@ private:
     // Rendering
     SDL_Renderer *renderer       = nullptr;
     SDL_Texture  *screen         = nullptr;
-    uint32_t     *pixels         = nullptr;
     SDL_Surface  *screen_surface = nullptr;
+    uint32_t     pixels[240 * 256];
 
 #ifndef INSPECT
     int          x_offset  = 0;
@@ -153,7 +148,7 @@ private:
 #endif
 
     // Directly attached devices
-    class cpu       *cpu = nullptr;
+    class cpu       *cpu       = nullptr;
     class cartridge *cartridge = nullptr;
 
     void  populate_palette_2C02 ();
@@ -231,7 +226,7 @@ public:
     inline uint32_t *get_pixels () { return (this -> pixels); }
 
     // DMA
-    inline uint8_t *&dma () { return (this -> oam); }
+    inline uint8_t *dma () { return (this -> oam); }
 
     // Attach devices for direct access
     inline void attach (class cpu *new_cpu) { this -> cpu = new_cpu; }
