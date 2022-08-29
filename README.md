@@ -7,7 +7,7 @@ A Nintendo NES emulator in the works.
 sudo apt install cmake g++ libsdl2-dev
 ```
 
-## Clone & Build
+## Clone & Build (Debian)
 ```bash
 git clone https://github.com/blagalucianflorin/lbnes
 cd lbnes
