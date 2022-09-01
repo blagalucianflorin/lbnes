@@ -17,6 +17,7 @@
 #include <cstring>
 #include <algorithm>
 #include <memory>
+#include <vector>
 
 class cartridge : public device
 {
@@ -54,6 +55,7 @@ public:
     typedef void (cartridge::*read_file_function) (const std::string &);
     std::map <std::string, read_file_function> supported_formats =
     {
+        {".nes", &cartridge::read_ines},
         {".ines", &cartridge::read_ines}
     };
 
