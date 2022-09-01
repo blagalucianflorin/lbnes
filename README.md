@@ -2,7 +2,7 @@
 
 A Nintendo NES emulator in the works.
 
-## Requirements
+## Requirements (Debian)
 ```bash
 sudo apt install cmake g++ libsdl2-dev
 ```
