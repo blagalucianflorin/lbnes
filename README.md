@@ -39,4 +39,12 @@ You should be able to build and run the project normally.
 
 ### macOS
 
-Not supported yet.
+Download the latest [SDL2](https://github.com/libsdl-org/SDL/releases) macOS release and copy the SDL2.framework directory to /Library/Frameworks.
+
+```bash
+git clone https://github.com/blagalucianflorin/lbnes
+cd lbnes
+mkdir build && cd build
+cmake .. && make
+./lbnes <path/to/rom.nes>
+```
