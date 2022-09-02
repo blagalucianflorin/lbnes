@@ -10,7 +10,7 @@ A Nintendo NES emulator in the works.
 sudo apt install cmake g++ libsdl2-dev
 git clone https://github.com/blagalucianflorin/lbnes
 cd lbnes
-mkdir build && cd build
+mkdir bin && cd bin
 cmake .. && make
 ./lbnes <path/to/rom.nes>
 ```
@@ -23,7 +23,7 @@ Download the latest [SDL2](https://github.com/libsdl-org/SDL/releases) developme
 
 Clone this repository to a folder and ```cd``` that folder in cmd.
 ```bash
-mkdir build && cd build
+mkdir bin && cd bin
 cmake .. -G "MinGW Makefiles"
 mingw32-make
 lbnes <path/to/rom.nes>
@@ -44,7 +44,7 @@ Download the latest [SDL2](https://github.com/libsdl-org/SDL/releases) macOS rel
 ```bash
 git clone https://github.com/blagalucianflorin/lbnes
 cd lbnes
-mkdir build && cd build
+mkdir bin && cd bin
 cmake .. && make
 ./lbnes <path/to/rom.nes>
 ```
