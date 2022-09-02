@@ -20,7 +20,11 @@
 #include <thread>
 #include <exception>
 
+#ifdef _WIN32
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include "include/bus/bus.h"
 #include "include/devices/cpu/6502.h"

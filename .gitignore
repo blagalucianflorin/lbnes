@@ -42,6 +42,7 @@ nemulator
 CMakeFiles
 cmake_install.cmake
 testing
+build
 
 # Clion
 .idea

@@ -15,7 +15,11 @@
 #include "include/devices/cpu/6502.h"
 #include "include/devices/ppu/oam.h"
 
+#ifdef _WIN32
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include <map>
 

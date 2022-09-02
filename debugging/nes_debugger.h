@@ -12,7 +12,11 @@
 #include <string>
 #include <cstdlib>
 
+#ifdef _WIN32
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include "include/bus/bus.h"
 #include "include/devices/memories/memory.h"
