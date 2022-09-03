@@ -85,7 +85,7 @@ elseif(APPLE)
     find_library(SDL2_LIBRARY SDL2)
     include_directories(lbnes ${SDL2_INCLUDE_DIRS})
     target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
-    target_link_libraries(lbnes ${SDL2_LIBRARY} -lyaml-cppd)
+    target_link_libraries(lbnes ${SDL2_LIBRARY} -lyaml-cpp)
 endif()
 
 file(COPY ${PROJECT_SOURCE_DIR}/config.yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
