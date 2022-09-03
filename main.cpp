@@ -2,10 +2,10 @@
 
 int main (int argc, char **argv)
 {
-    std::string  rom_file = argc > 1 ? argv[1] : "smb.nes";
+    std::string rom_file = argc > 1 ? argv[1] : "nestest.nes";
 
-    nes my_nes (rom_file);
-    my_nes.start ();
+    class nes nes (rom_file);
+    nes.start ();
 
     return (0);
 }
