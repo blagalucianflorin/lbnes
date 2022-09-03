@@ -43,6 +43,7 @@ CMakeFiles
 cmake_install.cmake
 testing
 build
+bin
 
 # Clion
 .idea
