@@ -88,5 +88,7 @@ elseif(APPLE)
     target_link_libraries(lbnes ${SDL2_LIBRARY} -lyaml-cppd)
 endif()
 
+file(COPY ${PROJECT_SOURCE_DIR}/config.yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 SET (CXX_WARNINGS_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
 SET (CMAKE_CXX_FLAGS  "${GCC_WARNINGS_COMPILE_FLAGS}")
