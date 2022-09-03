@@ -5,10 +5,10 @@
 #ifndef NEMULATOR_CARTRIDGE_H
 #define NEMULATOR_CARTRIDGE_H
 
-#include "include/devices/device.h"
-#include "include/devices/cartridges/exceptions/cartridge_exception.h"
+#include "devices/device.h"
+#include "devices/cartridges/exceptions/cartridge_exception.h"
 
-#include "include/misc/macros.h"
+#include "misc/macros.h"
 
 #include <string>
 #include <fstream>

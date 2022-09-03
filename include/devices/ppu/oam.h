@@ -5,12 +5,12 @@
 #ifndef NEMULATOR_OAM_H
 #define NEMULATOR_OAM_H
 
-#include "include/devices/device.h"
+#include "devices/device.h"
 
-#include "include/forwards/classes.h"
-#include "include/devices/cpu/6502.h"
-#include "include/devices/ppu/ppu.h"
-#include "include/devices/ppu/exceptions/ppu_exception.h"
+#include "forwards/classes.h"
+#include "devices/cpu/6502.h"
+#include "devices/ppu/ppu.h"
+#include "devices/ppu/exceptions/ppu_exception.h"
 
 class oam : public device
 {

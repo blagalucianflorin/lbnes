@@ -2,7 +2,7 @@
 // Created by lblaga on 19.03.2022.
 //
 
-#include "include/devices/memories/ram.h"
+#include "devices/memories/ram.h"
 
 void ram::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLINT
 {

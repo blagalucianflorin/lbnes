@@ -2,8 +2,8 @@
 // Created by Blaga Lucian-Florin on 07-Mar-21.
 //
 
-#include "include/devices/cpu/6502.h"
-#include "debugging/nes_debugger.h"
+#include "devices/cpu/6502.h"
+#include "../debugging/nes_debugger.h"
 
 
 void cpu::populate_operations ()

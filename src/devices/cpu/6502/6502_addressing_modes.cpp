@@ -2,7 +2,7 @@
 // Created by Blaga Lucian-Florin on 07-Mar-21.
 //
 
-#include "include/devices/cpu/6502.h"
+#include "devices/cpu/6502.h"
 
 
 uint8_t cpu::IMP () // NOLINT

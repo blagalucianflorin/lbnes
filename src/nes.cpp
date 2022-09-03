@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include "include/nes.h"
+#include "nes.h"
 
 nes::nes (const std::string& rom_file) :
     nes_cpu (),

@@ -2,7 +2,7 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#include "include/devices/device.h"
+#include "devices/device.h"
 
 bool device::responds_to (uint16_t address)
 {

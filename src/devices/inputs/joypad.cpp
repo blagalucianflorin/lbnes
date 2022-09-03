@@ -2,7 +2,7 @@
 // Created by lblaga on 18.05.2022.
 //
 
-#include "include/devices/inputs/joypad.h"
+#include "devices/inputs/joypad.h"
 
 #include <iostream>
 

@@ -2,7 +2,7 @@
 // Created by lblaga on 20.03.2022.
 //
 
-#include "include/devices/cartridges/cartridge.h"
+#include "devices/cartridges/cartridge.h"
 
 void cartridge::read_ines (const std::string& file_path)
 {

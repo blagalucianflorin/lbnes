@@ -26,16 +26,16 @@
 #include <SDL2/SDL.h>
 #endif
 
-#include "include/bus/bus.h"
-#include "include/devices/cpu/6502.h"
-#include "include/devices/ppu/ppu.h"
-#include "include/devices/cartridges/cartridge.h"
-#include "include/devices/inputs/joypad.h"
-#include "include/devices/memories/ram.h"
-#include "include/devices/memories/ppu_nametable_ram.h"
-#include "include/devices/memories/ppu_palette_ram.h"
+#include "bus/bus.h"
+#include "devices/cpu/6502.h"
+#include "devices/ppu/ppu.h"
+#include "devices/cartridges/cartridge.h"
+#include "devices/inputs/joypad.h"
+#include "devices/memories/ram.h"
+#include "devices/memories/ppu_nametable_ram.h"
+#include "devices/memories/ppu_palette_ram.h"
 
-#include "include/sdl_manager.h"
+#include "sdl_manager.h"
 
 class nes
 {

@@ -5,8 +5,8 @@
 #ifndef NEMULATOR_MEMORY_H
 #define NEMULATOR_MEMORY_H
 
-#include "include/forwards/classes.h"
-#include "include/devices/device.h"
+#include "forwards/classes.h"
+#include "devices/device.h"
 
 class memory : public device
 {

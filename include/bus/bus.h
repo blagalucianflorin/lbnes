@@ -9,8 +9,8 @@
 #include <vector>
 #include <stdexcept>
 
-#include "include/forwards/classes.h"
-#include "include/devices/device.h"
+#include "forwards/classes.h"
+#include "devices/device.h"
 
 class bus
 {

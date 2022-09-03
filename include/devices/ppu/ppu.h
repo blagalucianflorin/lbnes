@@ -5,15 +5,15 @@
 #ifndef NEMULATOR_PPU_H
 #define NEMULATOR_PPU_H
 
-#include "include/forwards/classes.h"
+#include "forwards/classes.h"
 
-#include "include/devices/device.h"
-#include "include/devices/ppu/exceptions/ppu_exception.h"
-#include "include/bus/bus.h"
-#include "include/devices/cartridges/cartridge.h"
-#include "include/misc/macros.h"
-#include "include/devices/cpu/6502.h"
-#include "include/devices/ppu/oam.h"
+#include "devices/device.h"
+#include "devices/ppu/exceptions/ppu_exception.h"
+#include "bus/bus.h"
+#include "devices/cartridges/cartridge.h"
+#include "misc/macros.h"
+#include "devices/cpu/6502.h"
+#include "devices/ppu/oam.h"
 
 #ifdef _WIN32
 #include <SDL.h>

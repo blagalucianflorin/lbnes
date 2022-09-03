@@ -13,7 +13,7 @@ if(NOT DEFINED CMAKE_CXX_COMPILER)
     set(CMAKE_CXX_COMPILER g++)
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(lbnes ${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
 
 set(SOURCES

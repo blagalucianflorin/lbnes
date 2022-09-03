@@ -2,7 +2,7 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#include "include/devices/cpu/6502.h"
+#include "devices/cpu/6502.h"
 
 
 cpu::cpu () : device (0x0000, 0x0000) // NOLINT

@@ -2,8 +2,8 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#include "include/bus/bus.h"
-#include "include/misc/macros.h"
+#include "bus/bus.h"
+#include "misc/macros.h"
 
 void bus::add_device (device *new_device)
 {

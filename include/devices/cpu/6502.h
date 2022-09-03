@@ -5,10 +5,10 @@
 #ifndef NEMULATOR_CPU_H
 #define NEMULATOR_CPU_H
 
-#include "include/forwards/classes.h"
-#include "include/devices/device.h"
-#include "include/bus/bus.h"
-#include "include/devices/ppu/ppu.h"
+#include "forwards/classes.h"
+#include "devices/device.h"
+#include "bus/bus.h"
+#include "devices/ppu/ppu.h"
 
 
 class cpu : public device

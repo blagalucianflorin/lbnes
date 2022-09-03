@@ -7,8 +7,8 @@
 
 #include <cstdint>
 
-#include "include/forwards/classes.h"
-#include "include/misc/macros.h"
+#include "forwards/classes.h"
+#include "misc/macros.h"
 
 class device
 {

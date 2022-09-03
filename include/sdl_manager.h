@@ -5,7 +5,7 @@
 #ifndef NEMULATOR_SDL_MANAGER_H
 #define NEMULATOR_SDL_MANAGER_H
 
-#include "include/devices/ppu/ppu.h"
+#include "devices/ppu/ppu.h"
 
 #ifdef _WIN32
 #include <SDL.h>

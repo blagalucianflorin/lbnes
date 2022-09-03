@@ -5,7 +5,7 @@
 #ifndef NEMULATOR_PPU_PALETTE_RAM_H
 #define NEMULATOR_PPU_PALETTE_RAM_H
 
-#include "include/devices/memories/memory.h"
+#include "devices/memories/memory.h"
 
 class ppu_palette_ram : public memory
 {

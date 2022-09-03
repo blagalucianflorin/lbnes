@@ -5,7 +5,7 @@
 #ifndef NEMULATOR_JOYPAD_H
 #define NEMULATOR_JOYPAD_H
 
-#include "include/devices/device.h"
+#include "devices/device.h"
 
 #ifdef _WIN32
 #include <SDL.h>
