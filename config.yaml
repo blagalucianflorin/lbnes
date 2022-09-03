@@ -1,0 +1,27 @@
+controls:
+  player_count: two
+
+  player_one:
+    type: keyboard
+    mapping:
+      dpad-up:    w
+      dpad-down:  s
+      dpad-left:  a
+      dpad-right: d
+      select:     j
+      start:      k
+      a:          n
+      b:          m
+
+  player_two:
+    type:             controller
+    controller_index: 1
+    mapping:
+      dpad-up:    dpad-up
+      dpad-down:  dpad-down
+      dpad-left:  dpad-left
+      dpad-right: dpad-right
+      select:     select
+      start:      start
+      a:          b
+      b:          a
