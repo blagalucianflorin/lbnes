@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(lbnes)
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(lib/yaml-cpp)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/yaml-cpp)
 
 if(NOT DEFINED CMAKE_C_COMPILER)
     message(ERROR "CMAKE_C_COMPILER is not set, defaulting to gcc")
@@ -14,42 +14,42 @@ if(NOT DEFINED CMAKE_CXX_COMPILER)
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(lbnes ${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
+include_directories(${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
 
 set(SOURCES
-        src/bus/bus.cpp
-        src/devices/cpu/6502/6502.cpp
-        src/devices/cpu/6502/6502_addressing_modes.cpp
-        src/devices/cpu/6502/6502_instructions.cpp
-        src/devices/memories/memory.cpp
-        src/devices/device.cpp
-        src/devices/memories/ram.cpp
-        src/devices/cartridges/cartridge.cpp
-        src/devices/cartridges/read_ines.cpp
-        src/devices/ppu/ppu.cpp
-        src/devices/memories/ppu_palette_ram.cpp
-        src/devices/memories/ppu_nametable_ram.cpp
-        src/devices/ppu/oam.cpp src/devices/inputs/joypad.cpp
-        src/sdl_manager.cpp
-        src/nes.cpp)
+    src/bus/bus.cpp
+    src/devices/cpu/6502/6502.cpp
+    src/devices/cpu/6502/6502_addressing_modes.cpp
+    src/devices/cpu/6502/6502_instructions.cpp
+    src/devices/memories/memory.cpp
+    src/devices/device.cpp
+    src/devices/memories/ram.cpp
+    src/devices/cartridges/cartridge.cpp
+    src/devices/cartridges/read_ines.cpp
+    src/devices/ppu/ppu.cpp
+    src/devices/memories/ppu_palette_ram.cpp
+    src/devices/memories/ppu_nametable_ram.cpp
+    src/devices/ppu/oam.cpp src/devices/inputs/joypad.cpp
+    src/sdl_manager.cpp
+    src/nes.cpp)
 
 set (INCLUDES
-        include/bus/bus.h
-        include/devices/cpu/6502.h
-        include/devices/device.h
-        include/devices/memories/memory.h
-        include/forwards/classes.h
-        include/misc/macros.h
-        include/devices/memories/ram.h
-        include/devices/cartridges/cartridge.h
-        include/devices/cartridges/exceptions/cartridge_exception.h
-        include/devices/ppu/ppu.h
-        include/devices/ppu/exceptions/ppu_exception.h
-        include/devices/memories/ppu_palette_ram.h
-        include/devices/memories/ppu_nametable_ram.h
-        include/devices/ppu/oam.h include/devices/inputs/joypad.h
-        include/sdl_manager.h
-        include/nes.h)
+    include/bus/bus.h
+    include/devices/cpu/6502.h
+    include/devices/device.h
+    include/devices/memories/memory.h
+    include/forwards/classes.h
+    include/misc/macros.h
+    include/devices/memories/ram.h
+    include/devices/cartridges/cartridge.h
+    include/devices/cartridges/exceptions/cartridge_exception.h
+    include/devices/ppu/ppu.h
+    include/devices/ppu/exceptions/ppu_exception.h
+    include/devices/memories/ppu_palette_ram.h
+    include/devices/memories/ppu_nametable_ram.h
+    include/devices/ppu/oam.h include/devices/inputs/joypad.h
+    include/sdl_manager.h
+    include/nes.h)
 
 if (NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
@@ -57,6 +57,7 @@ if (NES_DEBUGGER)
 endif ()
 
 add_executable (lbnes main.cpp ${SOURCES} ${INCLUDES})
+add_dependencies(lbnes yaml-cpp)
 
 if(WIN32)
     if(NOT DEFINED ENV{SDL_PATH})
