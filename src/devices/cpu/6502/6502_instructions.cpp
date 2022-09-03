@@ -3,7 +3,7 @@
 //
 
 #include "devices/cpu/6502.h"
-#include "../debugging/nes_debugger.h"
+#include "debugging/nes_debugger.h"
 
 
 void cpu::populate_operations ()

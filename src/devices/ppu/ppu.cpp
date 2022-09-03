@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "devices/ppu/ppu.h"
-#include "../debugging/nes_debugger.h"
+#include "debugging/nes_debugger.h"
 
 
 ppu::ppu (SDL_Renderer *renderer) : device (0x2000, 0x3FFF)

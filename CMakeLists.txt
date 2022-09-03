@@ -52,8 +52,8 @@ set (INCLUDES
         include/nes.h)
 
 if (NES_DEBUGGER)
-    set(SOURCES ${SOURCES} debugging/nes_debugger.cpp)
-    set(INCLUDES ${INCLUDES} debugging/nes_debugger.h)
+    set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
+    set(INCLUDES ${INCLUDES} include/debugging/nes_debugger.h)
 endif ()
 
 add_executable (lbnes main.cpp ${SOURCES} ${INCLUDES})
