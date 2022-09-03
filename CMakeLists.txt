@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.17)
 project(lbnes)
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory(lib/yaml-cpp)
+
 if(NOT DEFINED CMAKE_C_COMPILER)
     message(ERROR "CMAKE_C_COMPILER is not set, defaulting to gcc")
     set(CMAKE_C_COMPILER gcc)
@@ -11,9 +13,10 @@ if(NOT DEFINED CMAKE_CXX_COMPILER)
     set(CMAKE_CXX_COMPILER g++)
 endif()
 
-include_directories (${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(lbnes ${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
 
-set (SOURCES
+set(SOURCES
         src/bus/bus.cpp
         src/devices/cpu/6502/6502.cpp
         src/devices/cpu/6502/6502_addressing_modes.cpp
@@ -69,16 +72,19 @@ if(WIN32)
 
     target_include_directories(lbnes PUBLIC $ENV{SDL_PATH}/include)
     target_link_directories(lbnes PUBLIC ${SDL_LIB_DIRECTORY})
-    target_link_libraries(lbnes SDL2main SDL2)
+    target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
+    target_link_libraries(lbnes SDL2main SDL2 -lyaml-cppd)
 
     file(COPY ${SDL_LIB_DIRECTORY}/SDL2.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     add_definitions(-DSDL_MAIN_HANDLED)
 elseif(UNIX AND NOT APPLE)
-    target_link_libraries(lbnes -lSDL2)
+    target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
+    target_link_libraries(lbnes -lSDL2 -lyaml-cppd)
 elseif(APPLE)
     find_library(SDL2_LIBRARY SDL2)
     include_directories(lbnes ${SDL2_INCLUDE_DIRS})
-    target_link_libraries(lbnes ${SDL2_LIBRARY})
+    target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
+    target_link_libraries(lbnes ${SDL2_LIBRARY} -lyaml-cppd)
 endif()
 
 SET (CXX_WARNINGS_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
