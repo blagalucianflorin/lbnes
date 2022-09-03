@@ -90,5 +90,8 @@ endif()
 
 file(COPY ${PROJECT_SOURCE_DIR}/config.yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+file(DOWNLOAD https://github.com/christopherpow/nes-test-roms/raw/master/other/nestest.nes
+        ${CMAKE_CURRENT_BINARY_DIR}/nestest.nes)
+
 SET (CXX_WARNINGS_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
 SET (CMAKE_CXX_FLAGS  "${GCC_WARNINGS_COMPILE_FLAGS}")
