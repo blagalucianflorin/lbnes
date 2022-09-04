@@ -5,7 +5,9 @@ resolution:
 display-fps: true
 
 joypads:
-  - type: keyboard
+  - type:   keyboard
+    player: 1
+    # arrows-[up/down/left/right] and keypad-[1..9] also usable
     mapping:
       dpad-up:    w
       dpad-down:  s
@@ -16,14 +18,5 @@ joypads:
       a:          n
       b:          m
   - type:             controller
+    player:           2
     controller_index: 1
-#  - type: keyboard
-#    mapping:
-#      dpad-up:    arrows-up
-#      dpad-down:  arrows-down
-#      dpad-left:  arrows-left
-#      dpad-right: arrows-right
-#      select:     keypad-5
-#      start:      keypad-6
-#      a:          keypad-2
-#      b:          keypad-3

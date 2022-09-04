@@ -139,7 +139,6 @@ void nes::load_joypads ()
         return;
     }
 
-    int current_player = 1;
     auto players = configurator::get_instance ()["joypads"];
     for (auto player : players)
     {
@@ -155,16 +154,18 @@ void nes::load_joypads ()
             player_one_mapping.push_back (player["mapping"]["a"].as<std::string>());
             player_one_mapping.push_back (player["mapping"]["b"].as<std::string>());
 
-            (this -> joypads)[current_player - 1] -> change_type (joypad::KEYBOARD);
-            (this -> joypads)[current_player - 1] -> set_mapping (player_one_mapping);
-            (this -> joypads)[current_player - 1] -> change_player_number (current_player);
+            (this -> joypads)[player["player"].as<int>() - 1] -> change_type (joypad::KEYBOARD);
+            (this -> joypads)[player["player"].as<int>() - 1] -> set_mapping (player_one_mapping);
+            (this -> joypads)[player["player"].as<int>() - 1] ->
+                change_player_number (player["player"].as<int>());
         }
         else
         {
-            (this -> joypads)[current_player - 1] -> change_controller_number (player["controller_index"].as<int>() - 1);
-            (this -> joypads)[current_player - 1] -> change_type (joypad::CONTROLLER);
-            (this -> joypads)[current_player - 1] -> change_player_number (current_player);
+            (this -> joypads)[player["player"].as<int>() - 1] ->
+                change_controller_number (player["controller_index"].as<int>() - 1);
+            (this -> joypads)[player["player"].as<int>() - 1] -> change_type (joypad::CONTROLLER);
+            (this -> joypads)[player["player"].as<int>() - 1] ->
+                change_player_number (player["player"].as<int>());
         }
-        current_player++;
     }
 }
