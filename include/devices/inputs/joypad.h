@@ -24,8 +24,7 @@ public:
     enum INPUT_DEVICE
     {
         KEYBOARD,
-        CONTROLLER_ONE,
-        CONTROLLER_TWO,
+        CONTROLLER
     };
 
     enum BUTTON
@@ -41,14 +40,13 @@ public:
     };
 
 private:
-    uint8_t      saved_state;
-    SDL_Joystick *joystick;
-    INPUT_DEVICE input_device;
-    bool         activated         = true;
-    int          player_number     = 1;
-
-    // TODO implement
-    int          controller_number = 1;
+    uint8_t             saved_state;
+    SDL_GameController *controller;
+    INPUT_DEVICE        input_device;
+    bool                activated           = true;
+    int                 player_number       = 1;
+    int                 controller_number   = 0;
+    int                 controller_deadzone = 5000;
 
     std::vector <std::string> mapping = {"d", "a", "s", "w", "t", "r", "f", "g"};
 
@@ -60,7 +58,14 @@ private:
         {"d", SDL_SCANCODE_D}, {"f", SDL_SCANCODE_F}, {"g", SDL_SCANCODE_G}, {"h", SDL_SCANCODE_H},
         {"j", SDL_SCANCODE_J}, {"k", SDL_SCANCODE_K}, {"l", SDL_SCANCODE_L}, {"z", SDL_SCANCODE_Z},
         {"x", SDL_SCANCODE_X}, {"c", SDL_SCANCODE_C}, {"v", SDL_SCANCODE_V}, {"b", SDL_SCANCODE_B},
-        {"n", SDL_SCANCODE_N}, {"m", SDL_SCANCODE_M}
+        {"n", SDL_SCANCODE_N}, {"m", SDL_SCANCODE_M},
+
+        {"arrows-up", SDL_SCANCODE_UP}, {"arrows-down", SDL_SCANCODE_DOWN},
+        {"arrows-left", SDL_SCANCODE_LEFT}, {"arrows-right", SDL_SCANCODE_RIGHT},
+
+        {"keypad-1", SDL_SCANCODE_KP_1}, {"keypad-2", SDL_SCANCODE_KP_2}, {"keypad-3", SDL_SCANCODE_KP_3},
+        {"keypad-4", SDL_SCANCODE_KP_4}, {"keypad-5", SDL_SCANCODE_KP_5}, {"keypad-6", SDL_SCANCODE_KP_6},
+        {"keypad-7", SDL_SCANCODE_KP_7}, {"keypad-8", SDL_SCANCODE_KP_8}, {"keypad-9", SDL_SCANCODE_KP_9},
     };
 
 public:
@@ -78,6 +83,8 @@ public:
 
     uint8_t get_button (BUTTON button);
 
+    void    change_type (INPUT_DEVICE new_input_device);
+
     inline void reset_buttons () { this -> saved_state = 0x00; }
 
     inline void toggle_activated () { this -> activated = !(this -> activated); }
@@ -86,9 +93,9 @@ public:
 
     inline void change_input_device (INPUT_DEVICE new_input_device) { this -> input_device = new_input_device; }
 
-    inline void change_type (INPUT_DEVICE new_input_device) { this -> input_device = new_input_device; }
-
     inline void change_player_number (int new_player_number) { this -> player_number = new_player_number; }
+
+    inline void change_controller_number (int new_controller_number) { this -> controller_number = new_controller_number; }
 };
 
 #endif //NEMULATOR_JOYPAD_H
