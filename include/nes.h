@@ -38,9 +38,6 @@
 #include "sdl_manager.h"
 #include "configurator.h"
 
-#if WIN32
-#define YAML_CPP_STATIC_DEFINE
-#endif
 #include "yaml-cpp/yaml.h"
 
 class nes
