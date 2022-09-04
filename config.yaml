@@ -1,3 +1,9 @@
+resolution:
+  width: 768
+  height: 720
+
+display-fps: true
+
 joypads:
   - type: keyboard
     mapping:

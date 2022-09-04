@@ -14,7 +14,7 @@ nes::nes (const std::string& rom_file) :
     palette_ram (),
     nes_cartridge (rom_file)
 {
-    main_window (this -> game_window,  this -> game_renderer, "lbnes", WINDOW_WIDTH, WINDOW_HEIGHT);
+    main_window (this -> game_window,  this -> game_renderer);
 
     nes_ppu = std::make_unique<ppu> (this -> game_renderer);
 
@@ -64,6 +64,8 @@ void nes::main_loop ()
     auto                      last_time   = std::chrono::high_resolution_clock::now ();
     std::chrono::microseconds delta_time;
 
+    bool display_fps = configurator::get_instance ()["display-fps"].as<bool>();
+
     while (!quit)
     {
         frame_start = std::chrono::high_resolution_clock::now ();
@@ -81,7 +83,8 @@ void nes::main_loop ()
 
             this -> render_frame ();
 
-            SDL_SetWindowTitle (this -> game_window,
+            if (display_fps)
+                SDL_SetWindowTitle (this -> game_window,
                                 ("FPS: " + std::to_string (1000000.00 / (double) delta_time.count ())).c_str ());
         }
     }
