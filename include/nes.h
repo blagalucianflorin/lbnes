@@ -37,6 +37,8 @@
 
 #include "sdl_manager.h"
 
+#include "yaml-cpp/yaml.h"
+
 class nes
 {
 private:
@@ -52,13 +54,16 @@ private:
     ram             cpu_ram;
     ppu_palette_ram palette_ram;
     cartridge       nes_cartridge;
-    joypad          player_one_joypad;
-    joypad          player_two_joypad;
+
+    std::vector<std::unique_ptr<joypad>> joypads;
+    YAML::Node                           config;
 
     long long total_cycles = 0;
     double    target_fps   = 60.098814;
 
     void main_loop ();
+
+    void load_joypads ();
 
 public:
     explicit nes (const std::string& rom_file);

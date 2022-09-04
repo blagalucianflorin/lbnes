@@ -1,8 +1,5 @@
-controls:
-  player_count: two
-
-  player_one:
-    type: keyboard
+joypads:
+  - type: keyboard
     mapping:
       dpad-up:    w
       dpad-down:  s
@@ -12,16 +9,5 @@ controls:
       start:      k
       a:          n
       b:          m
-
-  player_two:
-    type:             controller
+  - type:             controller
     controller_index: 1
-    mapping:
-      dpad-up:    dpad-up
-      dpad-down:  dpad-down
-      dpad-left:  dpad-left
-      dpad-right: dpad-right
-      select:     select
-      start:      start
-      a:          b
-      b:          a

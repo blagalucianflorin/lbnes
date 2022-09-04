@@ -94,7 +94,7 @@ elseif(APPLE)
     target_link_libraries(lbnes ${SDL2_LIBRARY} -l${YAML-CPP_LIB})
 endif()
 
-file(COPY ${PROJECT_SOURCE_DIR}/config.yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+configure_file(${PROJECT_SOURCE_DIR}/config.yaml ${CMAKE_CURRENT_BINARY_DIR}/config.yaml)
 
 file(DOWNLOAD https://github.com/christopherpow/nes-test-roms/raw/master/other/nestest.nes
         ${CMAKE_CURRENT_BINARY_DIR}/nestest.nes)

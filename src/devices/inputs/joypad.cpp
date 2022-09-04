@@ -32,35 +32,13 @@ void joypad::write (uint16_t address, uint8_t data, bool to_parent_bus)
     this -> saved_state = 0x00;
     const Uint8* keyboard_state = SDL_GetKeyboardState(nullptr);
 
-    if (this -> input_device == KEYBOARD_ONE)
+    if (this -> input_device == KEYBOARD)
     {
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_A] ? 1 : 0) << 1;  // D-LEFT
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_D] ? 1 : 0) << 0;  // D-RIGHT
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_W] ? 1 : 0) << 3;  // D-UP
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_S] ? 1 : 0) << 2;  // D-DOWN
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_F] ? 1 : 0) << 6;  // A
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_G] ? 1 : 0) << 7;  // B
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_T] ? 1 : 0) << 4;  // Start
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_R] ? 1 : 0) << 5;  // Select
+        for (int i = 0; i < 8; i++)
+            this -> saved_state |= (keyboard_state[this -> sdl_scancode_translations[this -> mapping[i]]] ? 1 : 0) << i;
     }
-
-    if (this -> input_device == KEYBOARD_TWO)
+    else if ((this -> input_device == CONTROLLER_ONE || this -> input_device == CONTROLLER_TWO) && SDL_NumJoysticks () > 0)
     {
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_LEFT] ? 1 : 0) << 1;  // D-LEFT
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_RIGHT] ? 1 : 0) << 0; // D-RIGHT
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_UP] ? 1 : 0) << 3;    // D-UP
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_DOWN] ? 1 : 0) << 2;  // D-DOWN
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_N] ? 1 : 0) << 6;     // A
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_M] ? 1 : 0) << 7;     // B
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_K] ? 1 : 0) << 4;     // Start
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_J] ? 1 : 0) << 5;     // Select
-    }
-
-    if (this -> input_device == CONTROLLER_ONE || this -> input_device == CONTROLLER_TWO)
-    {
-        if (SDL_NumJoysticks () < 1)
-            return;
-
         this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_LEFT ? 1 : 0) << 1;
         this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_RIGHT ? 1 : 0) << 0;
         this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_UP ? 1 : 0) << 3;

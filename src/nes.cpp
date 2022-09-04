@@ -12,20 +12,33 @@ nes::nes (const std::string& rom_file) :
     ppu_bus (0x0000, 0x3FFF),
     cpu_ram (),
     palette_ram (),
-    nes_cartridge (rom_file),
-    player_one_joypad  (joypad::KEYBOARD_ONE, 1),
-    player_two_joypad  (joypad::KEYBOARD_TWO, 2)
+    nes_cartridge (rom_file)
 {
     main_window (this -> game_window,  this -> game_renderer, "lbnes", WINDOW_WIDTH, WINDOW_HEIGHT);
 
     nes_ppu = std::make_unique<ppu> (this -> game_renderer);
 
+    std::ifstream fin ("config.yaml");
+    if (fin.good ())
+    {
+        fin.close ();
+        this -> config = YAML::LoadFile ("config.yaml");
+    }
+
+    for (int i = 0; i < 2; i++)
+    {
+        this -> joypads.push_back (std::make_unique<joypad>());
+        this -> cpu_bus.add_device (this -> joypads[i].get ());
+    }
+
     this -> nes_ppu -> attach (&(this -> nes_cpu));
     this -> nes_ppu -> attach (&(this -> nes_cartridge));
     this -> nes_ppu -> set_child_bus (this -> ppu_bus);
     this -> ppu_bus.add_devices ({&(this -> palette_ram)});
-    this -> cpu_bus.add_devices ({(&this -> nes_cpu), &(this -> cpu_ram), &(this -> nes_cartridge),
-                                  &(this -> player_one_joypad), &(this -> player_two_joypad), (this -> nes_ppu).get ()});
+    this -> cpu_bus.add_devices ({&(this -> nes_cpu), &(this -> cpu_ram), &(this -> nes_cartridge),
+                                  (this -> nes_ppu).get ()});
+
+    this -> load_joypads ();
 
     this -> reset ();
 }
@@ -100,20 +113,61 @@ uint32_t *nes::render_frame ()
 
 uint8_t nes::get_button (joypad::BUTTON button, uint8_t player)
 {
-    return ((player == 1 ? this -> player_one_joypad : this -> player_two_joypad).get_button (button));
+    return ((this -> joypads)[player] -> get_button (button));
 }
 
 uint8_t nes::set_button (joypad::BUTTON button, uint8_t value, uint8_t player)
 {
-    return ((player == 1 ? this -> player_one_joypad : this -> player_two_joypad).set_button (button, value));
+    return ((this -> joypads)[player] -> set_button (button, value));
 }
 
 void nes::reset_buttons (uint8_t player)
 {
-    (player == 1 ? this -> player_one_joypad : this -> player_two_joypad).reset_buttons ();
+    (this -> joypads)[player] -> reset_buttons ();
 }
 
 void nes::toggle_joypad (uint8_t player)
 {
-    (player == 1 ? this -> player_one_joypad : this -> player_two_joypad).toggle_activated ();
+    (this -> joypads)[player] -> toggle_activated ();
+}
+
+void nes::load_joypads ()
+{
+    if (!config["joypads"])
+    {
+        (this -> joypads)[0] = std::make_unique<joypad> (joypad::KEYBOARD, 1);
+        (this -> joypads)[1] = std::make_unique<joypad> (joypad::CONTROLLER_ONE, 2);
+        this -> cpu_bus.add_device ((this -> joypads)[0].get ());
+        this -> cpu_bus.add_device ((this -> joypads)[1].get ());
+
+        return;
+    }
+
+    int current_player = 1;
+    auto players = config["joypads"];
+    for (auto player : players)
+    {
+        if (player["type"].as<std::string>() == "keyboard")
+        {
+            std::vector<std::string> player_one_mapping;
+            player_one_mapping.push_back (player["mapping"]["dpad-right"].as<std::string>());
+            player_one_mapping.push_back (player["mapping"]["dpad-left"].as<std::string>());
+            player_one_mapping.push_back (player["mapping"]["dpad-up"].as<std::string>());
+            player_one_mapping.push_back (player["mapping"]["dpad-down"].as<std::string>());
+            player_one_mapping.push_back (player["mapping"]["start"].as<std::string>());
+            player_one_mapping.push_back (player["mapping"]["select"].as<std::string>());
+            player_one_mapping.push_back (player["mapping"]["a"].as<std::string>());
+            player_one_mapping.push_back (player["mapping"]["b"].as<std::string>());
+
+            (this -> joypads)[current_player - 1] -> change_type (joypad::KEYBOARD);
+            (this -> joypads)[current_player - 1] -> set_mapping (player_one_mapping);
+            (this -> joypads)[current_player - 1] -> change_player_number (current_player);
+        }
+        else
+        {
+            (this -> joypads)[current_player - 1] -> change_type (joypad::CONTROLLER_ONE);
+            (this -> joypads)[current_player - 1] -> change_player_number (current_player);
+        }
+        current_player++;
+    }
 }
