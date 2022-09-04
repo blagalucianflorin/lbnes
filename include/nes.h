@@ -36,6 +36,7 @@
 #include "devices/memories/ppu_palette_ram.h"
 
 #include "sdl_manager.h"
+#include "configurator.h"
 
 #if WIN32
 #define YAML_CPP_STATIC_DEFINE
@@ -59,7 +60,6 @@ private:
     cartridge       nes_cartridge;
 
     std::vector<std::unique_ptr<joypad>> joypads;
-    YAML::Node                           config;
 
     long long total_cycles = 0;
     double    target_fps   = 60.098814;

@@ -31,7 +31,8 @@ set(SOURCES
     src/devices/memories/ppu_nametable_ram.cpp
     src/devices/ppu/oam.cpp src/devices/inputs/joypad.cpp
     src/sdl_manager.cpp
-    src/nes.cpp)
+    src/nes.cpp
+    src/configurator.cpp)
 
 set (INCLUDES
     include/bus/bus.h
@@ -49,7 +50,8 @@ set (INCLUDES
     include/devices/memories/ppu_nametable_ram.h
     include/devices/ppu/oam.h include/devices/inputs/joypad.h
     include/sdl_manager.h
-    include/nes.h)
+    include/nes.h
+    include/configurator.h)
 
 if (NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
