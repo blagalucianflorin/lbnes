@@ -165,6 +165,7 @@ void nes::load_joypads ()
         }
         else
         {
+            (this -> joypads)[current_player - 1] -> change_controller_number (player["controller_index"].as<int>() - 1);
             (this -> joypads)[current_player - 1] -> change_type (joypad::CONTROLLER);
             (this -> joypads)[current_player - 1] -> change_player_number (current_player);
         }
