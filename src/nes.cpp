@@ -18,13 +18,6 @@ nes::nes (const std::string& rom_file) :
 
     nes_ppu = std::make_unique<ppu> (this -> game_renderer);
 
-    std::ifstream fin ("config.yaml");
-    if (fin.good ())
-    {
-        fin.close ();
-        this -> config = YAML::LoadFile ("config.yaml");
-    }
-
     for (int i = 0; i < 2; i++)
     {
         this -> joypads.push_back (std::make_unique<joypad>());
@@ -133,7 +126,7 @@ void nes::toggle_joypad (uint8_t player)
 
 void nes::load_joypads ()
 {
-    if (!config["joypads"])
+    if (!configurator::get_instance ()["joypads"])
     {
         (this -> joypads)[0] = std::make_unique<joypad> (joypad::KEYBOARD, 1);
         (this -> joypads)[1] = std::make_unique<joypad> (joypad::CONTROLLER, 2);
@@ -144,7 +137,7 @@ void nes::load_joypads ()
     }
 
     int current_player = 1;
-    auto players = config["joypads"];
+    auto players = configurator::get_instance ()["joypads"];
     for (auto player : players)
     {
         if (player["type"].as<std::string>() == "keyboard")
