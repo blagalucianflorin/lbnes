@@ -136,7 +136,7 @@ void nes::load_joypads ()
     if (!config["joypads"])
     {
         (this -> joypads)[0] = std::make_unique<joypad> (joypad::KEYBOARD, 1);
-        (this -> joypads)[1] = std::make_unique<joypad> (joypad::CONTROLLER_ONE, 2);
+        (this -> joypads)[1] = std::make_unique<joypad> (joypad::CONTROLLER, 2);
         this -> cpu_bus.add_device ((this -> joypads)[0].get ());
         this -> cpu_bus.add_device ((this -> joypads)[1].get ());
 
@@ -165,7 +165,7 @@ void nes::load_joypads ()
         }
         else
         {
-            (this -> joypads)[current_player - 1] -> change_type (joypad::CONTROLLER_ONE);
+            (this -> joypads)[current_player - 1] -> change_type (joypad::CONTROLLER);
             (this -> joypads)[current_player - 1] -> change_player_number (current_player);
         }
         current_player++;

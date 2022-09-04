@@ -12,10 +12,10 @@ joypad::joypad (INPUT_DEVICE input_device, int player) : device (0x4016, 0x4017)
     this -> player_number = player;
     this -> input_device  = input_device;
 
-    if (SDL_NumJoysticks () > 0 && (this -> input_device == CONTROLLER_ONE || this -> input_device == CONTROLLER_TWO))
+    if (SDL_NumJoysticks () > 0 && (this -> input_device == CONTROLLER))
     {
         SDL_JoystickEventState(SDL_ENABLE);
-        this -> joystick = SDL_JoystickOpen(this -> input_device == CONTROLLER_ONE ? 0 : 1);
+        this -> joystick = SDL_JoystickOpen(this -> input_device == controller_number);
     }
 }
 
@@ -37,7 +37,7 @@ void joypad::write (uint16_t address, uint8_t data, bool to_parent_bus)
         for (int i = 0; i < 8; i++)
             this -> saved_state |= (keyboard_state[this -> sdl_scancode_translations[this -> mapping[i]]] ? 1 : 0) << i;
     }
-    else if ((this -> input_device == CONTROLLER_ONE || this -> input_device == CONTROLLER_TWO) && SDL_NumJoysticks () > 0)
+    else if ((this -> input_device == CONTROLLER) && SDL_NumJoysticks () > 0)
     {
         this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_LEFT ? 1 : 0) << 1;
         this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_RIGHT ? 1 : 0) << 0;
@@ -72,4 +72,15 @@ uint8_t joypad::set_button (joypad::BUTTON button, uint8_t value)
 uint8_t joypad::get_button (joypad::BUTTON button)
 {
     return (((this -> saved_state) >> button) & 1);
+}
+
+void joypad::change_type (joypad::INPUT_DEVICE new_input_device)
+{
+    this -> input_device = new_input_device;
+
+    if (new_input_device == CONTROLLER && SDL_NumJoysticks () > 0)
+    {
+        SDL_JoystickEventState(SDL_ENABLE);
+        this -> joystick = SDL_JoystickOpen(this -> input_device == controller_number);
+    }
 }

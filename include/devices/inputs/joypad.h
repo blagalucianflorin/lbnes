@@ -24,8 +24,7 @@ public:
     enum INPUT_DEVICE
     {
         KEYBOARD,
-        CONTROLLER_ONE,
-        CONTROLLER_TWO,
+        CONTROLLER
     };
 
     enum BUTTON
@@ -48,7 +47,7 @@ private:
     int          player_number     = 1;
 
     // TODO implement
-    int          controller_number = 1;
+    int          controller_number = 0;
 
     std::vector <std::string> mapping = {"d", "a", "s", "w", "t", "r", "f", "g"};
 
@@ -78,6 +77,8 @@ public:
 
     uint8_t get_button (BUTTON button);
 
+    void    change_type (INPUT_DEVICE new_input_device);
+
     inline void reset_buttons () { this -> saved_state = 0x00; }
 
     inline void toggle_activated () { this -> activated = !(this -> activated); }
@@ -85,8 +86,6 @@ public:
     inline void set_mapping (std::vector<std::string> new_mapping) { this -> mapping = std::move(new_mapping); }
 
     inline void change_input_device (INPUT_DEVICE new_input_device) { this -> input_device = new_input_device; }
-
-    inline void change_type (INPUT_DEVICE new_input_device) { this -> input_device = new_input_device; }
 
     inline void change_player_number (int new_player_number) { this -> player_number = new_player_number; }
 };

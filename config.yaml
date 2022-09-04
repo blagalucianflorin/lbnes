@@ -1,4 +1,6 @@
 joypads:
+  - type:             controller
+    controller_index: 1
   - type: keyboard
     mapping:
       dpad-up:    w
@@ -9,5 +11,3 @@ joypads:
       start:      k
       a:          n
       b:          m
-  - type:             controller
-    controller_index: 1
