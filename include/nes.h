@@ -5,26 +5,13 @@
 #ifndef NEMULATOR_NES_H
 #define NEMULATOR_NES_H
 
-#ifdef INSPECT
-#define WINDOW_WIDTH 1600
-#define WINDOW_HEIGHT 900
-#else
-#define WINDOW_WIDTH 256
-#define WINDOW_HEIGHT 240
-#endif
-
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <chrono>
 #include <thread>
 #include <exception>
-
-#ifdef _WIN32
-#include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
+#include <memory>
 
 #include "bus/bus.h"
 #include "devices/cpu/6502.h"
@@ -35,12 +22,17 @@
 #include "devices/memories/ppu_nametable_ram.h"
 #include "devices/memories/ppu_palette_ram.h"
 
+#ifdef _WIN32
+#include <SDL.h>
+#include <windows.h>
+
+#define YAML_CPP_STATIC_DEFINE
+#else
+#include <SDL2/SDL.h>
+#endif
+
 #include "sdl_manager.h"
 #include "configurator.h"
-
-#if WIN32
-#define YAML_CPP_STATIC_DEFINE
-#endif
 #include "yaml-cpp/yaml.h"
 
 class nes

@@ -2,7 +2,7 @@ resolution:
   width: 768
   height: 720
 
-display-fps: true
+display-fps: false
 
 joypads:
   - type:   keyboard

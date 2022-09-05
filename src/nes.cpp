@@ -2,17 +2,35 @@
 // Created by lblaga on 27.05.2022.
 //
 
-#include <memory>
-
 #include "nes.h"
 
+#if _WIN32
+void cross_platform_sleep(int64_t usec)
+{
+    HANDLE timer;
+    LARGE_INTEGER ft;
+
+    ft.QuadPart = -(10*usec);
+
+    timer = CreateWaitableTimer(NULL, TRUE, NULL);
+    SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
+    WaitForSingleObject(timer, INFINITE);
+    CloseHandle(timer);
+}
+#else
+inline void cross_platform_sleep(int64_t microseconds)
+{
+    std::this_thread::sleep_for(std::chrono::microseconds (microseconds));
+}
+#endif
+
 nes::nes (const std::string& rom_file) :
-    nes_cpu (),
-    cpu_bus (0x0000, 0xFFFF),
-    ppu_bus (0x0000, 0x3FFF),
-    cpu_ram (),
-    palette_ram (),
-    nes_cartridge (rom_file)
+        nes_cpu (),
+        cpu_bus (0x0000, 0xFFFF),
+        ppu_bus (0x0000, 0x3FFF),
+        cpu_ram (),
+        palette_ram (),
+        nes_cartridge (rom_file)
 {
     main_window (this -> game_window,  this -> game_renderer);
 
@@ -57,11 +75,12 @@ void nes::reset ()
 
 void nes::main_loop ()
 {
-    double                    fps_period  = 1000000.0 / this -> target_fps;
+    auto                      fps_period  = std::chrono::microseconds ((int) (1000000 / this -> target_fps));
     double                    average_fps = 60.098814;
     bool                      quit        = false;
     auto                      frame_start = std::chrono::high_resolution_clock::now ();
-    auto                      last_time   = std::chrono::high_resolution_clock::now ();
+    double                    fps;
+    std::chrono::microseconds sleep_time;
     std::chrono::microseconds delta_time;
 
     bool display_fps = configurator::get_instance ()["display-fps"].as<bool>();
@@ -69,26 +88,25 @@ void nes::main_loop ()
     while (!quit)
     {
         frame_start = std::chrono::high_resolution_clock::now ();
+
         while (SDL_PollEvent (&this -> game_input_event) == 1)
             if (this -> game_input_event.type == SDL_QUIT)
                 quit = true;
             else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_p)
-                    ToggleFullscreen (this -> game_window);
+                ToggleFullscreen (this -> game_window);
 
-        delta_time  = std::chrono::duration_cast<std::chrono::microseconds> (frame_start - last_time);
-        if ((double) delta_time.count () >= fps_period)
-        {
-            last_time   = frame_start;
-            average_fps = (average_fps + (1000000.00 / (double) delta_time.count ())) / 2;
+        this -> render_frame ();
+        delta_time = std::chrono::duration_cast <std::chrono::microseconds> (std::chrono::high_resolution_clock::now () - frame_start);
+        sleep_time = std::chrono::duration_cast <std::chrono::microseconds> (fps_period - delta_time);
 
-            this -> render_frame ();
+        cross_platform_sleep ((sleep_time.count () / 100) * 95);
+        while (frame_start + fps_period > std::chrono::high_resolution_clock::now ()) {}
 
-            if (display_fps)
-                SDL_SetWindowTitle (this -> game_window,
-                                ("FPS: " + std::to_string (1000000.00 / (double) delta_time.count ())).c_str ());
-        }
+        fps         = 1000000000.0 / (std::chrono::high_resolution_clock::now () - frame_start).count ();
+        average_fps = (average_fps + fps) / 2;
+        if (display_fps)
+            SDL_SetWindowTitle (this -> game_window,("FPS: " + std::to_string (fps)).c_str ());
     }
-    std::cout << "Average FPS: " << average_fps << std::endl;
 }
 
 uint32_t *nes::render_frame ()
@@ -157,15 +175,15 @@ void nes::load_joypads ()
             (this -> joypads)[player["player"].as<int>() - 1] -> change_type (joypad::KEYBOARD);
             (this -> joypads)[player["player"].as<int>() - 1] -> set_mapping (player_one_mapping);
             (this -> joypads)[player["player"].as<int>() - 1] ->
-                change_player_number (player["player"].as<int>());
+                    change_player_number (player["player"].as<int>());
         }
         else
         {
             (this -> joypads)[player["player"].as<int>() - 1] ->
-                change_controller_number (player["controller_index"].as<int>() - 1);
+                    change_controller_number (player["controller_index"].as<int>() - 1);
             (this -> joypads)[player["player"].as<int>() - 1] -> change_type (joypad::CONTROLLER);
             (this -> joypads)[player["player"].as<int>() - 1] ->
-                change_player_number (player["player"].as<int>());
+                    change_player_number (player["player"].as<int>());
         }
     }
 }
