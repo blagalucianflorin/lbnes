@@ -86,6 +86,7 @@ if(WIN32)
 
     file(COPY ${SDL_LIB_DIRECTORY}/SDL2.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     add_definitions(-DSDL_MAIN_HANDLED)
+    add_definitions(-DYAML_CPP_STATIC_DEFINE)
 elseif(UNIX AND NOT APPLE)
     target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
     target_link_libraries(lbnes -lSDL2 -l${YAML-CPP_LIB})
