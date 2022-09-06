@@ -40,14 +40,14 @@ private:
     SDL_Window   *game_window     = nullptr;
     SDL_Event    game_input_event {};
 
-    std::unique_ptr <ppu> nes_ppu;
-    cpu                   nes_cpu;
-    bus                   cpu_bus;
-    bus                   ppu_bus;
+    std::shared_ptr <ppu> nes_ppu;
+    std::shared_ptr <cpu> nes_cpu;
+    std::shared_ptr <bus> cpu_bus;
+    std::shared_ptr <bus> ppu_bus;
 
-    ram             cpu_ram;
-    ppu_palette_ram palette_ram;
-    cartridge       nes_cartridge;
+    std::shared_ptr <ram>             cpu_ram;
+    std::shared_ptr <ppu_palette_ram> palette_ram;
+    std::shared_ptr <cartridge>       nes_cartridge;
 
     std::vector<std::unique_ptr<joypad>> joypads;
 
@@ -64,6 +64,8 @@ public:
     ~nes ();
 
     void        reset ();
+
+    void        reload (const std::string& rom_file);
 
     inline void toggle_fullscreen () { ToggleFullscreen (this -> game_window); }
 

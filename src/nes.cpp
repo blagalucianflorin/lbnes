@@ -24,14 +24,15 @@ inline void cross_platform_sleep(int64_t microseconds)
 }
 #endif
 
-nes::nes (const std::string& rom_file) :
-        nes_cpu (),
-        cpu_bus (0x0000, 0xFFFF),
-        ppu_bus (0x0000, 0x3FFF),
-        cpu_ram (),
-        palette_ram (),
-        nes_cartridge (rom_file)
+nes::nes (const std::string& rom_file)
 {
+    nes_cpu = std::make_shared<cpu> ();
+    cpu_bus = std::make_shared<bus> (0x0000, 0xFFFF);
+    ppu_bus = std::make_shared<bus> (0x0000, 0x3FFF);
+    cpu_ram = std::make_shared<ram> ();
+    palette_ram = std::make_shared <ppu_palette_ram> ();
+    nes_cartridge = std::make_shared <cartridge> (rom_file);
+
     main_window (this -> game_window,  this -> game_renderer);
 
     nes_ppu = std::make_unique<ppu> (this -> game_renderer);
@@ -41,14 +42,14 @@ nes::nes (const std::string& rom_file) :
     for (int i = 0; i < 2; i++)
     {
         this -> joypads.push_back (std::make_unique<joypad>());
-        this -> cpu_bus.add_device (this -> joypads[i].get ());
+        this -> cpu_bus -> add_device (this -> joypads[i].get ());
     }
 
-    this -> nes_ppu -> attach (&(this -> nes_cpu));
-    this -> nes_ppu -> attach (&(this -> nes_cartridge));
-    this -> nes_ppu -> set_child_bus (this -> ppu_bus);
-    this -> ppu_bus.add_devices ({&(this -> palette_ram)});
-    this -> cpu_bus.add_devices ({&(this -> nes_cpu), &(this -> cpu_ram), &(this -> nes_cartridge),
+    this -> nes_ppu -> attach (this -> nes_cpu.get ());
+    this -> nes_ppu -> attach (this -> nes_cartridge.get ());
+    this -> nes_ppu -> set_child_bus (*(this -> ppu_bus));
+    this -> ppu_bus -> add_devices ({this -> palette_ram.get ()});
+    this -> cpu_bus -> add_devices ({this -> nes_cpu.get (), this -> cpu_ram.get (), this -> nes_cartridge.get (),
                                   (this -> nes_ppu).get ()});
 
     this -> load_joypads ();
@@ -70,8 +71,8 @@ void nes::start ()
 
 void nes::reset ()
 {
-    this -> nes_cpu.reset ();
-    this -> nes_cartridge.reset ();
+    this -> nes_cpu -> reset ();
+    this -> nes_cartridge -> reset ();
     this -> nes_ppu -> reset ();
 }
 
@@ -96,6 +97,8 @@ void nes::main_loop ()
                 quit = true;
             else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_p)
                 ToggleFullscreen (this -> game_window);
+            else if (this -> game_input_event.type == SDL_DROPFILE)
+                reload (game_input_event.drop.file);
 
         this -> render_frame ();
         delta_time = std::chrono::duration_cast <std::chrono::microseconds> (std::chrono::high_resolution_clock::now () - frame_start);
@@ -117,7 +120,7 @@ uint32_t *nes::render_frame ()
     {
         this -> nes_ppu -> clock ();
         if (this -> total_cycles % 3 == 0)
-            (this -> nes_cpu).clock ();
+            (this -> nes_cpu) -> clock ();
 
         (this -> total_cycles)++;
     }
@@ -153,8 +156,8 @@ void nes::load_joypads ()
     {
         (this -> joypads)[0] = std::make_unique<joypad> (joypad::KEYBOARD, 1);
         (this -> joypads)[1] = std::make_unique<joypad> (joypad::CONTROLLER, 2);
-        this -> cpu_bus.add_device ((this -> joypads)[0].get ());
-        this -> cpu_bus.add_device ((this -> joypads)[1].get ());
+        this -> cpu_bus -> add_device ((this -> joypads)[0].get ());
+        this -> cpu_bus -> add_device ((this -> joypads)[1].get ());
 
         return;
     }
@@ -199,8 +202,6 @@ int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
 
     if (event -> type == SDL_JOYDEVICEADDED)
     {
-        std::cout << "Joystick connected" << std::endl;
-
         if ((*joypads)[0] -> get_input_device () == joypad::KEYBOARD)
         {
             (*joypads)[0] -> change_player_number (2);
@@ -214,8 +215,6 @@ int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
 
     if (event -> type == SDL_JOYDEVICEREMOVED)
     {
-        std::cout << "Controller disconnected" << std::endl;
-
         (*joypads)[0] -> change_player_number (1);
         joypad::INPUT_DEVICE input_device = configurator::get_instance ()["joypads"][1]["type"].as<std::string>() ==
                 "keyboard" ? joypad::KEYBOARD : joypad::CONTROLLER;
@@ -226,4 +225,27 @@ int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
     }
 
     return (1);
+}
+
+void nes::reload (const std::string &rom_file)
+{
+    nes_cpu = std::make_shared<cpu> ();
+    cpu_bus = std::make_shared<bus> (0x0000, 0xFFFF);
+    ppu_bus = std::make_shared<bus> (0x0000, 0x3FFF);
+    cpu_ram = std::make_shared<ram> ();
+    palette_ram = std::make_shared <ppu_palette_ram> ();
+    nes_cartridge = std::make_shared <cartridge> (rom_file);
+    nes_ppu = std::make_unique<ppu> (this -> game_renderer);
+
+    for (int i = 0; i < 2; i++)
+        this -> cpu_bus -> add_device (this -> joypads[i].get ());
+
+    this -> nes_ppu -> attach (this -> nes_cpu.get ());
+    this -> nes_ppu -> attach (this -> nes_cartridge.get ());
+    this -> nes_ppu -> set_child_bus (*(this -> ppu_bus));
+    this -> ppu_bus -> add_devices ({this -> palette_ram.get ()});
+    this -> cpu_bus -> add_devices ({this -> nes_cpu.get (), this -> cpu_ram.get (), this -> nes_cartridge.get (),
+                                     (this -> nes_ppu).get ()});
+
+    this -> reset ();
 }
