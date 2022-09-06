@@ -4,12 +4,18 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/yaml-cpp)
 
-if(NOT DEFINED CMAKE_C_COMPILER)
-    message(ERROR "CMAKE_C_COMPILER is not set, defaulting to gcc")
+if (NOT CMAKE_BUILD_TYPE)
+    message(STATUS "CMAKE_BUILD_TYPE is not set, defaulting to Release")
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+if(NOT CMAKE_C_COMPILER)
+    message(STATUS "CMAKE_C_COMPILER is not set, defaulting to gcc")
     set(CMAKE_C_COMPILER gcc)
 endif()
-if(NOT DEFINED CMAKE_CXX_COMPILER)
-    message(ERROR "CMAKE_CXX_COMPILER is not set, defaulting to g++")
+
+if(NOT CMAKE_CXX_COMPILER)
+    message(STATUS "CMAKE_CXX_COMPILER is not set, defaulting to g++")
     set(CMAKE_CXX_COMPILER g++)
 endif()
 
@@ -69,7 +75,7 @@ endif()
 
 if(WIN32)
     if(NOT DEFINED ENV{SDL_PATH})
-        message(ERROR "Environment variable SDL_PATH is not set, defaulting to C:/SDL2/")
+        message(STATUS "Environment variable SDL_PATH is not set, defaulting to C:/SDL2/")
         set($ENV{SDL_PATH} "C:/SDL2/")
     endif()
 
