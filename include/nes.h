@@ -25,8 +25,6 @@
 #ifdef _WIN32
 #include <SDL.h>
 #include <windows.h>
-
-#define YAML_CPP_STATIC_DEFINE
 #else
 #include <SDL2/SDL.h>
 #endif
@@ -80,6 +78,8 @@ public:
     void        toggle_joypad (uint8_t player = 1);
 
     void        reset_buttons (uint8_t player = 1);
+
+    static int SDLCALL controller_connection_event_manager (void *userdata, SDL_Event * event);
 };
 
 #endif //NEMULATOR_NES_H

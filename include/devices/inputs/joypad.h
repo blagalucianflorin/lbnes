@@ -93,6 +93,8 @@ public:
 
     inline void change_input_device (INPUT_DEVICE new_input_device) { this -> input_device = new_input_device; }
 
+    inline INPUT_DEVICE get_input_device () { return (this -> input_device); }
+
     inline void change_player_number (int new_player_number) { this -> player_number = new_player_number; }
 
     inline void change_controller_number (int new_controller_number) { this -> controller_number = new_controller_number; }

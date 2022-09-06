@@ -36,6 +36,8 @@ nes::nes (const std::string& rom_file) :
 
     nes_ppu = std::make_unique<ppu> (this -> game_renderer);
 
+    SDL_SetEventFilter (nes::controller_connection_event_manager, &(this -> joypads));
+
     for (int i = 0; i < 2; i++)
     {
         this -> joypads.push_back (std::make_unique<joypad>());
@@ -165,8 +167,8 @@ void nes::load_joypads ()
             std::vector<std::string> player_one_mapping;
             player_one_mapping.push_back (player["mapping"]["dpad-right"].as<std::string>());
             player_one_mapping.push_back (player["mapping"]["dpad-left"].as<std::string>());
-            player_one_mapping.push_back (player["mapping"]["dpad-up"].as<std::string>());
             player_one_mapping.push_back (player["mapping"]["dpad-down"].as<std::string>());
+            player_one_mapping.push_back (player["mapping"]["dpad-up"].as<std::string>());
             player_one_mapping.push_back (player["mapping"]["start"].as<std::string>());
             player_one_mapping.push_back (player["mapping"]["select"].as<std::string>());
             player_one_mapping.push_back (player["mapping"]["a"].as<std::string>());
@@ -186,4 +188,42 @@ void nes::load_joypads ()
                     change_player_number (player["player"].as<int>());
         }
     }
+}
+
+int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
+{
+    if (!configurator::get_instance ()["new_controller_replaces_player_one"].as<bool>())
+        return (1);
+
+    auto joypads = (std::vector<std::unique_ptr<joypad>>*) user_data;
+
+    if (event -> type == SDL_JOYDEVICEADDED)
+    {
+        std::cout << "Joystick connected" << std::endl;
+
+        if ((*joypads)[0] -> get_input_device () == joypad::KEYBOARD)
+        {
+            (*joypads)[0] -> change_player_number (2);
+            (*joypads)[1] -> change_controller_number (SDL_NumJoysticks() - 1);
+            (*joypads)[1] -> change_type (joypad::CONTROLLER);
+            (*joypads)[1] -> change_player_number (1);
+        }
+
+        return (1);
+    }
+
+    if (event -> type == SDL_JOYDEVICEREMOVED)
+    {
+        std::cout << "Controller disconnected" << std::endl;
+
+        (*joypads)[0] -> change_player_number (1);
+        joypad::INPUT_DEVICE input_device = configurator::get_instance ()["joypads"][1]["type"].as<std::string>() ==
+                "keyboard" ? joypad::KEYBOARD : joypad::CONTROLLER;
+        (*joypads)[1] -> change_type (input_device);
+        (*joypads)[1] -> change_player_number (2);
+
+        return (1);
+    }
+
+    return (1);
 }

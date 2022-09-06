@@ -20,3 +20,5 @@ joypads:
   - type:             controller
     player:           2
     controller_index: 1
+
+new_controller_replaces_player_one: true
