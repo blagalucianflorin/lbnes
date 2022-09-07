@@ -2,6 +2,7 @@
 // Created by lblaga on 27.05.2022.
 //
 
+#include <iomanip>
 #include "nes.h"
 
 #if _WIN32
@@ -88,6 +89,10 @@ void nes::main_loop ()
 
     bool display_fps = configurator::get_instance ()["display-fps"].as<bool>();
 
+    if (configurator::get_instance ()["speed"])
+        fps_period = std::chrono::microseconds ((int) ((float) fps_period.count () *
+                                                (100.0 / configurator::get_instance ()["speed"].as<int>())));
+
     while (!quit)
     {
         frame_start = std::chrono::high_resolution_clock::now ();
@@ -107,10 +112,14 @@ void nes::main_loop ()
         cross_platform_sleep ((sleep_time.count () / 100) * 95);
         while (frame_start + fps_period > std::chrono::high_resolution_clock::now ()) {}
 
-        fps         = 1000000000.0 / (std::chrono::high_resolution_clock::now () - frame_start).count ();
+        fps         = 1000000000.0 / (double) (std::chrono::high_resolution_clock::now () - frame_start).count ();
         average_fps = (average_fps + fps) / 2;
+
+        std::stringstream sstream;
+        sstream << std::fixed << std::setprecision(2) << fps;
+
         if (display_fps)
-            SDL_SetWindowTitle (this -> game_window,("FPS: " + std::to_string (fps)).c_str ());
+            SDL_SetWindowTitle (this -> game_window,((std::string("lbnes - FPS: ") + sstream.str ()).c_str ()));
     }
 }
 

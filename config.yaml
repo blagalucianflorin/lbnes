@@ -2,7 +2,7 @@ resolution:
   width: 768
   height: 720
 
-display-fps: false
+display-fps: true
 
 joypads:
   - type:   keyboard
@@ -22,3 +22,5 @@ joypads:
     controller_index: 1
 
 new_controller_replaces_player_one: true
+
+speed: 100 #%
