@@ -53,6 +53,7 @@ private:
 
     long long total_cycles = 0;
     double    target_fps   = 60.098814;
+    bool      rom_loaded   = false;
 
     void main_loop ();
 
@@ -65,7 +66,7 @@ public:
 
     void        reset ();
 
-    void        reload (const std::string& rom_file);
+    void        reload (const std::string& rom_file, bool initialize_controllers = false);
 
     inline void toggle_fullscreen () { ToggleFullscreen (this -> game_window); }
 

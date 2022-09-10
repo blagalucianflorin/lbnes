@@ -27,35 +27,11 @@ inline void cross_platform_sleep(int64_t microseconds)
 
 nes::nes (const std::string& rom_file)
 {
-    nes_cpu = std::make_shared<cpu> ();
-    cpu_bus = std::make_shared<bus> (0x0000, 0xFFFF);
-    ppu_bus = std::make_shared<bus> (0x0000, 0x3FFF);
-    cpu_ram = std::make_shared<ram> ();
-    palette_ram = std::make_shared <ppu_palette_ram> ();
-    nes_cartridge = std::make_shared <cartridge> (rom_file);
-
     main_window (this -> game_window,  this -> game_renderer);
-
-    nes_ppu = std::make_unique<ppu> (this -> game_renderer);
-
     SDL_SetEventFilter (nes::controller_connection_event_manager, &(this -> joypads));
 
-    for (int i = 0; i < 2; i++)
-    {
-        this -> joypads.push_back (std::make_unique<joypad>());
-        this -> cpu_bus -> add_device (this -> joypads[i].get ());
-    }
-
-    this -> nes_ppu -> attach (this -> nes_cpu.get ());
-    this -> nes_ppu -> attach (this -> nes_cartridge.get ());
-    this -> nes_ppu -> set_child_bus (*(this -> ppu_bus));
-    this -> ppu_bus -> add_devices ({this -> palette_ram.get ()});
-    this -> cpu_bus -> add_devices ({this -> nes_cpu.get (), this -> cpu_ram.get (), this -> nes_cartridge.get (),
-                                  (this -> nes_ppu).get ()});
-
-    this -> load_joypads ();
-
-    this -> reset ();
+    if (!rom_file.empty())
+        this -> reload (rom_file, true);
 }
 
 nes::~nes ()
@@ -93,6 +69,18 @@ void nes::main_loop ()
         fps_period = std::chrono::microseconds ((int) ((float) fps_period.count () *
                                                 (100.0 / configurator::get_instance ()["speed"].as<int>())));
 
+    while (!quit && !this -> rom_loaded)
+    {
+        while (SDL_PollEvent (&this -> game_input_event) == 1)
+            if (this -> game_input_event.type == SDL_QUIT)
+                quit = true;
+            else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_p)
+                ToggleFullscreen (this -> game_window);
+            else if (this -> game_input_event.type == SDL_DROPFILE)
+                reload (game_input_event.drop.file, true);
+    }
+
+    quit = false;
     while (!quit)
     {
         frame_start = std::chrono::high_resolution_clock::now ();
@@ -103,7 +91,7 @@ void nes::main_loop ()
             else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_p)
                 ToggleFullscreen (this -> game_window);
             else if (this -> game_input_event.type == SDL_DROPFILE)
-                reload (game_input_event.drop.file);
+                reload (game_input_event.drop.file, false);
 
         this -> render_frame ();
         delta_time = std::chrono::duration_cast <std::chrono::microseconds> (std::chrono::high_resolution_clock::now () - frame_start);
@@ -236,7 +224,7 @@ int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
     return (1);
 }
 
-void nes::reload (const std::string &rom_file)
+void nes::reload (const std::string &rom_file, bool initialize_controllers)
 {
     nes_cpu = std::make_shared<cpu> ();
     cpu_bus = std::make_shared<bus> (0x0000, 0xFFFF);
@@ -246,8 +234,16 @@ void nes::reload (const std::string &rom_file)
     nes_cartridge = std::make_shared <cartridge> (rom_file);
     nes_ppu = std::make_unique<ppu> (this -> game_renderer);
 
+    if (initialize_controllers)
+        this -> joypads.clear ();
     for (int i = 0; i < 2; i++)
+    {
+        if (initialize_controllers)
+            this -> joypads.push_back (std::make_unique<joypad>());
         this -> cpu_bus -> add_device (this -> joypads[i].get ());
+    }
+    if (initialize_controllers)
+        this -> load_joypads ();
 
     this -> nes_ppu -> attach (this -> nes_cpu.get ());
     this -> nes_ppu -> attach (this -> nes_cartridge.get ());
@@ -255,6 +251,8 @@ void nes::reload (const std::string &rom_file)
     this -> ppu_bus -> add_devices ({this -> palette_ram.get ()});
     this -> cpu_bus -> add_devices ({this -> nes_cpu.get (), this -> cpu_ram.get (), this -> nes_cartridge.get (),
                                      (this -> nes_ppu).get ()});
+
+    this -> rom_loaded = true;
 
     this -> reset ();
 }
