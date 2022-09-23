@@ -18,11 +18,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Git Sumbodule Update
+          
+    - name: Pull & update submodules recursively
       run: |
-        git pull --recurse-submodules
-        git submodule update --remote --recursive
+        git submodule update --init --recursive
+        git submodule update --recursive --remote
     
     - name: APT update
       run: sudo apt update -y && sudo apt upgrade -y
