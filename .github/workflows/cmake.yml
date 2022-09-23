@@ -19,6 +19,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: APT update
+      run: sudo apt update -y && sudo apt upgrade -y
+    
     - name: Dependencies
       # CMake g++ and SDL2
       run: sudo apt install cmake g++ libsdl2-dev
