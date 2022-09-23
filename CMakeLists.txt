@@ -93,6 +93,8 @@ if(WIN32)
     file(COPY ${SDL_LIB_DIRECTORY}/SDL2.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     add_definitions(-DSDL_MAIN_HANDLED)
     add_definitions(-DYAML_CPP_STATIC_DEFINE)
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-subsystem,windows")
 elseif(UNIX AND NOT APPLE)
     target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
     target_link_libraries(lbnes -lSDL2 -l${YAML-CPP_LIB})
@@ -105,5 +107,5 @@ endif()
 
 configure_file(${PROJECT_SOURCE_DIR}/config.yaml ${CMAKE_CURRENT_BINARY_DIR}/config.yaml)
 
-SET (CXX_WARNINGS_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
-SET (CMAKE_CXX_FLAGS  "${GCC_WARNINGS_COMPILE_FLAGS}")
+set(CXX_WARNINGS_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS_COMPILE_FLAGS}")
