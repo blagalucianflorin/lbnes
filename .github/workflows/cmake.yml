@@ -3,14 +3,14 @@ name: CI
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - '(nightly|stable|release)-v[0-9]+.[0-9]+(.[0-9]+)*'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
 jobs:
-  build:
+  build-ubuntu:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -50,6 +50,80 @@ jobs:
         mkdir lbnes-releasedir
         cp lbnes config.yaml lbnes-releasedir
         tar -cavf ubuntu-${{ env.RELEASE_VERSION }}.tar.gz lbnes-releasedir
+        
+    - name: Upload assets
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "${{github.workspace}}/build/ubuntu-${{ env.RELEASE_VERSION }}.tar.gz"
+        tags: true
+        draft: true
+
+
+  build-windows:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+              
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        
+    - name: Pull & update submodules recursively
+      run: |
+        git submodule update --init --recursive
+        git submodule update --recursive --remote
+    
+#     - name: APT update
+#       run: sudo apt update -y && sudo apt upgrade -y
+    - name: Download SDL2_image
+      # You may pin to the exact commit or the version.
+      # uses: albin-johansson/download-sdl2-image@4351247ed4fa2a10344d76071bd2567e2ca56c98
+      uses: albin-johansson/download-sdl2-image@v2
+      with:
+        # The version of SDL2_image that will be downloaded
+#         version: # optional, default is 2.0.5
+        # Where the SDL2_image sources will be saved
+        sources_destination: "C:/SDL2/"
+        # Where the SDL2_image runtime binaries will be saved
+#         binaries_destination: 
+    
+    - name: Install MinGW
+      # You may pin to the exact commit or the version.
+      # uses: egor-tensin/setup-mingw@f3c5d799aadf8fa230ac67a422b01dd085bbc96b
+      uses: egor-tensin/setup-mingw@v2
+      with:
+        # Target platform
+        platform: x32
+        # Install Cygwin packages
+#         cygwin: # optional, default is 0
+        # Enable static linking workaround
+        static: 1
+        # Set up cc/c++ executables
+        cc: 1
+        # On Cygwin, replace executable symlinks with hardlinks
+#         hardlinks: # optional, default is 0
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Tar and strip the binary
+      run: |
+        ls
+        cd ${{github.workspace}}/build
+        mkdir lbnes-releasedir
+        cp lbnes.exe config.yaml SDL2.dll lbnes-releasedir
+        tar -cavf windows-x86-${{ env.RELEASE_VERSION }}.zip lbnes-releasedir
         
     - name: Upload assets
       uses: xresloader/upload-to-github-release@v1
