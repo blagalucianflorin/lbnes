@@ -107,14 +107,15 @@ jobs:
       
     - name: Tar and strip the binary
       run: |
-        ls
+        dir
         cd ${{github.workspace}}/bin
-        ls
+        dir
         mkdir lbnes-releasedir
         copy lbnes.exe lbnes-releasedir
         copy config.yaml lbnes-releasedir
         copy SDL2.dll lbnes-releasedir
         tar -caf windows-x86-${{github.ref_name}}.zip lbnes-releasedir
+        dir
         
     - name: Upload assets
       uses: xresloader/upload-to-github-release@v1
