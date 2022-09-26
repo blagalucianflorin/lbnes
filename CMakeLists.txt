@@ -76,7 +76,7 @@ endif()
 if(WIN32)
     if(NOT DEFINED ENV{SDL_PATH})
         message(STATUS "Environment variable SDL_PATH is not set, defaulting to C:/SDL2/")
-        set($ENV{SDL_PATH} "C:/SDL2/")
+        set(ENV{SDL_PATH} "C:/SDL2/")
     endif()
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
