@@ -37,7 +37,7 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       
-    - name: Tar and strip the binary
+    - name: Create build archive
       run: |
         ls
         cd ${{github.workspace}}/build
@@ -47,7 +47,7 @@ jobs:
         cd lbnes-releasedir
         tar -cavf lbnes-ubuntu-${{ env.RELEASE_VERSION }}.tar.gz lbnes
         
-    - name: Upload binaries to release
+    - name: Upload build archive to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
         ren SDL2-2.24.0 SDL2
         set SDL_PATH=C:\\SDL2
     
-    - name: Install MinGW
+    - name: Setup MinGW
       uses: egor-tensin/setup-mingw@v2
       with:
         platform: x32
@@ -96,7 +96,7 @@ jobs:
         cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         mingw32-make
       
-    - name: Tar and strip the binary
+    - name: Create build archive
       run: |
         dir
         cd ${{github.workspace}}/bin
@@ -111,7 +111,7 @@ jobs:
         tar -caf lbnes-windows-x86-${{github.ref_name}}.zip lbnes
         dir
         
-    - name: Upload binaries to release
+    - name: Upload build archive to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
