@@ -117,9 +117,10 @@ jobs:
         tar -caf windows-x86-${{github.ref_name}}.zip lbnes-releasedir
         dir
         
-    - name: Upload to release
-      uses: JasonEtco/upload-to-release@master
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
       with:
-        args: ${{github.workspace}}/bin/windows-x86-${{github.ref_name}}.zip application/zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{github.workspace}}/bin/windows-x86-${{github.ref_name}}.zip
+        asset_name: windows-x86-${{github.ref_name}}.zip
+        overwrite: true
