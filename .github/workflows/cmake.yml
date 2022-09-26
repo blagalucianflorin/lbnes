@@ -81,17 +81,17 @@ jobs:
     
 #     - name: APT update
 #       run: sudo apt update -y && sudo apt upgrade -y
-    - name: Download SDL2_image
+    - name: Download SDL2
       # You may pin to the exact commit or the version.
-      # uses: albin-johansson/download-sdl2-image@4351247ed4fa2a10344d76071bd2567e2ca56c98
-      uses: albin-johansson/download-sdl2-image@v2
+      # uses: albin-johansson/download-sdl2@d4e9339339b31b200ada5c7530d5eadad01576c2
+      uses: albin-johansson/download-sdl2@v2
       with:
-        # The version of SDL2_image that will be downloaded
-#         version: # optional, default is 2.0.5
-        # Where the SDL2_image sources will be saved
-        sources_destination: "C:/SDL2/"
-        # Where the SDL2_image runtime binaries will be saved
-#         binaries_destination: 
+        # The version of SDL2 that will be downloaded
+#         version: # optional, default is 2.0.16
+        # Where the SDL2 sources will be saved
+        sources_destination: "C:/SDL2"
+        # Where the SDL2 runtime binaries will be saved
+        binaries_destination: "C:/SDL2"
     
     - name: Install MinGW
       # You may pin to the exact commit or the version.
