@@ -114,8 +114,8 @@ jobs:
         copy lbnes.exe lbnes-releasedir
         copy config.yaml lbnes-releasedir
         copy SDL2.dll lbnes-releasedir
-        copy C:\\MinGW\\bin\\libstdc++-6.dll lbnes-releasedir
-        copy C:\\MinGW\\bin\\libgcc_s_dw2-1.dll lbnes-releasedir
+        copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\bin\\libstdc++-6.dll lbnes-releasedir
+        copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\bin\\libgcc_s_dw2-1.dll lbnes-releasedir
         tar -caf windows-x86-${{github.ref_name}}.zip lbnes-releasedir
         dir
         
