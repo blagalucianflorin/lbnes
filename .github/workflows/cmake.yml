@@ -125,3 +125,14 @@ jobs:
         file: "${{github.workspace}}/bin/windows-x86-${{github.ref_name}}.zip"
         tags: true
         draft: true
+        
+    - name: Upload to Release Action
+      # You may pin to the exact commit or the version.
+      # uses: Shopify/upload-to-release@9942a4c936dab172f7101dcc7dc20528ea949102
+      uses: Shopify/upload-to-release@v1.0.1
+      with:
+        # Artifact name
+        name: windows-x86-${{github.ref_name}}.zip
+        path: "${{github.workspace}}/bin/windows-x86-${{github.ref_name}}.zip"
+        content-type: "application/zip"
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
