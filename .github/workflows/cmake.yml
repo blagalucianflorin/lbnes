@@ -96,6 +96,7 @@ jobs:
 
     - name : Build
       run: |
+        set SDL_PATH=C:\\SDL2
         cd ${{github.workspace}}
         mkdir bin && cd bin
         cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
