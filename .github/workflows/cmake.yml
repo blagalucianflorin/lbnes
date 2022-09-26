@@ -108,7 +108,9 @@ jobs:
         cd ${{github.workspace}}/bin
         ls
         mkdir lbnes-releasedir
-        for %I in (lbnes.exe config.yaml SDL2.dll) do copy %I lbnes-releasedir
+        copy lbnes.exe lbnes-releasedir
+        copy config.yaml lbnes-releasedir
+        copy SDL2.dll lbnes-releasedir
         tar -caf windows-x86-${{env.RELEASE_VERSION}}.zip lbnes-releasedir
         
     - name: Upload assets
