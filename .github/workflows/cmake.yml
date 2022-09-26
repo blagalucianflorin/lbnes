@@ -78,23 +78,13 @@ jobs:
       run: |
         git submodule update --init --recursive
         git submodule update --recursive --remote
-    
-    - name: Download & Extract SDL2
-      # You may pin to the exact commit or the version.
-      # uses: gamedev-thingy/Download-Extract@20063b5f6b2b847425c9e3ff02830b19bcb66d70
-      uses: gamedev-thingy/Download-Extract@done
-      with:
-        # The URL to download from
-        url: "https://www.libsdl.org/release/SDL2-devel-2.24.0-mingw.zip"
-        # Where the files will be extracted to
-        destination: "C:"
-        # Name of the downloaded ZIP file
-        ZIPname: "SDL2-devel-2.24.0-mingw"
         
     - name: Setup SDL2
       run: |
         C:
         cd ../../../../../../../..
+        curl --url https://www.libsdl.org/release/SDL2-devel-2.24.0-mingw.zip --output SDL2.zip
+        tar -xf SDL2.zip
         ren SDL2-2.24.0 SDL2
     
     - name: Install MinGW
