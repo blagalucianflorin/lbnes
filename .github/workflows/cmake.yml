@@ -53,15 +53,14 @@ jobs:
         cp lbnes config.yaml lbnes-releasedir
         tar -cavf ubuntu-${{ env.RELEASE_VERSION }}.tar.gz lbnes-releasedir
         
-    - name: Upload assets
-      uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
       with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: "${{github.workspace}}/build/ubuntu-${{ env.RELEASE_VERSION }}.tar.gz"
-        tags: true
-        draft: true
-
+        asset_name: ubuntu-${{ env.RELEASE_VERSION }}.tar.gz
+        overwrite: true
+        
 
   build-windows:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
