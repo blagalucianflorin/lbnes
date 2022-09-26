@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-#       - '(nightly|stable|release)-v[0-9]+.[0-9]+(.[0-9]+)*'
+#       - 'v[0-9]+.[0-9]+.[0-9]+'
+      - '(nightly|stable|release)-v[0-9]+.[0-9]+(.[0-9]+)*'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -97,13 +97,6 @@ jobs:
         platform: x32
         static: 1
         cc: 1
-        
-    - name: MinGW explore
-      run: |
-        dir C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin
-        dir C:\ProgramData\chocolatey\lib\mingw\tools\install\
-        dir C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\
-        dir C:\ProgramData\chocolatey\lib\mingw\tools\install\bin
 
     - name : Build
       run: |
