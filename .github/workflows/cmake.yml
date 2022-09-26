@@ -71,8 +71,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
               
-    - name: Set env
-      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    - name: Create tag artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{github.ref_name}}
+        path: Release
         
     - name: Pull & update submodules recursively
       run: |
@@ -111,13 +114,13 @@ jobs:
         copy lbnes.exe lbnes-releasedir
         copy config.yaml lbnes-releasedir
         copy SDL2.dll lbnes-releasedir
-        tar -caf windows-x86-${{env.RELEASE_VERSION}}.zip lbnes-releasedir
+        tar -caf windows-x86-${{github.ref_name}}.zip lbnes-releasedir
         
     - name: Upload assets
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "${{github.workspace}}/bin/windows-x86-${{env.RELEASE_VERSION}}.zip"
+        file: "${{github.workspace}}/bin/windows-x86-${{github.ref_name}}.zip"
         tags: true
         draft: true
