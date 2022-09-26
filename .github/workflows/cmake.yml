@@ -85,8 +85,8 @@ jobs:
     - name: Setup SDL2
       run: |
         curl --url https://github.com/libsdl-org/SDL/releases/download/release-2.24.0/SDL2-devel-2.24.0-mingw.zip --output C:\\temp\\SDL2.zip
-        tar -xf C:\\temp\\SDL2.zip -C C:\\
-        ren SDL2-2.24.0 SDL2
+        tar -xf C:\\temp\\SDL2.zip -C C:\\SDL2-2.24.0
+        ren C:\\SDL2-2.24.0 C:\\SDL2
     
     - name: Install MinGW
       uses: egor-tensin/setup-mingw@v2
@@ -95,28 +95,35 @@ jobs:
         static: 1
         cc: 1
 
-    - name: Configure CMake
+    - name : Build
+      run: |
+        cd ${{github.workspace}}
+        mkdir bin && cd bin
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        mingw32-make
+
+#     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+#       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Build
+#     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+#       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -G "MinGW Makefiles"
       
     - name: Tar and strip the binary
       run: |
         ls
-        cd ${{github.workspace}}/build
+        cd ${{github.workspace}}/bin
         mkdir lbnes-releasedir
         cp lbnes.exe config.yaml SDL2.dll lbnes-releasedir
-        tar -caf windows-x86-${{ env.RELEASE_VERSION }}.zip lbnes-releasedir
+        tar -caf windows-x86-${{env.RELEASE_VERSION}}.zip lbnes-releasedir
         
     - name: Upload assets
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "${{github.workspace}}/build/windows-x86-${{ env.RELEASE_VERSION }}.zip"
+        file: "${{github.workspace}}/bin/windows-x86-${{env.RELEASE_VERSION}}.zip"
         tags: true
         draft: true
