@@ -78,7 +78,7 @@ jobs:
       run: |
         git submodule update --init --recursive
         git submodule update --recursive --remote
-        
+    
     - name: Download & Extract SDL2
       # You may pin to the exact commit or the version.
       # uses: gamedev-thingy/Download-Extract@20063b5f6b2b847425c9e3ff02830b19bcb66d70
@@ -89,7 +89,7 @@ jobs:
         # Where the files will be extracted to
         destination: "C:\\"
         # Name of the downloaded ZIP file
-        ZIPname: "SDL2-devel-2.24.0-mingw.zip"
+        ZIPname: "SDL2-devel-2.24.0-mingw"
         
     - name: Setup SDL2
       run: |
