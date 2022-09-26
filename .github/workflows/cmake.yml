@@ -84,11 +84,9 @@ jobs:
 
     - name: Setup SDL2
       run: |
-        mkdir C:\\temp
         curl --url https://github.com/libsdl-org/SDL/releases/download/release-2.24.0/SDL2-devel-2.24.0-mingw.zip --output C:\\temp\\SDL2.zip
         tar -xf C:\\temp\\SDL2.zip -C C:\\
         ren SDL2-2.24.0 SDL2
-        rmdir C:\\temp
     
     - name: Install MinGW
       uses: egor-tensin/setup-mingw@v2
