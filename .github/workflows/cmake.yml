@@ -117,15 +117,6 @@ jobs:
         tar -caf windows-x86-${{github.ref_name}}.zip lbnes-releasedir
         dir
         
-    - name: Upload assets
-      uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "${{github.workspace}}/bin/windows-x86-${{github.ref_name}}.zip"
-        tags: true
-        draft: true
-        
     - name: Upload to Release Action
       # You may pin to the exact commit or the version.
       # uses: Shopify/upload-to-release@9942a4c936dab172f7101dcc7dc20528ea949102
