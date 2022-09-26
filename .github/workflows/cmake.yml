@@ -86,6 +86,7 @@ jobs:
         curl --url https://www.libsdl.org/release/SDL2-devel-2.24.0-VC.zip --output SDL2.zip
         tar -xf SDL2.zip
         ren SDL2-2.24.0 SDL2
+        set SDL_PATH=C:\\SDL2
     
     - name: Install MinGW
       uses: egor-tensin/setup-mingw@v2
@@ -96,7 +97,6 @@ jobs:
 
     - name : Build
       run: |
-        set SDL_PATH=C:\\SDL2
         cd ${{github.workspace}}
         mkdir bin && cd bin
         cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
@@ -106,8 +106,9 @@ jobs:
       run: |
         ls
         cd ${{github.workspace}}/bin
+        ls
         mkdir lbnes-releasedir
-        cp lbnes.exe config.yaml SDL2.dll lbnes-releasedir
+        copy lbnes.exe config.yaml SDL2.dll lbnes-releasedir
         tar -caf windows-x86-${{env.RELEASE_VERSION}}.zip lbnes-releasedir
         
     - name: Upload assets
