@@ -116,6 +116,7 @@ jobs:
         copy SDL2.dll lbnes-releasedir
         copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin\\libstdc++-6.dll lbnes-releasedir
         copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin\\libgcc_s_dw2-1.dll lbnes-releasedir
+        copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin\\libwinpthread-1.dll lbnes-releasedir
         tar -caf windows-x86-${{github.ref_name}}.zip lbnes-releasedir
         dir
         
