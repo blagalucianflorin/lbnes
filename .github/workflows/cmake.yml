@@ -85,14 +85,16 @@ jobs:
       uses: gamedev-thingy/Download-Extract@done
       with:
         # The URL to download from
-        url: "https://github.com/libsdl-org/SDL/releases/download/release-2.24.0/SDL2-devel-2.24.0-mingw.zip"
+        url: "https://www.libsdl.org/release/SDL2-devel-2.24.0-mingw.zip"
         # Where the files will be extracted to
-        destination: "C:\\"
+        destination: "C:"
         # Name of the downloaded ZIP file
         ZIPname: "SDL2-devel-2.24.0-mingw"
         
     - name: Setup SDL2
       run: |
+        C:
+        cd ../../../../../../../..
         ren SDL2-2.24.0 SDL2
     
     - name: Install MinGW
