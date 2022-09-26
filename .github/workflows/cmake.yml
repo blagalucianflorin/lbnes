@@ -83,7 +83,7 @@ jobs:
       run: |
         C:
         cd ../../../../../../../..
-        curl --url https://www.libsdl.org/release/SDL2-devel-2.24.0-mingw.zip --output SDL2.zip
+        curl --url https://www.libsdl.org/release/SDL2-devel-2.24.0-VC.zip --output SDL2.zip
         tar -xf SDL2.zip
         ren SDL2-2.24.0 SDL2
     
