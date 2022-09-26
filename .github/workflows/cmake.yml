@@ -81,6 +81,10 @@ jobs:
     
 #     - name: APT update
 #       run: sudo apt update -y && sudo apt upgrade -y
+
+    - name: Create SDL2 directory
+      run: mkdir C:SDL2
+
     - name: Download SDL2
       # You may pin to the exact commit or the version.
       # uses: albin-johansson/download-sdl2@d4e9339339b31b200ada5c7530d5eadad01576c2
@@ -89,9 +93,9 @@ jobs:
         # The version of SDL2 that will be downloaded
 #         version: # optional, default is 2.0.16
         # Where the SDL2 sources will be saved
-        sources_destination: "C:/SDL2"
+        sources_destination: "C:SDL2"
         # Where the SDL2 runtime binaries will be saved
-        binaries_destination: "C:/SDL2"
+        binaries_destination: "C:SDL2"
     
     - name: Install MinGW
       # You may pin to the exact commit or the version.
