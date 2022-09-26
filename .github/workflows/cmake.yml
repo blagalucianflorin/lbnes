@@ -39,7 +39,6 @@ jobs:
       
     - name: Create build archive
       run: |
-        ls
         cd ${{github.workspace}}/build
         mkdir lbnes-releasedir
         mkdir lbnes-releasedir/lbnes
@@ -52,7 +51,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: "${{github.workspace}}/build/lbnes-releasedir/lbnes-ubuntu-${{ env.RELEASE_VERSION }}.tar.gz"
-        asset_name: ubuntu-${{ env.RELEASE_VERSION }}.tar.gz
+        asset_name: lbnes-ubuntu-${{ env.RELEASE_VERSION }}.tar.gz
         overwrite: true
         
 
@@ -98,9 +97,7 @@ jobs:
       
     - name: Create build archive
       run: |
-        dir
         cd ${{github.workspace}}/bin
-        dir
         mkdir lbnes
         copy lbnes.exe lbnes
         copy config.yaml lbnes
@@ -109,12 +106,11 @@ jobs:
         copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin\\libgcc_s_dw2-1.dll lbnes
         copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin\\libwinpthread-1.dll lbnes
         tar -caf lbnes-windows-x86-${{github.ref_name}}.zip lbnes
-        dir
         
     - name: Upload build archive to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{github.workspace}}/bin/lbnes-windows-x86-${{github.ref_name}}.zip
-        asset_name: windows-x86-${{github.ref_name}}.zip
+        asset_name: lbnes-windows-x86-${{github.ref_name}}.zip
         overwrite: true
