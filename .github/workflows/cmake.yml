@@ -203,6 +203,6 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: "${{github.workspace}}/build/lbnes-releasedir/lbnes-macos-universal-${{ env.RELEASE_VERSION }}.tar.gz"
+        file: "${{github.workspace}}/bin/lbnes-releasedir/lbnes-macos-universal-${{ env.RELEASE_VERSION }}.tar.gz"
         asset_name: lbnes-macos-universal-${{ env.RELEASE_VERSION }}.tar.gz
         overwrite: true
