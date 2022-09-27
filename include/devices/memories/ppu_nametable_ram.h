@@ -5,7 +5,7 @@
 #ifndef NEMULATOR_PPU_NAMETABLE_RAM_H
 #define NEMULATOR_PPU_NAMETABLE_RAM_H
 
-#include "include/devices/memories/memory.h"
+#include "devices/memories/memory.h"
 
 class ppu_nametable_ram : public memory
 {

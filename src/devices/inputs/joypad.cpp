@@ -2,7 +2,7 @@
 // Created by lblaga on 18.05.2022.
 //
 
-#include "include/devices/inputs/joypad.h"
+#include "devices/inputs/joypad.h"
 
 #include <iostream>
 
@@ -12,10 +12,10 @@ joypad::joypad (INPUT_DEVICE input_device, int player) : device (0x4016, 0x4017)
     this -> player_number = player;
     this -> input_device  = input_device;
 
-    if (SDL_NumJoysticks () > 0 && (this -> input_device == CONTROLLER_ONE || this -> input_device == CONTROLLER_TWO))
+    if (SDL_NumJoysticks () > 0 && (this -> input_device == CONTROLLER))
     {
         SDL_JoystickEventState(SDL_ENABLE);
-        this -> joystick = SDL_JoystickOpen(this -> input_device == CONTROLLER_ONE ? 0 : 1);
+        this -> controller = SDL_GameControllerOpen (this -> controller_number);
     }
 }
 
@@ -32,43 +32,28 @@ void joypad::write (uint16_t address, uint8_t data, bool to_parent_bus)
     this -> saved_state = 0x00;
     const Uint8* keyboard_state = SDL_GetKeyboardState(nullptr);
 
-    if (this -> input_device == KEYBOARD_ONE)
+    if (this -> input_device == KEYBOARD)
     {
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_A] ? 1 : 0) << 1;  // D-LEFT
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_D] ? 1 : 0) << 0;  // D-RIGHT
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_W] ? 1 : 0) << 3;  // D-UP
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_S] ? 1 : 0) << 2;  // D-DOWN
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_F] ? 1 : 0) << 6;  // A
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_G] ? 1 : 0) << 7;  // B
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_T] ? 1 : 0) << 4;  // Start
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_R] ? 1 : 0) << 5;  // Select
+        for (int i = 0; i < 8; i++)
+            this -> saved_state |= (keyboard_state[this -> sdl_scancode_translations[this -> mapping[i]]] ? 1 : 0) << i;
     }
-
-    if (this -> input_device == KEYBOARD_TWO)
+    else if ((this -> input_device == CONTROLLER) && SDL_NumJoysticks () > 0)
     {
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_LEFT] ? 1 : 0) << 1;  // D-LEFT
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_RIGHT] ? 1 : 0) << 0; // D-RIGHT
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_UP] ? 1 : 0) << 3;    // D-UP
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_DOWN] ? 1 : 0) << 2;  // D-DOWN
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_N] ? 1 : 0) << 6;     // A
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_M] ? 1 : 0) << 7;     // B
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_K] ? 1 : 0) << 4;     // Start
-        this -> saved_state |= (keyboard_state[SDL_SCANCODE_J] ? 1 : 0) << 5;     // Select
-    }
+        this -> saved_state |= SDL_GameControllerGetButton (this -> controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) << BUTTON::DPAD_LEFT;
+        this -> saved_state |= SDL_GameControllerGetButton (this -> controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) << BUTTON::DPAD_RIGHT;
+        this -> saved_state |= SDL_GameControllerGetButton (this -> controller, SDL_CONTROLLER_BUTTON_DPAD_UP) << BUTTON::DPAD_UP;
+        this -> saved_state |= SDL_GameControllerGetButton (this -> controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) << BUTTON::DPAD_DOWN;
+        this -> saved_state |= SDL_GameControllerGetButton (this -> controller, SDL_CONTROLLER_BUTTON_START) << BUTTON::START;
+        this -> saved_state |= SDL_GameControllerGetButton (this -> controller, SDL_CONTROLLER_BUTTON_BACK) << BUTTON::SELECT;
+        this -> saved_state |= SDL_GameControllerGetButton (this -> controller, SDL_CONTROLLER_BUTTON_A) << BUTTON::A;
+        this -> saved_state |= SDL_GameControllerGetButton (this -> controller, SDL_CONTROLLER_BUTTON_B) << BUTTON::B;
 
-    if (this -> input_device == CONTROLLER_ONE || this -> input_device == CONTROLLER_TWO)
-    {
-        if (SDL_NumJoysticks () < 1)
-            return;
-
-        this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_LEFT ? 1 : 0) << 1;
-        this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_RIGHT ? 1 : 0) << 0;
-        this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_UP ? 1 : 0) << 3;
-        this -> saved_state |= (SDL_JoystickGetHat (this -> joystick, 0) == SDL_HAT_DOWN ? 1 : 0) << 2;
-        this -> saved_state |= (SDL_JoystickGetButton (this -> joystick, 0) ? 1 : 0) << 7;
-        this -> saved_state |= (SDL_JoystickGetButton (this -> joystick, 1) ? 1 : 0) << 6;
-        this -> saved_state |= (SDL_JoystickGetButton (this -> joystick, 7) ? 1 : 0) << 4;
-        this -> saved_state |= (SDL_JoystickGetButton (this -> joystick, 6) ? 1 : 0) << 5;
+        auto x_axis = SDL_GameControllerGetAxis (this -> controller, SDL_CONTROLLER_AXIS_LEFTX);
+        auto y_axis = SDL_GameControllerGetAxis (this -> controller, SDL_CONTROLLER_AXIS_LEFTY);
+        this -> saved_state |= ((x_axis < -(this -> controller_deadzone)) ? 1 : 0) << BUTTON::DPAD_LEFT;
+        this -> saved_state |= ((x_axis > (this -> controller_deadzone)) ? 1 : 0) << BUTTON::DPAD_RIGHT;
+        this -> saved_state |= ((y_axis < -(this -> controller_deadzone)) ? 1 : 0) << BUTTON::DPAD_UP;
+        this -> saved_state |= ((y_axis > (this -> controller_deadzone)) ? 1 : 0) << BUTTON::DPAD_DOWN;
     }
 }
 
@@ -94,4 +79,15 @@ uint8_t joypad::set_button (joypad::BUTTON button, uint8_t value)
 uint8_t joypad::get_button (joypad::BUTTON button)
 {
     return (((this -> saved_state) >> button) & 1);
+}
+
+void joypad::change_type (joypad::INPUT_DEVICE new_input_device)
+{
+    this -> input_device = new_input_device;
+
+    if (new_input_device == CONTROLLER && SDL_NumJoysticks () > 0)
+    {
+        SDL_JoystickEventState(SDL_ENABLE);
+        this -> controller = SDL_GameControllerOpen (this -> controller_number);
+    }
 }

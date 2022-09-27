@@ -5,83 +5,84 @@
 #ifndef NEMULATOR_NES_H
 #define NEMULATOR_NES_H
 
-#ifdef INSPECT
-#define WINDOW_WIDTH 1600
-#define WINDOW_HEIGHT 900
-#else
-#define WINDOW_WIDTH 256
-#define WINDOW_HEIGHT 240
-#endif
-
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <chrono>
 #include <thread>
 #include <exception>
+#include <memory>
 
+#include "bus/bus.h"
+#include "devices/cpu/6502.h"
+#include "devices/ppu/ppu.h"
+#include "devices/cartridges/cartridge.h"
+#include "devices/inputs/joypad.h"
+#include "devices/memories/ram.h"
+#include "devices/memories/ppu_nametable_ram.h"
+#include "devices/memories/ppu_palette_ram.h"
+
+#ifdef _WIN32
+#include <SDL.h>
+#include <windows.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
-#include "include/bus/bus.h"
-#include "include/devices/cpu/6502.h"
-#include "include/devices/ppu/ppu.h"
-#include "include/devices/cartridges/cartridge.h"
-#include "include/devices/inputs/joypad.h"
-#include "include/devices/memories/ram.h"
-#include "include/devices/memories/ppu_nametable_ram.h"
-#include "include/devices/memories/ppu_palette_ram.h"
-
-#include "include/sdl_manager.h"
+#include "sdl_manager.h"
+#include "configurator.h"
+#include "yaml-cpp/yaml.h"
 
 class nes
 {
 private:
     SDL_Renderer *game_renderer   = nullptr;
     SDL_Window   *game_window     = nullptr;
-    SDL_Event    game_input_event;
+    SDL_Event    game_input_event {};
 
-    bool running = true;
+    std::shared_ptr <ppu> nes_ppu;
+    std::shared_ptr <cpu> nes_cpu;
+    std::shared_ptr <bus> cpu_bus;
+    std::shared_ptr <bus> ppu_bus;
 
-    cpu *nes_cpu = nullptr;
-    ppu *nes_ppu = nullptr;
-    bus *cpu_bus = nullptr;
-    bus *ppu_bus = nullptr;
+    std::shared_ptr <ram>             cpu_ram;
+    std::shared_ptr <ppu_palette_ram> palette_ram;
+    std::shared_ptr <cartridge>       nes_cartridge;
 
-    ram             *cpu_ram           = nullptr;
-    ppu_palette_ram *palette_ram       = nullptr;
-    cartridge       *nes_cartridge     = nullptr;
-    joypad          *player_one_joypad = nullptr;
-    joypad          *player_two_joypad = nullptr;
+    std::vector<std::unique_ptr<joypad>> joypads;
 
     long long total_cycles = 0;
     double    target_fps   = 60.098814;
-
-    bool      main_loop_started = false;
+    bool      rom_loaded   = false;
 
     void main_loop ();
 
+    void load_joypads ();
+
 public:
-    nes (std::string rom_file);
+    explicit nes (const std::string& rom_file);
 
     ~nes ();
 
     void        reset ();
 
+    void        reload (const std::string& rom_file, bool initialize_controllers = false);
+
     inline void toggle_fullscreen () { ToggleFullscreen (this -> game_window); }
 
-    void start ();
+    void        start ();
 
-    inline void pause () { this -> running = false; }
+    uint32_t    *render_frame ();
 
-    uint32_t *render_frame ();
+    uint8_t     set_button (joypad::BUTTON button, uint8_t value = 1, uint8_t player = 1);
 
-    uint8_t set_button (joypad::BUTTON button, uint8_t value = 1, uint8_t player = 1);
+    uint8_t     get_button (joypad::BUTTON button, uint8_t player = 1);
 
-    uint8_t get_button (joypad::BUTTON button, uint8_t player = 1);
+    void        toggle_joypad (uint8_t player = 1);
 
-    void    toggle_joypad (uint8_t player = 1);
+    void        reset_buttons (uint8_t player = 1);
 
-    void reset_buttons (uint8_t player = 1);
+    static int SDLCALL controller_connection_event_manager (void *userdata, SDL_Event * event);
 };
 
 #endif //NEMULATOR_NES_H

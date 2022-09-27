@@ -7,10 +7,11 @@
 
 #include <cstdint>
 
-#include "include/forwards/classes.h"
-#include "include/misc/macros.h"
+#include "forwards/classes.h"
+#include "misc/macros.h"
+#include "misc/state.h"
 
-class device
+class device: public state
 {
 protected:
     uint16_t    lower_bound;
@@ -43,6 +44,10 @@ public:
     virtual void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) = 0; // NOLINT
 
     virtual uint8_t read (uint16_t address, bool from_parent_bus = true) = 0; // NOLINT
+
+    std::string     save_state (const std::string& name) override;
+
+    void            load_state (std::string saved_state) override;
 };
 
 #endif //NEMULATOR_DEVICE_H

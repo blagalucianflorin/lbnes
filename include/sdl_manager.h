@@ -5,16 +5,21 @@
 #ifndef NEMULATOR_SDL_MANAGER_H
 #define NEMULATOR_SDL_MANAGER_H
 
-#include "include/devices/ppu/ppu.h"
+#include "devices/ppu/ppu.h"
+#include "configurator.h"
 
+#ifdef _WIN32
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
+
 #include <iostream>
 
 
 void ToggleFullscreen(SDL_Window* Window);
 
-void main_window (SDL_Window *&window, SDL_Renderer *&renderer, const char *window_title,
-                  int window_width = 256, int window_height = 240);
+void main_window (SDL_Window *&window, SDL_Renderer *&renderer);
 
 void draw_tiles (ppu *my_ppu);
 

@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - 'release-[0-9]+.[0-9]+.[0-9]+'
+      - 'stable-[0-9]+.[0-9]+.[0-9]+'
+      - 'nightly-[0-9]+.[0-9]+.[0-9]+'
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+              
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        
+    - name: Pull & update submodules recursively
+      run: |
+        git submodule update --init --recursive
+        git submodule update --recursive --remote
+    
+    - name: APT update
+      run: sudo apt update -y && sudo apt upgrade -y
+    
+    - name: Dependencies
+      run: sudo apt install cmake g++ libsdl2-dev
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Create build archive
+      run: |
+        cd ${{github.workspace}}/build
+        mkdir lbnes-releasedir
+        mkdir lbnes-releasedir/lbnes
+        cp lbnes config.yaml lbnes-releasedir/lbnes
+        cd lbnes-releasedir
+        tar -cavf lbnes-ubuntu-${{ env.RELEASE_VERSION }}.tar.gz lbnes
+        
+    - name: Upload build archive to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: "${{github.workspace}}/build/lbnes-releasedir/lbnes-ubuntu-${{ env.RELEASE_VERSION }}.tar.gz"
+        asset_name: lbnes-ubuntu-${{ env.RELEASE_VERSION }}.tar.gz
+        overwrite: true
+        
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+              
+    - name: Create tag artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{github.ref_name}}
+        path: Release
+        
+    - name: Pull & update submodules recursively
+      run: |
+        git submodule update --init --recursive
+        git submodule update --recursive --remote
+        
+    - name: Setup SDL2
+      run: |
+        C:
+        cd ../../../../../../../..
+        curl --url https://www.libsdl.org/release/SDL2-devel-2.24.0-VC.zip --output SDL2.zip
+        tar -xf SDL2.zip
+        ren SDL2-2.24.0 SDL2
+        set SDL_PATH=C:\\SDL2
+    
+    - name: Setup MinGW
+      uses: egor-tensin/setup-mingw@v2
+      with:
+        platform: x32
+        static: 1
+        cc: 1
+
+    - name : Build
+      run: |
+        cd ${{github.workspace}}
+        mkdir bin && cd bin
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        mingw32-make
+      
+    - name: Create build archive
+      run: |
+        cd ${{github.workspace}}/bin
+        mkdir lbnes
+        copy lbnes.exe lbnes
+        copy config.yaml lbnes
+        copy SDL2.dll lbnes
+        copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin\\libstdc++-6.dll lbnes
+        copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin\\libgcc_s_dw2-1.dll lbnes
+        copy C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin\\libwinpthread-1.dll lbnes
+        tar -caf lbnes-windows-x86-${{github.ref_name}}.zip lbnes
+        
+    - name: Upload build archive to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{github.workspace}}/bin/lbnes-windows-x86-${{github.ref_name}}.zip
+        asset_name: lbnes-windows-x86-${{github.ref_name}}.zip
+        overwrite: true

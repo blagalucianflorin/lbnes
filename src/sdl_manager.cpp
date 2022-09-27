@@ -2,7 +2,7 @@
 // Created by lblaga on 22.05.2022.
 //
 
-#include "include/sdl_manager.h"
+#include "sdl_manager.h"
 
 
 void ToggleFullscreen(SDL_Window* Window)
@@ -12,15 +12,16 @@ void ToggleFullscreen(SDL_Window* Window)
     SDL_ShowCursor(IsFullscreen);
 }
 
-void main_window (SDL_Window *&window, SDL_Renderer *&renderer, const char *window_title,
-                  int window_width, int window_height)
+void main_window (SDL_Window *&window, SDL_Renderer *&renderer)
 {
+    int window_width  = configurator::get_instance ()["resolution"]["width"].as<int>();
+    int window_height = configurator::get_instance ()["resolution"]["height"].as<int>();
+
     SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     SDL_CreateWindowAndRenderer (window_width, window_height, 0, &window, &renderer);
-    SDL_SetWindowSize (window, window_width * 3, window_height * 3);
+    SDL_SetWindowSize (window, window_width,window_height);
     SDL_SetWindowPosition (window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    SDL_SetWindowTitle (window, window_title);
-//    TTF_Init();
+    SDL_SetWindowTitle (window, "lbnes");
 }
 
 void draw_tiles (ppu *my_ppu)

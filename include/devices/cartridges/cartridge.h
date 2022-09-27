@@ -5,10 +5,10 @@
 #ifndef NEMULATOR_CARTRIDGE_H
 #define NEMULATOR_CARTRIDGE_H
 
-#include "include/devices/device.h"
-#include "include/devices/cartridges/exceptions/cartridge_exception.h"
+#include "devices/device.h"
+#include "devices/cartridges/exceptions/cartridge_exception.h"
 
-#include "include/misc/macros.h"
+#include "misc/macros.h"
 
 #include <string>
 #include <fstream>
@@ -16,6 +16,8 @@
 #include <map>
 #include <cstring>
 #include <algorithm>
+#include <memory>
+#include <vector>
 
 class cartridge : public device
 {
@@ -40,9 +42,9 @@ public:
 #else
     private:
 #endif
-    uint8_t *program_memory   = nullptr;
-    uint8_t *character_memory = nullptr;
-    uint8_t *sram             = nullptr;
+    std::vector<uint8_t> program_memory;
+    std::vector<uint8_t> character_memory;
+    std::vector<uint8_t> sram;
 
     MAPPER         mapper         = NROM;
     MIRRORING_TYPE mirroring_type = HORIZONTAL;
@@ -53,13 +55,14 @@ public:
     typedef void (cartridge::*read_file_function) (const std::string &);
     std::map <std::string, read_file_function> supported_formats =
     {
+        {".nes", &cartridge::read_ines},
         {".ines", &cartridge::read_ines}
     };
 
 public:
     explicit cartridge (const std::string &file_path);
 
-    ~cartridge () noexcept override;
+    ~cartridge () override = default;
 
     void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
 

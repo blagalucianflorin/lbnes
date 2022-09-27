@@ -5,8 +5,9 @@
 #ifndef NEMULATOR_MEMORY_H
 #define NEMULATOR_MEMORY_H
 
-#include "include/forwards/classes.h"
-#include "include/devices/device.h"
+#include "forwards/classes.h"
+#include "devices/device.h"
+#include "misc/base64.h"
 
 class memory : public device
 {
@@ -28,6 +29,10 @@ public:
     {
         return (internal_memory[address - (this -> lower_bound)]);
     }
+
+    std::string save_state (const std::string& name) override;
+
+    void        load_state (std::string saved_state) override;
 };
 
 #endif //NEMULATOR_MEMORY_H

@@ -9,10 +9,11 @@
 #include <vector>
 #include <stdexcept>
 
-#include "include/forwards/classes.h"
-#include "include/devices/device.h"
+#include "forwards/classes.h"
+#include "devices/device.h"
+#include "misc/state.h"
 
-class bus
+class bus: public state
 {
 private:
     uint16_t              lower_bound = 0x0000;
@@ -22,7 +23,7 @@ private:
 public:
     bus () = default;
 
-    ~bus ();
+    ~bus () = default;
 
     bus (uint16_t lower_bound, uint16_t upper_bound) : lower_bound (lower_bound), upper_bound (upper_bound) {}
 
@@ -33,6 +34,10 @@ public:
     void    write (uint16_t address, uint8_t data);
 
     uint8_t read (uint16_t address);
+
+    std::string save_state (const std::string& name) override;
+
+    void        load_state (std::string saved_state) override;
 };
 
 #endif //NEMULATOR_BUS_H

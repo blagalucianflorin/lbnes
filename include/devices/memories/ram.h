@@ -5,7 +5,7 @@
 #ifndef NEMULATOR_RAM_H
 #define NEMULATOR_RAM_H
 
-#include "include/devices/memories/memory.h"
+#include "devices/memories/memory.h"
 
 class ram : public memory
 {

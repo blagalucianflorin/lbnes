@@ -5,19 +5,14 @@
 #ifndef NEMULATOR_CPU_H
 #define NEMULATOR_CPU_H
 
-#include "include/forwards/classes.h"
-#include "include/devices/device.h"
-#include "include/bus/bus.h"
-#include "include/devices/ppu/ppu.h"
+#include "forwards/classes.h"
+#include "devices/device.h"
+#include "bus/bus.h"
+#include "devices/ppu/ppu.h"
 
 
 class cpu : public device
 {
-#ifdef G_TESTING
-public:
-#else
-private:
-#endif
     bool     accumulator_addressing = false;
     uint16_t jump_relative_address  = 0xFFFF;
     uint16_t destination_address    = 0xFFFE;
@@ -65,7 +60,7 @@ private:
 
     uint8_t set_flag (FLAG flag, uint8_t value);
 
-    uint8_t get_flag (FLAG flag);
+    uint8_t get_flag (FLAG flag) const;
 
     void    push_to_stack (uint8_t value);
 
@@ -130,6 +125,10 @@ public:
     inline long get_cycles_elapsed () { return (this -> cycles_elapsed); }
 
     void    dma (ppu *target_ppu, uint8_t page);
+
+    std::string save_state (const std::string& name) override;
+
+    void        load_state (std::string saved_state) override;
 };
 
 #endif //NEMULATOR_CPU_H

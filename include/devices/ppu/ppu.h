@@ -5,31 +5,30 @@
 #ifndef NEMULATOR_PPU_H
 #define NEMULATOR_PPU_H
 
-#include "include/forwards/classes.h"
+#include "forwards/classes.h"
 
-#include "include/devices/device.h"
-#include "include/devices/ppu/exceptions/ppu_exception.h"
-#include "include/bus/bus.h"
-#include "include/devices/cartridges/cartridge.h"
-#include "include/misc/macros.h"
-#include "include/devices/cpu/6502.h"
-#include "include/devices/ppu/oam.h"
+#include "devices/device.h"
+#include "devices/ppu/exceptions/ppu_exception.h"
+#include "bus/bus.h"
+#include "devices/cartridges/cartridge.h"
+#include "misc/macros.h"
+#include "devices/cpu/6502.h"
+#include "devices/ppu/oam.h"
 
+#ifdef _WIN32
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include <map>
 
 class ppu : public device
 {
-#ifdef PUBLIC
-public:
-#else
-    private:
-#endif
-
-    uint8_t *nametable_memory;
-    uint8_t *palette_memory;
-    uint8_t *oam;
+private:
+    uint8_t nametable_memory[2048];
+    uint8_t palette_memory[33];
+    uint8_t oam[256];
 
     uint8_t control_register     = 0x0000;
     uint8_t mask_register        = 0x0000;
@@ -141,8 +140,8 @@ private:
     // Rendering
     SDL_Renderer *renderer       = nullptr;
     SDL_Texture  *screen         = nullptr;
-    uint32_t     *pixels         = nullptr;
     SDL_Surface  *screen_surface = nullptr;
+    uint32_t     pixels[240 * 256];
 
 #ifndef INSPECT
     int          x_offset  = 0;
@@ -153,7 +152,7 @@ private:
 #endif
 
     // Directly attached devices
-    class cpu       *cpu = nullptr;
+    class cpu       *cpu       = nullptr;
     class cartridge *cartridge = nullptr;
 
     void  populate_palette_2C02 ();
@@ -231,7 +230,7 @@ public:
     inline uint32_t *get_pixels () { return (this -> pixels); }
 
     // DMA
-    inline uint8_t *&dma () { return (this -> oam); }
+    inline uint8_t *dma () { return (this -> oam); }
 
     // Attach devices for direct access
     inline void attach (class cpu *new_cpu) { this -> cpu = new_cpu; }
@@ -240,6 +239,7 @@ public:
 
     inline void attach (class cartridge *new_cartridge) { this -> cartridge = new_cartridge; }
 
+    inline bool is_odd_frame () { return (this -> odd_frame); }
 
     void      draw_nametable ();
 
