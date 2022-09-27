@@ -13,11 +13,6 @@
 
 class cpu : public device
 {
-#ifdef G_TESTING
-public:
-#else
-private:
-#endif
     bool     accumulator_addressing = false;
     uint16_t jump_relative_address  = 0xFFFF;
     uint16_t destination_address    = 0xFFFE;
@@ -130,6 +125,10 @@ public:
     inline long get_cycles_elapsed () { return (this -> cycles_elapsed); }
 
     void    dma (ppu *target_ppu, uint8_t page);
+
+    std::string save_state (const std::string& name) override;
+
+    void        load_state (std::string saved_state) override;
 };
 
 #endif //NEMULATOR_CPU_H

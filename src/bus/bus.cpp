@@ -41,3 +41,30 @@ uint8_t bus::read (uint16_t address)
 
     return (0);
 }
+
+std::string bus::save_state (const std::string &name)
+{
+    YAML::Node final_node;
+
+    final_node[name] = YAML::Node ();
+    final_node[name]["lower_bound"] = this -> lower_bound;
+    final_node[name]["upper_bound"] = this -> upper_bound;
+    final_node[name]["devices"]     = YAML::Node ();
+
+    for (auto device : this -> devices)
+        final_node[name]["devices"].push_back (device -> save_state (typeid (*device).name ()));
+
+    return (YAML::Dump(final_node));
+}
+
+void bus::load_state (std::string saved_state)
+{
+    YAML::Node saved_node = YAML::Load (saved_state.c_str ()).begin() -> second;
+
+    this -> lower_bound = saved_node["lower_bound"].as<uint16_t>();
+    this -> upper_bound = saved_node["upper_bound"].as<uint16_t>();
+
+//    this -> devices.clear ();
+//    for (auto device : saved_node["devices"])
+//        this -> devices. push_back ()
+}

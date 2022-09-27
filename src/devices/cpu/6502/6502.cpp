@@ -172,3 +172,62 @@ void cpu::dma (ppu *target_ppu, uint8_t page)
     this -> dma_entry   = 0x00;
     this -> cycles_left = 512;
 }
+
+std::string cpu::save_state (const std::string &name)
+{
+    YAML::Node base_device_node = YAML::Load (device::save_state ("base_device"));
+    YAML::Node final_node;
+
+    final_node[name] = YAML::Node ();
+
+    final_node[name]["accumulator_addressing"] = this -> accumulator_addressing;
+    final_node[name]["jump_relative_address"]  = this -> jump_relative_address;
+    final_node[name]["destination_address"]    = this -> destination_address;
+
+    final_node[name]["flags_register"]  = this -> flags_register;
+    final_node[name]["accumulator"]     = this -> accumulator;
+    final_node[name]["x_register"]      = this -> x_register;
+    final_node[name]["y_register"]      = this -> y_register;
+    final_node[name]["program_counter"] = this -> program_counter;
+    final_node[name]["stack_pointer"]   = this -> stack_pointer;
+
+    final_node[name]["cycles_left"]    = this -> cycles_left;
+    final_node[name]["cycles_elapsed"] = this -> cycles_elapsed;
+
+    final_node[name]["dma_active"] = this -> dma_active;
+    final_node[name]["dma_begin"]  = this -> dma_begin;
+    final_node[name]["dma_entry"]  = this -> dma_entry;
+    final_node[name]["dma_data"]   = this -> dma_data;
+    final_node[name]["dma_page"]   = this -> dma_page;
+
+    for (auto pair : base_device_node["base_device"])
+        final_node[name]["base_device"][pair.first] = pair.second;
+
+    return (YAML::Dump(final_node));
+}
+
+void cpu::load_state (std::string saved_state)
+{
+    YAML::Node saved_node = YAML::Load (saved_state.c_str ()).begin() -> second;
+    device::load_state (YAML::Dump(saved_node["base_device"]));
+
+    this -> accumulator_addressing = saved_node["accumulator_addressing"].as<bool>();
+    this -> jump_relative_address  = saved_node["jump_relative_address"].as<uint16_t>();
+    this -> destination_address    = saved_node["destination_address"].as<uint16_t>();
+
+    this -> flags_register  = saved_node["flags_register"].as<uint8_t>();
+    this -> accumulator     = saved_node["accumulator"].as<uint8_t>();
+    this -> x_register      = saved_node["x_register"].as<uint8_t>();
+    this -> y_register      = saved_node["y_register"].as<uint8_t>();
+    this -> program_counter = saved_node["program_counter"].as<uint16_t>();
+    this -> stack_pointer   = saved_node["stack_pointer"].as<uint8_t>();
+
+    this -> cycles_left    = saved_node["cycles_left"].as<long>();
+    this -> cycles_elapsed = saved_node["cycles_elapsed"].as<long>();
+
+    this -> dma_active = saved_node["dma_active"].as<bool>();
+    this -> dma_begin  = saved_node["dma_begin"].as<bool>();
+    this -> dma_entry  = saved_node["dma_entry"].as<uint8_t>();
+    this -> dma_data   = saved_node["dma_data"].as<uint8_t>();
+    this -> dma_page   = saved_node["dma_page"].as<uint8_t>();
+}
