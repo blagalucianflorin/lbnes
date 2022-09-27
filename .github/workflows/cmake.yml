@@ -182,17 +182,17 @@ jobs:
         sudo cp -rf /Volumes/SDL2/SDL2.framework/ /Library/Frameworks/
         sudo ls /Volumes/
         sudo ls /Library/Frameworks/
-        sudo ls /Library/Frameworks/SDL2.framework
+        sudo ls /Library/Frameworks/SDL2.framework/
 
     - name: Build
       run: |
-        cd ${{github.workspace}
+        cd ${{github.workspace}}
         mkdir bin && cd bin
         cmake .. && make
       
     - name: Create build archive
       run: |
-        cd ${{github.workspace}}/build
+        cd ${{github.workspace}}/bin
         mkdir lbnes-releasedir
         mkdir lbnes-releasedir/lbnes
         cp lbnes config.yaml lbnes-releasedir/lbnes
