@@ -179,7 +179,7 @@ jobs:
       run: |
         curl --url https://www.libsdl.org/release/SDL2-${{ env.SDL_VERSION }}.dmg --output SDL2.dmg
         sudo hdiutil attach SDL2.dmg
-        sudo cp -rf /Volumes/SDL2/SDL2.framework/ /Library/Frameworks/
+        sudo cp -rf /Volumes/SDL2/* /Library/Frameworks/
         sudo ls /Volumes/
         sudo ls /Library/Frameworks/
         sudo ls /Library/Frameworks/SDL2.framework/
