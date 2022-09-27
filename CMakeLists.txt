@@ -38,7 +38,8 @@ set(SOURCES
     src/devices/ppu/oam.cpp src/devices/inputs/joypad.cpp
     src/sdl_manager.cpp
     src/nes.cpp
-    src/configurator.cpp)
+    src/configurator.cpp
+    src/misc/base64.cpp)
 
 set (INCLUDES
     include/bus/bus.h
@@ -57,7 +58,9 @@ set (INCLUDES
     include/devices/ppu/oam.h include/devices/inputs/joypad.h
     include/sdl_manager.h
     include/nes.h
-    include/configurator.h)
+    include/configurator.h
+    include/misc/state.h
+    include/misc/base64.h)
 
 if (NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
@@ -76,7 +79,7 @@ endif()
 if(WIN32)
     if(NOT DEFINED ENV{SDL_PATH})
         message(STATUS "Environment variable SDL_PATH is not set, defaulting to C:/SDL2/")
-        set($ENV{SDL_PATH} "C:/SDL2/")
+        set(ENV{SDL_PATH} "C:/SDL2/")
     endif()
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
