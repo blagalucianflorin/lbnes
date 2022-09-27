@@ -185,7 +185,7 @@ jobs:
         curl --url https://www.libsdl.org/release/SDL2-2.24.0.dmg --output SDL2-2.24.0.dmg
         sudo hdiutil attach SDL2-2.24.0.dmg
         sudo ls /Volumes/
-        cd /Volumesc/SDL2/
+        cd /Volumes/SDL2/
         cp -R SDL2.framework /Library/Frameworks
         
 
