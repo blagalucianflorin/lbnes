@@ -1,12 +1,12 @@
 # lbnes
 
 A Nintendo Entertainment System emulator in the works. Written in C++ with SDL2.
-Cross-platform support (currently Linux, Windows and macOS). Actively developing new features and adding game support.
+Cross-platform support (currently Linux, Windows, Raspberry Pi and macOS). Actively developing new features and adding game support.
 Not 100% accurate but it works pretty well.
 
 ## Releases
 Check out the latest stable release on the [releases page](https://github.com/blagalucianflorin/lbnes/releases).
-Currently only Ubuntu and Windows-x86 builds are available. macOS builds are in the works.
+Currently only Ubuntu and Windows-x86, Raspberry Pi 4 builds are available. macOS builds are in the works.
 
 You can also build the emulator yourself, check out the 'Requirements, Clone & Build' section.
 
@@ -25,7 +25,7 @@ You can also build the emulator yourself, check out the 'Requirements, Clone & B
 ## Requirements, Clone & Build
 
 
-### Linux (Debian)
+### Linux (Debian) - Ubuntu / Raspberry Pi
 ```bash
 sudo apt install cmake g++ libsdl2-dev
 git clone --recursive https://github.com/blagalucianflorin/lbnes
