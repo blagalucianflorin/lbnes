@@ -9,6 +9,7 @@ on:
 
 env:
   BUILD_TYPE: Release
+  SDL_VERSION: 2.24.0
 
 jobs:
   build-ubuntu:
@@ -76,9 +77,9 @@ jobs:
       run: |
         C:
         cd ../../../../../../../..
-        curl --url https://www.libsdl.org/release/SDL2-devel-2.24.0-VC.zip --output SDL2.zip
+        curl --url https://www.libsdl.org/release/SDL2-devel-${{ env.SDL_VERSION }}-VC.zip --output SDL2.zip
         tar -xf SDL2.zip
-        ren SDL2-2.24.0 SDL2
+        ren SDL2-${{ env.SDL_VERSION }} SDL2
         set SDL_PATH=C:\\SDL2
     
     - name: Setup MinGW
@@ -173,20 +174,12 @@ jobs:
       run: |
         git submodule update --init --recursive
         git submodule update --recursive --remote
-    
-#     - name: APT update
-#       run: sudo apt update -y && sudo apt upgrade -y
-    
-#     - name: Dependencies
-#       run: sudo apt install cmake g++ libsdl2-dev
 
     - name: Setup SDL2
       run: |
-        curl --url https://www.libsdl.org/release/SDL2-2.24.0.dmg --output SDL2-2.24.0.dmg
-        sudo hdiutil attach SDL2-2.24.0.dmg
-        sudo ls /Volumes/
-        cd /Volumes/SDL2/
-        cp -R SDL2.framework /Library/Frameworks
+        curl --url https://www.libsdl.org/release/SDL2-${{ env.SDL_VERSION }}.dmg --output SDL2.dmg
+        sudo hdiutil attach SDL2.dmg
+        sudo cp -rf /Volumes/SDL2/SDL2.framework/ /Library/Frameworks/
         
 
     - name: Configure CMake
