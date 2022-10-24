@@ -9,6 +9,7 @@ on:
 
 env:
   BUILD_TYPE: Release
+  SDL_VERSION: 2.24.0
 
 jobs:
   build-ubuntu:
@@ -76,9 +77,9 @@ jobs:
       run: |
         C:
         cd ../../../../../../../..
-        curl --url https://www.libsdl.org/release/SDL2-devel-2.24.0-VC.zip --output SDL2.zip
+        curl --url https://www.libsdl.org/release/SDL2-devel-${{ env.SDL_VERSION }}-VC.zip --output SDL2.zip
         tar -xf SDL2.zip
-        ren SDL2-2.24.0 SDL2
+        ren SDL2-${{ env.SDL_VERSION }} SDL2
         set SDL_PATH=C:\\SDL2
     
     - name: Setup MinGW
@@ -113,4 +114,95 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{github.workspace}}/bin/lbnes-windows-x86-${{github.ref_name}}.zip
         asset_name: lbnes-windows-x86-${{github.ref_name}}.zip
+        overwrite: true
+        
+        
+  build-pi4:
+    runs-on: pi-self-hosted
+
+    steps:
+    - uses: actions/checkout@v3
+              
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        
+    - name: Pull & update submodules recursively
+      run: |
+        git submodule update --init --recursive
+        git submodule update --recursive --remote
+    
+    - name: APT update
+      run: sudo apt update -y && sudo apt upgrade -y
+    
+    - name: Dependencies
+      run: sudo apt install cmake g++ libsdl2-dev
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Create build archive
+      run: |
+        cd ${{github.workspace}}/build
+        mkdir lbnes-releasedir
+        mkdir lbnes-releasedir/lbnes
+        cp lbnes config.yaml lbnes-releasedir/lbnes
+        cd lbnes-releasedir
+        tar -cavf lbnes-pi4-${{ env.RELEASE_VERSION }}.tar.gz lbnes
+        
+    - name: Upload build archive to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: "${{github.workspace}}/build/lbnes-releasedir/lbnes-pi4-${{ env.RELEASE_VERSION }}.tar.gz"
+        asset_name: lbnes-pi4-${{ env.RELEASE_VERSION }}.tar.gz
+        overwrite: true
+        
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+              
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        
+    - name: Pull & update submodules recursively
+      run: |
+        git submodule update --init --recursive
+        git submodule update --recursive --remote
+
+    - name: Setup SDL2
+      run: |
+        curl --url https://www.libsdl.org/release/SDL2-${{ env.SDL_VERSION }}.dmg --output SDL2.dmg
+        sudo hdiutil attach SDL2.dmg
+        sudo cp -rf /Volumes/SDL2/* /Library/Frameworks/
+        sudo ls /Volumes/
+        sudo ls /Library/Frameworks/
+        sudo ls /Library/Frameworks/SDL2.framework/
+
+    - name: Build
+      run: |
+        cd ${{github.workspace}}
+        mkdir bin && cd bin
+        cmake .. && make
+      
+    - name: Create build archive
+      run: |
+        cd ${{github.workspace}}/bin
+        mkdir lbnes-releasedir
+        mkdir lbnes-releasedir/lbnes
+        cp lbnes config.yaml lbnes-releasedir/lbnes
+        cd lbnes-releasedir
+        tar -cavf lbnes-macos-universal-${{ env.RELEASE_VERSION }}.tar.gz lbnes
+        
+    - name: Upload build archive to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: "${{github.workspace}}/bin/lbnes-releasedir/lbnes-macos-universal-${{ env.RELEASE_VERSION }}.tar.gz"
+        asset_name: lbnes-macos-universal-${{ env.RELEASE_VERSION }}.tar.gz
         overwrite: true

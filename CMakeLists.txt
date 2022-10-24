@@ -39,7 +39,8 @@ set(SOURCES
     src/sdl_manager.cpp
     src/nes.cpp
     src/configurator.cpp
-    src/arguments_manager.cpp)
+    src/arguments_manager.cpp
+    src/misc/base64.cpp)
 
 set (INCLUDES
     include/bus/bus.h
@@ -59,7 +60,8 @@ set (INCLUDES
     include/sdl_manager.h
     include/nes.h
     include/configurator.hpp
-    include/arguments_manager.hpp)
+    include/arguments_manager.hpp
+    include/misc/base64.h)
 
 if (NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)

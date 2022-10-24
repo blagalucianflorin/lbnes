@@ -1,11 +1,31 @@
 # lbnes
 
-A Nintendo NES emulator in the works.
+A Nintendo Entertainment System emulator in the works. Written in C++ with SDL2.
+Cross-platform support (currently Linux, Windows, Raspberry Pi and macOS). Actively developing new features and adding game support.
+Not 100% accurate but it works pretty well.
+
+## Releases
+Check out the latest stable release on the [releases page](https://github.com/blagalucianflorin/lbnes/releases).
+Currently only Ubuntu and Windows-x86, Raspberry Pi 4 builds are available. macOS builds are in the works.
+
+You can also build the emulator yourself, check out the 'Requirements, Clone & Build' section.
+
+## Features
+- [x] **mapper 0**
+- [x] **drag 'n' drop ROMs**
+- [x] **two players support**
+- [x] **controller support**
+- [x] **configuration file**
+- [x] **speed adjustment**
+- [x] **key mapping**
+- [ ] save states (work in progress)
+- [ ] sound
+- [ ] other mappers
 
 ## Requirements, Clone & Build
 
 
-### Linux (Debian)
+### Linux (Debian) - Ubuntu / Raspberry Pi
 ```bash
 sudo apt install cmake g++ libsdl2-dev
 git clone --recursive https://github.com/blagalucianflorin/lbnes
@@ -29,15 +49,11 @@ mingw32-make
 lbnes <path/to/rom.nes>
 ```
 
-
-### Windows (with CLion)
-Download the latest [SDL2](https://github.com/libsdl-org/SDL/releases) development VC release and extract it somewhere. Add the extracted folder as an environment variable called SDL_PATH.
-
-Clone this repository (recursive) to a folder and open it in [CLion](https://www.jetbrains.com/clion/download/#section=windows).
-
-You should be able to build and run the project normally.
+#### (windows) Clion
+You could also open this in Clion and build it after installing SDL2 like shown above.
 
 ### macOS
+
 
 Download the latest [SDL2](https://github.com/libsdl-org/SDL/releases) macOS release and copy the SDL2.framework directory to /Library/Frameworks.
 
