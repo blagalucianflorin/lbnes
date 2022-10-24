@@ -1,8 +1,14 @@
 #include "nes.h"
+#include "arguments_manager.hpp"
 
-int main (int argc, char **argv)
+int main (int argc, char *argv[])
 {
-    class nes nes (argc > 1 ? argv[1] : "");
+    auto exit = arguments_manager::process (argc, argv);
+
+    if (exit)
+        return (0);
+
+    class nes nes;
     nes.start ();
 
     return (0);

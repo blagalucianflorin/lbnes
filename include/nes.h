@@ -30,7 +30,7 @@
 #endif
 
 #include "sdl_manager.h"
-#include "configurator.h"
+#include "configurator.hpp"
 #include "yaml-cpp/yaml.h"
 
 class nes
@@ -55,12 +55,10 @@ private:
     double    target_fps   = 60.098814;
     bool      rom_loaded   = false;
 
-    void main_loop ();
-
     void load_joypads ();
 
 public:
-    explicit nes (const std::string& rom_file);
+    nes ();
 
     ~nes ();
 
@@ -68,7 +66,7 @@ public:
 
     void        reload (const std::string& rom_file, bool initialize_controllers = false);
 
-    inline void toggle_fullscreen () { ToggleFullscreen (this -> game_window); }
+    inline void toggle_fullscreen () { ::toggle_fullscreen (this -> game_window); }
 
     void        start ();
 

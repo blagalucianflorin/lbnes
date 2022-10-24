@@ -25,8 +25,10 @@ inline void cross_platform_sleep(int64_t microseconds)
 }
 #endif
 
-nes::nes (const std::string& rom_file)
+nes::nes ()
 {
+    auto rom_file = configurator::get_instance ()["rom"].as<std::string> ();
+
     main_window (this -> game_window,  this -> game_renderer);
     SDL_SetEventFilter (nes::controller_connection_event_manager, &(this -> joypads));
 
@@ -43,18 +45,6 @@ nes::~nes ()
 
 void nes::start ()
 {
-    this -> main_loop ();
-}
-
-void nes::reset ()
-{
-    this -> nes_cpu -> reset ();
-    this -> nes_cartridge -> reset ();
-    this -> nes_ppu -> reset ();
-}
-
-void nes::main_loop ()
-{
     auto                      fps_period  = std::chrono::microseconds ((int) (1000000 / this -> target_fps));
     double                    average_fps = 60.098814;
     bool                      quit        = false;
@@ -69,13 +59,13 @@ void nes::main_loop ()
         fps_period = std::chrono::microseconds ((int) ((float) fps_period.count () *
                                                 (100.0 / configurator::get_instance ()["speed"].as<int>())));
 
-    while (!quit && !this -> rom_loaded)
+    while (!quit && !(this -> rom_loaded))
     {
-        while (SDL_PollEvent (&this -> game_input_event) == 1)
+        while (SDL_PollEvent (&(this -> game_input_event)))
             if (this -> game_input_event.type == SDL_QUIT)
                 quit = true;
             else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_p)
-                ToggleFullscreen (this -> game_window);
+                ::toggle_fullscreen (this -> game_window);
             else if (this -> game_input_event.type == SDL_DROPFILE)
                 reload (game_input_event.drop.file, true);
     }
@@ -89,7 +79,7 @@ void nes::main_loop ()
             if (this -> game_input_event.type == SDL_QUIT)
                 quit = true;
             else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_p)
-                ToggleFullscreen (this -> game_window);
+                ::toggle_fullscreen (this->game_window);
             else if (this -> game_input_event.type == SDL_DROPFILE)
                 reload (game_input_event.drop.file, false);
 
@@ -109,6 +99,13 @@ void nes::main_loop ()
         if (display_fps)
             SDL_SetWindowTitle (this -> game_window,((std::string("lbnes - FPS: ") + sstream.str ()).c_str ()));
     }
+}
+
+void nes::reset ()
+{
+    this -> nes_cpu -> reset ();
+    this -> nes_cartridge -> reset ();
+    this -> nes_ppu -> reset ();
 }
 
 uint32_t *nes::render_frame ()

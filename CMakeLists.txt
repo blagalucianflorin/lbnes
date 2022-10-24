@@ -38,7 +38,8 @@ set(SOURCES
     src/devices/ppu/oam.cpp src/devices/inputs/joypad.cpp
     src/sdl_manager.cpp
     src/nes.cpp
-    src/configurator.cpp)
+    src/configurator.cpp
+    src/arguments_manager.cpp)
 
 set (INCLUDES
     include/bus/bus.h
@@ -57,7 +58,8 @@ set (INCLUDES
     include/devices/ppu/oam.h include/devices/inputs/joypad.h
     include/sdl_manager.h
     include/nes.h
-    include/configurator.h)
+    include/configurator.hpp
+    include/arguments_manager.hpp)
 
 if (NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
@@ -94,7 +96,9 @@ if(WIN32)
     add_definitions(-DSDL_MAIN_HANDLED)
     add_definitions(-DYAML_CPP_STATIC_DEFINE)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-subsystem,windows")
+#    Commented at the moment because printing to terminal doesn't work on windows while this is enabled
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-subsystem,windows")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 elseif(UNIX AND NOT APPLE)
     target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
     target_link_libraries(lbnes -lSDL2 -l${YAML-CPP_LIB})
