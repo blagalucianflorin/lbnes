@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/yaml-cpp)
 
+
 if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "CMAKE_BUILD_TYPE is not set, defaulting to Release")
     set(CMAKE_BUILD_TYPE "Release")
@@ -21,6 +22,8 @@ endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
+include_directories(${PROJECT_SOURCE_DIR}/lib/imgui)
+include_directories(${PROJECT_SOURCE_DIR}/lib/imgui/backends)
 
 set(SOURCES
     src/bus/bus.cpp
@@ -63,6 +66,28 @@ set (INCLUDES
     include/arguments_manager.hpp
     include/misc/base64.h)
 
+set (IMGUI_SOURCES_AND_INCLUDES
+    lib/imgui/imconfig.h
+    lib/imgui/imgui.cpp
+    lib/imgui/imgui.h
+    lib/imgui/imgui_internal.h
+    lib/imgui/imgui_tables.cpp
+    lib/imgui/imgui_widgets.cpp
+    lib/imgui/imgui_demo.cpp
+    lib/imgui/imgui_draw.cpp
+    lib/imgui/imstb_rectpack.h
+    lib/imgui/imstb_textedit.h
+    lib/imgui/imstb_truetype.h
+    lib/imgui/backends/imgui_impl_sdl.h
+    lib/imgui/backends/imgui_impl_sdl.cpp
+    lib/imgui/backends/imgui_impl_sdlrenderer.h
+    lib/imgui/backends/imgui_impl_sdlrenderer.cpp)
+
+file(GLOB IMGUI_SOURCES ${IMGUI_SOURCES_AND_INCLUDES})
+add_library(imgui STATIC ${IMGUI_SOURCES})
+target_include_directories(imgui PUBLIC "lib/imgui")
+target_include_directories(imgui PUBLIC "lib/imgui/backends")
+
 if (NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
     set(INCLUDES ${INCLUDES} include/debugging/nes_debugger.h)
@@ -102,13 +127,19 @@ if(WIN32)
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-subsystem,windows")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 elseif(UNIX AND NOT APPLE)
+    find_package(SDL2 REQUIRED)
+    find_library(SDL2_LIBRARY SDL2)
+    include_directories(lbnes "${SDL2_INCLUDE_DIRS}")
     target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
-    target_link_libraries(lbnes -lSDL2 -l${YAML-CPP_LIB})
+    target_link_libraries(lbnes PUBLIC -lSDL2 -l${YAML-CPP_LIB})
+    target_link_libraries(lbnes PUBLIC imgui)
 elseif(APPLE)
     find_library(SDL2_LIBRARY SDL2)
+    include_directories(lbnes "${SDL2_INCLUDE_DIRS}/SDL2")
     include_directories(lbnes ${SDL2_INCLUDE_DIRS})
     target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
-    target_link_libraries(lbnes ${SDL2_LIBRARY} -l${YAML-CPP_LIB})
+    target_link_libraries(lbnes PUBLIC ${SDL2_LIBRARY} -l${YAML-CPP_LIB})
+    target_link_libraries(lbnes PUBLIC imgui)
 endif()
 
 configure_file(${PROJECT_SOURCE_DIR}/config.yaml ${CMAKE_CURRENT_BINARY_DIR}/config.yaml)
