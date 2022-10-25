@@ -34,6 +34,8 @@
 #include "configurator.hpp"
 #include "yaml-cpp/yaml.h"
 
+#include "portable-file-dialogs.h"
+
 class nes
 {
 private:

@@ -24,6 +24,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui)
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui/backends)
+include_directories(${PROJECT_SOURCE_DIR}/lib/portable-file-dialogs)
 
 set(SOURCES
     src/bus/bus.cpp
@@ -82,6 +83,10 @@ set (IMGUI_SOURCES_AND_INCLUDES
     lib/imgui/backends/imgui_impl_sdl.cpp
     lib/imgui/backends/imgui_impl_sdlrenderer.h
     lib/imgui/backends/imgui_impl_sdlrenderer.cpp)
+
+set (INCLUDES
+    ${INCLUDES}
+    lib/portable-file-dialogs/portable-file-dialogs.h)
 
 file(GLOB IMGUI_SOURCES ${IMGUI_SOURCES_AND_INCLUDES})
 add_library(imgui STATIC ${IMGUI_SOURCES})

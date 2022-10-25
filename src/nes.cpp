@@ -130,6 +130,15 @@ void nes::start ()
         ImGui::Begin("Menu");
         ImGui::Text("Emulation speed");
         ImGui::SliderInt("##", &speed, 1, 200);
+        if (ImGui::Button ("Load ROM"))
+        {
+            auto selection = pfd::open_file("Select a file").result();
+            if (!selection.empty())
+            {
+                std::cout << "Loading ROM:" << selection[0];
+                this -> reload (selection[0], false);
+            }
+        }
         ImGui::End();
 
         ImGui::Render();
