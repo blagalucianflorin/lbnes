@@ -37,7 +37,7 @@ cmake .. && make
 
 
 ### Windows (with MinGW)
-Install [CMake](https://cmake.org/download/) and [MinGW](https://sourceforge.net/projects/mingw/) and add them to PATH. CMake can be added to path through its install and MinGW will have to be added manually (probably "C:\MinGW\bin").
+Install [CMake](https://cmake.org/download/) and [MinGW64](https://winlibs.com/#download-release) and add them to PATH. CMake can be added to path through its install and MinGW64 will have to be added manually (probably "C:\mingw64\bin").
 
 Download the latest [SDL2](https://github.com/libsdl-org/SDL/releases) development VC release and extract it somewhere. Add the extracted folder as an environment variable called SDL_PATH.
 

@@ -76,6 +76,8 @@ void nes::start ()
     auto                      fps_period  = std::chrono::microseconds ((int) (1000000 / this -> target_fps));
     double                    average_fps = 60.098814;
     bool                      quit        = false;
+    bool                      show_menu   = true;
+    bool                      fullscreen  = configurator::get_instance()["fullscreen"].as<bool>();
     auto                      frame_start = std::chrono::high_resolution_clock::now ();
     double                    fps;
     std::chrono::microseconds sleep_time;
@@ -116,7 +118,7 @@ void nes::start ()
             if (this->game_input_event.type == SDL_QUIT)
                 quit = true;
             else if (this->game_input_event.type == SDL_KEYDOWN && this->game_input_event.key.keysym.sym == SDLK_p)
-                ::toggle_fullscreen(this->game_window);
+                show_menu = !show_menu;
             else if (this->game_input_event.type == SDL_DROPFILE)
                 reload(game_input_event.drop.file, false);
         }
@@ -127,19 +129,24 @@ void nes::start ()
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Menu");
-        ImGui::Text("Emulation speed");
-        ImGui::SliderInt("##", &speed, 1, 200);
-        if (ImGui::Button ("Load ROM"))
+        if (show_menu)
         {
-            auto selection = pfd::open_file("Select a file").result();
-            if (!selection.empty())
-            {
-                std::cout << "Loading ROM:" << selection[0];
-                this -> reload (selection[0], false);
+            ImGui::Begin("Menu");
+            ImGui::Text("Emulation speed");
+            ImGui::SliderInt("##", &speed, 1, 200);
+            if (ImGui::Button("Load ROM")) {
+                auto selection = pfd::open_file("Select a file").result();
+                if (!selection.empty()) {
+                    std::cout << "Loading ROM:" << selection[0];
+                    this->reload(selection[0], false);
+                }
             }
+            bool old_fullscreen_checkbox = fullscreen;
+            ImGui::Checkbox("Fullscreen", &fullscreen);
+            if (old_fullscreen_checkbox != fullscreen)
+                ::toggle_fullscreen (this -> game_window);
+            ImGui::End();
         }
-        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
