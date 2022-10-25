@@ -22,6 +22,7 @@
 #include "devices/memories/ppu_nametable_ram.h"
 #include "devices/memories/ppu_palette_ram.h"
 
+#include "sdl_manager.h"
 #ifdef _WIN32
 #include <SDL.h>
 #include <windows.h>
@@ -40,13 +41,17 @@ private:
     SDL_Window   *game_window     = nullptr;
     SDL_Event    game_input_event {};
 
+    SDL_Renderer *imgui_renderer   = nullptr;
+    SDL_Window   *imgui_window     = nullptr;
+    SDL_Event    imgui_input_event {};
+
     std::shared_ptr <ppu> nes_ppu;
     std::shared_ptr <cpu> nes_cpu;
     std::shared_ptr <bus> cpu_bus;
     std::shared_ptr <bus> ppu_bus;
 
     std::shared_ptr <ram>             cpu_ram;
-    std::shared_ptr <ppu_palette_ram> palette_ram;
+//    std::unique_ptr <ppu_palette_ram> palette_ram;
     std::shared_ptr <cartridge>       nes_cartridge;
 
     std::vector<std::unique_ptr<joypad>> joypads;

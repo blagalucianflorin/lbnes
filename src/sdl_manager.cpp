@@ -58,9 +58,9 @@ void draw_tiles (ppu *my_ppu)
 
 void draw_palette (SDL_Renderer *renderer, ppu *my_ppu)
 {
-    int top  = 300;
-    int left = 900;
-    int size = 10;
+    int top  = 0;
+    int left = 0;
+    int size = 25;
 
     for (uint16_t i = 0; i < 8; i++)
     {
@@ -109,7 +109,7 @@ void draw_whole_palette (SDL_Renderer *renderer, ppu *my_ppu)
 void surface_set_pixel (SDL_Surface *surface, int x, int y, uint32_t pixel)
 {
     auto direct_access_pixel = (uint32_t*) (((uint8_t*) surface -> pixels) + (y * surface -> pitch) +
-                               (x * surface -> format -> BytesPerPixel));
+                                            (x * surface -> format -> BytesPerPixel));
 
     *direct_access_pixel = pixel;
 }
