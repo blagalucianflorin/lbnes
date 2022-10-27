@@ -2,18 +2,19 @@
 // Created by lblaga on 04.09.2022.
 //
 
-#include "configurator.hpp"
+#include "options/configurator.hpp"
 
-configurator *configurator::instance = nullptr;
+configurator *configurator::instance   = nullptr;
+std::string  configurator::config_file = "config.yaml";
 
-configurator::configurator (const std::string &config_file_name)
+configurator::configurator ()
 {
-    std::ifstream fin (config_file_name);
+    std::ifstream fin (configurator::config_file);
 
     if (fin.good ())
     {
         fin.close ();
-        this -> config = YAML::LoadFile (config_file_name);
+        this -> config = YAML::LoadFile (configurator::config_file);
     }
 
     this -> set_defaults ();
@@ -50,4 +51,7 @@ void configurator::set_defaults ()
 
     if (!(this -> config)["new_controller_replaces_player_one"])
         (this -> config)["new_controller_replaces_player_one"] = true;
+
+    if (!(this -> config)["show_menu"])
+        (this -> config)["show_menu"] = true;
 }

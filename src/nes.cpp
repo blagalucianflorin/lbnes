@@ -2,180 +2,54 @@
 // Created by lblaga on 27.05.2022.
 //
 
-#include <iomanip>
 #include "nes.h"
 
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_sdlrenderer.h"
-
-#if _WIN32
-void cross_platform_sleep(int64_t usec)
-{
-    HANDLE timer;
-    LARGE_INTEGER ft;
-
-    ft.QuadPart = -(10*usec);
-
-    timer = CreateWaitableTimer(NULL, TRUE, NULL);
-    SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
-    WaitForSingleObject(timer, INFINITE);
-    CloseHandle(timer);
-}
-#else
-inline void cross_platform_sleep(int64_t microseconds)
-{
-    std::this_thread::sleep_for(std::chrono::microseconds (microseconds));
-}
-#endif
 
 nes::nes ()
 {
     auto rom_file = configurator::get_instance ()["rom"].as<std::string> ();
 
-    int window_width  = configurator::get_instance ()["resolution"]["width"].as<int> ();
-    int window_height = configurator::get_instance ()["resolution"]["height"].as<int> ();
-
     main_window (this -> game_window,  this -> game_renderer);
-
-//    int game_window_x;
-//    int game_window_y;
-//    SDL_GetWindowPosition(this -> game_window, &game_window_x, &game_window_y);
-//    main_window (this -> imgui_window,  this -> imgui_renderer, "Menu", 300, 300,
-//                 game_window_x + window_width, game_window_y);
     SDL_SetEventFilter (nes::controller_connection_event_manager, &(this -> joypads));
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    this -> imgui_manager = std::make_unique <class imgui_manager> (this -> game_renderer, this -> game_window, this);
 
-    ImGui::StyleColorsDark();
-
-    ImGui_ImplSDL2_InitForSDLRenderer(this -> game_window, this -> game_renderer);
-    ImGui_ImplSDLRenderer_Init(this -> game_renderer);
-//    ImGui_ImplSDL2_InitForSDLRenderer(this -> imgui_window, this -> imgui_renderer);
-//    ImGui_ImplSDLRenderer_Init(this -> imgui_renderer);
+    this -> options.show_menu   = configurator::get_instance()["show_menu"].as<bool> ();
+    this -> options.fullscreen  = configurator::get_instance()["fullscreen"].as<bool> ();
+    this -> options.display_fps = configurator::get_instance ()["display-fps"].as<bool> ();
+    this -> options.speed       = configurator::get_instance()["speed"].as<int> ();
+    this -> options.quit        = false;
 
     if (!rom_file.empty())
         this -> reload (rom_file, true);
 }
 
+
 nes::~nes ()
 {
-    ImGui_ImplSDLRenderer_Shutdown ();
-    ImGui_ImplSDL2_Shutdown ();
-    ImGui::DestroyContext ();
+    this -> imgui_manager.reset ();
 
     SDL_DestroyRenderer (this -> game_renderer);
     SDL_DestroyWindow (this -> game_window);
     SDL_Quit ();
 }
 
+
 void nes::start ()
 {
-    auto                      fps_period  = std::chrono::microseconds ((int) (1000000 / this -> target_fps));
-    double                    average_fps = 60.098814;
-    bool                      quit        = false;
-    bool                      show_menu   = true;
-    bool                      fullscreen  = configurator::get_instance()["fullscreen"].as<bool>();
-    auto                      frame_start = std::chrono::high_resolution_clock::now ();
-    double                    fps;
-    std::chrono::microseconds sleep_time;
-    std::chrono::microseconds delta_time;
+    auto frame_start = std::chrono::high_resolution_clock::now ();
 
-    bool display_fps = configurator::get_instance ()["display-fps"].as<bool>();
-
-    static int speed = 100;
-
-    if (configurator::get_instance ()["speed"])
-    {
-        fps_period = std::chrono::microseconds((int) ((float) fps_period.count() *
-                                                      (100.0 / configurator::get_instance()["speed"].as<int>())));
-
-        speed = configurator::get_instance ()["speed"].as<int>();
-    }
-
-    while (!quit && !(this -> rom_loaded))
-    {
-        while (SDL_PollEvent (&(this -> game_input_event)))
-            if (this -> game_input_event.type == SDL_QUIT)
-                quit = true;
-            else if (this -> game_input_event.type == SDL_DROPFILE)
-                reload (game_input_event.drop.file, true);
-    }
-
-
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-    quit = false;
-    while (!quit)
+    while (!this -> options.quit)
     {
         frame_start = std::chrono::high_resolution_clock::now ();
 
-        while (SDL_PollEvent (&this -> game_input_event) == 1)
-        {
-            ImGui_ImplSDL2_ProcessEvent(&this -> game_input_event);
-            if (this->game_input_event.type == SDL_QUIT)
-                quit = true;
-            else if (this->game_input_event.type == SDL_KEYDOWN && this->game_input_event.key.keysym.sym == SDLK_p)
-                show_menu = !show_menu;
-            else if (this->game_input_event.type == SDL_DROPFILE)
-                reload(game_input_event.drop.file, false);
-        }
-
+        this -> process_events ();
         this -> render_frame ();
-
-        ImGui_ImplSDLRenderer_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-
-        if (show_menu)
-        {
-            ImGui::Begin("Menu");
-            ImGui::Text("Emulation speed");
-            ImGui::SliderInt("##", &speed, 1, 200);
-            if (ImGui::Button("Load ROM")) {
-                auto selection = pfd::open_file("Select a file").result();
-                if (!selection.empty()) {
-                    std::cout << "Loading ROM:" << selection[0];
-                    this->reload(selection[0], false);
-                }
-            }
-            bool old_fullscreen_checkbox = fullscreen;
-            ImGui::Checkbox("Fullscreen", &fullscreen);
-            if (old_fullscreen_checkbox != fullscreen)
-                ::toggle_fullscreen (this -> game_window);
-            ImGui::End();
-        }
-
-        ImGui::Render();
-        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-
-//        draw_palette (this -> game_renderer, this -> nes_ppu.get ());
-
-        SDL_RenderPresent (this -> game_renderer);
-
-//        SDL_SetRenderDrawColor(this -> imgui_renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-//        SDL_RenderClear(this -> imgui_renderer);
-//        SDL_RenderPresent (this -> imgui_renderer);
-
-        fps_period = std::chrono::microseconds ((int) ((float) (std::chrono::microseconds ((int) (1000000 / this -> target_fps))).count () * (100.0 /speed)));
-        delta_time = std::chrono::duration_cast <std::chrono::microseconds> (std::chrono::high_resolution_clock::now () - frame_start);
-        sleep_time = std::chrono::duration_cast <std::chrono::microseconds> (fps_period - delta_time);
-
-        cross_platform_sleep ((sleep_time.count () / 100) * 95);
-        while (frame_start + fps_period > std::chrono::high_resolution_clock::now ()) {}
-
-        fps         = 1000000000.0 / (double) (std::chrono::high_resolution_clock::now () - frame_start).count ();
-        average_fps = (average_fps + fps) / 2;
-
-        std::stringstream sstream;
-        sstream << std::fixed << std::setprecision(2) << fps;
-
-        if (display_fps)
-            SDL_SetWindowTitle (this -> game_window,((std::string("lbnes - FPS: ") + sstream.str ()).c_str ()));
+        this -> sleep_until_next_frame (frame_start);
+        this -> set_title ();
     }
 }
+
 
 void nes::reset ()
 {
@@ -184,39 +58,54 @@ void nes::reset ()
     this -> nes_ppu -> reset ();
 }
 
+
 uint32_t *nes::render_frame ()
 {
-    for (int i = 0; i < (262 * 341) + (this -> nes_ppu -> is_odd_frame () ? 1 : 0); i++)
-    {
-        this -> nes_ppu -> clock ();
-        if (this -> total_cycles % 3 == 0)
-            (this -> nes_cpu) -> clock ();
+    SDL_SetRenderDrawColor (this -> game_renderer, 128, 128, 128, 255);
+    SDL_RenderClear (this -> game_renderer);
 
-        (this -> total_cycles)++;
+    if (this -> rom_loaded)
+    {
+        for (int i = 0; i < (262 * 341) + (this->nes_ppu->is_odd_frame() ? 1 : 0); i++)
+        {
+            this->nes_ppu->clock();
+            if (this->total_cycles % 3 == 0)
+                (this->nes_cpu)->clock();
+
+            (this->total_cycles)++;
+        }
     }
+
+    this -> imgui_manager -> draw_menu ();
+    SDL_RenderPresent (this -> game_renderer);
 
     return (this -> nes_ppu -> get_pixels ());
 }
+
 
 uint8_t nes::get_button (joypad::BUTTON button, uint8_t player)
 {
     return ((this -> joypads)[player] -> get_button (button));
 }
 
+
 uint8_t nes::set_button (joypad::BUTTON button, uint8_t value, uint8_t player)
 {
     return ((this -> joypads)[player] -> set_button (button, value));
 }
+
 
 void nes::reset_buttons (uint8_t player)
 {
     (this -> joypads)[player] -> reset_buttons ();
 }
 
+
 void nes::toggle_joypad (uint8_t player)
 {
     (this -> joypads)[player] -> toggle_activated ();
 }
+
 
 void nes::load_joypads ()
 {
@@ -261,6 +150,7 @@ void nes::load_joypads ()
     }
 }
 
+
 int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
 {
     if (!configurator::get_instance ()["new_controller_replaces_player_one"].as<bool>())
@@ -295,6 +185,7 @@ int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
     return (1);
 }
 
+
 void nes::reload (const std::string &rom_file, bool initialize_controllers)
 {
     nes_cpu = std::make_shared<cpu> ();
@@ -303,7 +194,7 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
     cpu_ram = std::make_shared<ram> ();
 //    palette_ram = std::make_unique <ppu_palette_ram> ();
     nes_cartridge = std::make_shared <cartridge> (rom_file);
-    nes_ppu = std::make_unique<ppu> (this -> game_renderer);
+    nes_ppu = std::make_shared <ppu> (this -> game_renderer);
 
     if (initialize_controllers)
         this -> joypads.clear ();
@@ -326,4 +217,51 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
     this -> rom_loaded = true;
 
     this -> reset ();
+}
+
+
+void nes::process_events ()
+{
+    while (SDL_PollEvent (&this -> game_input_event) == 1)
+    {
+        this -> imgui_manager -> process_event (&this -> game_input_event);
+        if (this->game_input_event.type == SDL_QUIT)
+            this -> options.quit = true;
+        else if (this->game_input_event.type == SDL_KEYDOWN && this->game_input_event.key.keysym.sym == SDLK_p)
+            this -> options.show_menu = !this -> options.show_menu;
+        else if (this->game_input_event.type == SDL_DROPFILE)
+            reload(game_input_event.drop.file, false);
+    }
+}
+
+
+void nes::sleep_until_next_frame (std::chrono::time_point<std::chrono::high_resolution_clock> &frame_start)
+{
+    static std::chrono::microseconds fps_period;
+    static std::chrono::microseconds sleep_time;
+
+    fps_period = std::chrono::microseconds ((int) ((float) (std::chrono::microseconds
+            ((int) (1000000 / this -> target_fps))).count () * (100.0 / this -> options.speed)));
+    sleep_time = std::chrono::duration_cast <std::chrono::microseconds> (fps_period - std::chrono::duration_cast
+            <std::chrono::microseconds>(std::chrono::high_resolution_clock::now () - frame_start));
+
+    std::this_thread::sleep_for(std::chrono::microseconds ((sleep_time.count () / 100) * 95));
+    while (frame_start + fps_period > std::chrono::high_resolution_clock::now ()) {}
+
+    current_fps = 1000000000.0 / (double) (std::chrono::high_resolution_clock::now () - frame_start).count ();
+    average_fps = (average_fps + current_fps) / 2;
+}
+
+
+void nes::set_title ()
+{
+    if (this -> options.display_fps)
+    {
+        std::stringstream fps_string_stream;
+        fps_string_stream << std::fixed << std::setprecision (2) << this -> current_fps;
+        SDL_SetWindowTitle (this -> game_window, ((std::string ("lbnes - FPS: ") +
+                                                   fps_string_stream.str ()).c_str ()));
+    }
+    else
+        SDL_SetWindowTitle (this -> game_window, std::string ("lbnes").c_str ());
 }

@@ -40,11 +40,12 @@ set(SOURCES
     src/devices/memories/ppu_palette_ram.cpp
     src/devices/memories/ppu_nametable_ram.cpp
     src/devices/ppu/oam.cpp src/devices/inputs/joypad.cpp
-    src/sdl_manager.cpp
+    src/graphics/sdl_manager.cpp
     src/nes.cpp
-    src/configurator.cpp
-    src/arguments_manager.cpp
-    src/misc/base64.cpp)
+    src/options/configurator.cpp
+    src/options/arguments_manager.cpp
+    src/misc/base64.cpp
+    src/graphics/imgui_manager.cpp)
 
 set (INCLUDES
     include/bus/bus.h
@@ -60,12 +61,14 @@ set (INCLUDES
     include/devices/ppu/exceptions/ppu_exception.h
     include/devices/memories/ppu_palette_ram.h
     include/devices/memories/ppu_nametable_ram.h
-    include/devices/ppu/oam.h include/devices/inputs/joypad.h
-    include/sdl_manager.h
+    include/devices/ppu/oam.h
+    include/devices/inputs/joypad.h
+    include/graphics/sdl_manager.h
     include/nes.h
-    include/configurator.hpp
-    include/arguments_manager.hpp
-    include/misc/base64.h)
+    include/options/configurator.hpp
+    include/options/arguments_manager.hpp
+    include/misc/base64.h
+    include/graphics/imgui_manager.hpp)
 
 set (IMGUI_SOURCES_AND_INCLUDES
     lib/imgui/imconfig.h
@@ -107,6 +110,8 @@ else()
     set(YAML-CPP_LIB yaml-cpp)
 endif()
 
+add_definitions(-DIMGUI_RENDERER_SDL)
+
 if(WIN32)
     if(NOT DEFINED ENV{SDL_PATH})
         message(STATUS "Environment variable SDL_PATH is not set, defaulting to C:/SDL2/")
@@ -131,6 +136,11 @@ if(WIN32)
     file(COPY ${SDL_LIB_DIRECTORY}/SDL2.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     add_definitions(-DSDL_MAIN_HANDLED)
     add_definitions(-DYAML_CPP_STATIC_DEFINE)
+
+    # Add IFileDialog for mingw64
+    # TODO try to fix this 'hack'
+    add_compile_definitions(NTDDI_VERSION=0x0A000006)
+    add_compile_definitions(_WIN32_WINNT=0x0A00)
 
 #    Commented at the moment because printing to terminal doesn't work on windows while this is enabled
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-subsystem,windows")

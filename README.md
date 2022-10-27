@@ -18,6 +18,7 @@ You can also build the emulator yourself, check out the 'Requirements, Clone & B
 - [x] **configuration file**
 - [x] **speed adjustment**
 - [x] **key mapping**
+- [x] **GUI**
 - [ ] save states (work in progress)
 - [ ] sound
 - [ ] other mappers

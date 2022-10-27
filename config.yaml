@@ -19,7 +19,9 @@ joypads:
 #  width: 768
 #  height: 720
 
-display-fps: true
+display-fps: false
+
+show_menu: true
 
 #new_controller_replaces_player_one: true
 

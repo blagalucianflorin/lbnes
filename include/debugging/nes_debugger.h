@@ -22,7 +22,7 @@
 #include "devices/memories/memory.h"
 #include "devices/cpu/6502.h"
 #include "devices/ppu/ppu.h"
-#include "sdl_manager.h"
+#include "graphics/sdl_manager.h"
 
 struct t_coords
 {

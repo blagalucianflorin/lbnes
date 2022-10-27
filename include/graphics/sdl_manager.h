@@ -6,7 +6,7 @@
 #define NEMULATOR_SDL_MANAGER_H
 
 #include "devices/ppu/ppu.h"
-#include "configurator.hpp"
+#include "options/configurator.hpp"
 
 extern "C" {
 #ifdef _WIN32

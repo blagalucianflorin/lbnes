@@ -17,7 +17,7 @@ protected:
 
     YAML::Node config;
 
-    explicit   configurator (const std::string &config_file_name = "config.yaml");
+    explicit   configurator ();
 
     void       set_defaults ();
 
@@ -25,6 +25,8 @@ public:
     static configurator &get_instance ();
 
     inline YAML::Node   operator[] (const std::string &value) { return (config[value]); }
+
+    static std::string config_file;
 };
 
 #endif //LBNES_CONFIGURATOR_HPP

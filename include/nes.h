@@ -12,6 +12,7 @@
 #include <thread>
 #include <exception>
 #include <memory>
+#include <iomanip>
 
 #include "bus/bus.h"
 #include "devices/cpu/6502.h"
@@ -22,7 +23,10 @@
 #include "devices/memories/ppu_nametable_ram.h"
 #include "devices/memories/ppu_palette_ram.h"
 
-#include "sdl_manager.h"
+#include "graphics/imgui_manager.hpp"
+#include "graphics/sdl_manager.h"
+#include "options/configurator.hpp"
+#include "yaml-cpp/yaml.h"
 #ifdef _WIN32
 #include <SDL.h>
 #include <windows.h>
@@ -30,22 +34,24 @@
 #include <SDL2/SDL.h>
 #endif
 
-#include "sdl_manager.h"
-#include "configurator.hpp"
-#include "yaml-cpp/yaml.h"
 
-#include "portable-file-dialogs.h"
 
 class nes
 {
+public:
+    struct options
+    {
+        bool show_menu;
+        bool fullscreen;
+        bool display_fps;
+        int  speed;
+        bool quit;
+    };
+
 private:
     SDL_Renderer *game_renderer   = nullptr;
     SDL_Window   *game_window     = nullptr;
     SDL_Event    game_input_event {};
-
-    SDL_Renderer *imgui_renderer   = nullptr;
-    SDL_Window   *imgui_window     = nullptr;
-    SDL_Event    imgui_input_event {};
 
     std::shared_ptr <ppu> nes_ppu;
     std::shared_ptr <cpu> nes_cpu;
@@ -61,8 +67,22 @@ private:
     long long total_cycles = 0;
     double    target_fps   = 60.098814;
     bool      rom_loaded   = false;
+    double    average_fps  = 60.098814;
+    double    current_fps{};
+
+    std::unique_ptr <class imgui_manager> imgui_manager;
+
+    struct options options{};
 
     void load_joypads ();
+
+    void process_events ();
+
+    void sleep_until_next_frame (std::chrono::time_point<std::chrono::high_resolution_clock> &frame_start);
+
+    void set_title ();
+
+    friend class imgui_manager;
 
 public:
     nes ();
@@ -72,8 +92,6 @@ public:
     void        reset ();
 
     void        reload (const std::string& rom_file, bool initialize_controllers = false);
-
-    inline void toggle_fullscreen () { ::toggle_fullscreen (this -> game_window); }
 
     void        start ();
 

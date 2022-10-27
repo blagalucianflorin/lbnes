@@ -1,5 +1,5 @@
 #include "nes.h"
-#include "arguments_manager.hpp"
+#include "options/arguments_manager.hpp"
 
 int main (int argc, char *argv[])
 {
