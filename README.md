@@ -1,6 +1,6 @@
 # lbnes
 
-A Nintendo Entertainment System emulator in the works. Written in C++ with SDL2.
+A Nintendo Entertainment System emulator in the works. Written in C++ with SDL2 and ImGui.
 Cross-platform support (currently Linux, Windows, Raspberry Pi and macOS). Actively developing new features and adding game support.
 Not 100% accurate but it works pretty well.
 
