@@ -42,6 +42,7 @@ include_directories(${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui)
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui/backends)
 include_directories(${PROJECT_SOURCE_DIR}/lib/portable-file-dialogs)
+include_directories(${PROJECT_SOURCE_DIR}/lib/CppSockets)
 
 set(SOURCES
     src/bus/bus.cpp
@@ -107,6 +108,15 @@ set (IMGUI_SOURCES_AND_INCLUDES
 set (INCLUDES
     ${INCLUDES}
     lib/portable-file-dialogs/portable-file-dialogs.h)
+
+
+set (INCLUDES
+    ${INCLUDES}
+    lib/CppSockets/SocketCompat.hpp
+    lib/CppSockets/TcpServerSocket.hpp
+    lib/CppSockets/TcpClientSocket.hpp
+    lib/CppSockets/TcpSocket.hpp)
+
 
 file(GLOB IMGUI_SOURCES ${IMGUI_SOURCES_AND_INCLUDES})
 add_library(imgui STATIC ${IMGUI_SOURCES})
