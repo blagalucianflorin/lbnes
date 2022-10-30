@@ -15,14 +15,18 @@ joypads:
     player:           2
     controller_index: 1
 
+rom: smb.nes
+
 #resolution:
 #  width: 768
 #  height: 720
 
-display-fps: false
+#display_fps: false
 
-show_menu: true
+#show_menu: true
 
 #new_controller_replaces_player_one: true
 
-speed: 100 #%
+#speed: 100 #%
+
+#vsync: false

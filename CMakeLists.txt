@@ -2,8 +2,25 @@ cmake_minimum_required(VERSION 3.17)
 project(lbnes)
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/yaml-cpp)
+set(LBNES_VERSION 1.1)
 
+#[===[  Changelist:
+
+v1.1 - added menu with imgui
+     - added arguments
+     - fix occasional color corruption
+     - eliminated need for any configuration file (though you can still use one)
+     - switched to mingw64 on Windows
+     - performance optimizations
+     - VSync option
+
+v1.0 - initial version
+
+]===]#
+
+add_compile_definitions(LBNES_VERSION="${LBNES_VERSION}")
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/yaml-cpp)
 
 if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "CMAKE_BUILD_TYPE is not set, defaulting to Release")
@@ -96,18 +113,26 @@ add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC "lib/imgui")
 target_include_directories(imgui PUBLIC "lib/imgui/backends")
 
-if (NES_DEBUGGER)
+if(NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
     set(INCLUDES ${INCLUDES} include/debugging/nes_debugger.h)
-endif ()
+endif()
 
-add_executable (lbnes main.cpp ${SOURCES} ${INCLUDES})
+add_executable(lbnes main.cpp ${SOURCES} ${INCLUDES})
 add_dependencies(lbnes yaml-cpp)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(YAML-CPP_LIB yaml-cppd)
 else()
     set(YAML-CPP_LIB yaml-cpp)
+endif()
+
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+    set(GCC_OPTIMIZATION_FLAGS "-O0")
+else()
+    set(GCC_OPTIMIZATION_FLAGS "-O3")
 endif()
 
 add_definitions(-DIMGUI_RENDERER_SDL)
@@ -137,8 +162,8 @@ if(WIN32)
     add_definitions(-DSDL_MAIN_HANDLED)
     add_definitions(-DYAML_CPP_STATIC_DEFINE)
 
-    # Add IFileDialog for mingw64
     # TODO try to fix this 'hack'
+    # Add IFileDialog for mingw64
     add_compile_definitions(NTDDI_VERSION=0x0A000006)
     add_compile_definitions(_WIN32_WINNT=0x0A00)
 
@@ -162,4 +187,4 @@ endif()
 configure_file(${PROJECT_SOURCE_DIR}/config.yaml ${CMAKE_CURRENT_BINARY_DIR}/config.yaml)
 
 set(CXX_WARNINGS_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS_COMPILE_FLAGS} ${GCC_OPTIMIZATION_FLAGS}")

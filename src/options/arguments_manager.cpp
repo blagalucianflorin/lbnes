@@ -4,6 +4,7 @@
 
 #include "options/arguments_manager.hpp"
 
+
 // TODO checks needed
 int arguments_manager::process (int argc, char **argv)
 {
@@ -17,6 +18,13 @@ int arguments_manager::process (int argc, char **argv)
         if (current_argument == "-h" or current_argument == "--help")
         {
             arguments_manager::print_help ();
+
+            return (1);
+        }
+
+        if (current_argument == "-v" or current_argument == "--version")
+        {
+            std::cout << "lbnes v" LBNES_VERSION << std::endl;
 
             return (1);
         }
@@ -69,19 +77,19 @@ int arguments_manager::process (int argc, char **argv)
             goto SKIP_ARGUMENT_CHECKS;
         }
 
-        if (current_argument == "--display-fps")
+        if (current_argument == "--display_fps")
         {
             if (i >= argc - 1)
             {
                 next_argument = argv[i + 1];
 
                 if (next_argument[0] != '-')
-                    configurator::get_instance ()["display-fps"] = next_argument == "true";
+                    configurator::get_instance ()["display_fps"] = next_argument == "true";
                 else
-                    configurator::get_instance ()["display-fps"] = true;
+                    configurator::get_instance ()["display_fps"] = true;
             }
             else
-                configurator::get_instance ()["display-fps"] = true;
+                configurator::get_instance ()["display_fps"] = true;
 
             goto SKIP_ARGUMENT_CHECKS;
         }
@@ -134,6 +142,23 @@ int arguments_manager::process (int argc, char **argv)
             goto SKIP_ARGUMENT_CHECKS;
         }
 
+        if (current_argument == "--vsync")
+        {
+            if (i >= argc - 1)
+            {
+                next_argument = argv[i + 1];
+
+                if (next_argument[0] != '-')
+                    configurator::get_instance ()["vsync"] = next_argument == "true";
+                else
+                    configurator::get_instance ()["vsync"] = true;
+            }
+            else
+                configurator::get_instance ()["vsync"] = true;
+
+            goto SKIP_ARGUMENT_CHECKS;
+        }
+
 SKIP_ARGUMENT_CHECKS:
         continue;
     }
@@ -141,18 +166,32 @@ SKIP_ARGUMENT_CHECKS:
     return (0);
 }
 
+
 void arguments_manager::print_help ()
 {
     std::string help =
-        "lbnes help. Options:\n"
-        "\t-h / --help: Display this menu.\n\n"
+        "lbnes " LBNES_VERSION "\n\n"
+
+        "The options priority is as follows:\n"
+        "\t1. CLI arguments.\n"
+        "\t2. Config file values.\n"
+        "\t3. Default values.\n\n"
+
+        "Default controls mapping (only player one):\n"
+        "\t- DPAD: \tWASD\n"
+        "\t- A:\t\tN\n"
+        "\t- B:\t\tM\n"
+        "\t- Start:\tK\n"
+        "\t- Select:\tJ\n\n"
+
+        "Options:\n"
+        "\t-h / --help: Display this message.\n\n"
 
         "\t-r / --rom <rom_file>: ROM file to be loaded at startup.\n"
         "\tDefault: none\n\n"
 
         "\t-f / --fullscreen [true/false]: Start in fullscreen.\n"
         "\tNot specifying true/false will default to true.\n"
-        "\t\tNote: This should only be used with a ROM file also specified at the moment.\n"
         "\tDefault: false\n\n"
 
         "\t-W / --width <width>: Width of the window.\n"
@@ -161,7 +200,7 @@ void arguments_manager::print_help ()
         "\t-H / --height <height>: Height of the window.\n"
         "\tDefault: 720\n\n"
 
-        "\t--display-fps [true/false]: Display fps in title bar.\n"
+        "\t--display_fps [true/false]: Display fps in title bar.\n"
         "\tNot specifying true/false will default to true.\n"
         "\tDefault: false\n\n"
 
@@ -176,9 +215,11 @@ void arguments_manager::print_help ()
         "\tNot specifying true/false will default to true.\n"
         "\tDefault: true\n\n"
 
+        "\t--vsync [true/false]: VSync option. Only works for 60 FPS.\n"
+        "\tNot specifying true/false will default to true.\n"
+        "\tDefault: false\n\n"
+
         "\t-c / --config_file <config_file_path>: The config file to load at startup.\n"
-        "\tIf no config file is specified or found, default values no overwritten by CLI arguments\n"
-        "\twill be used.\n"
         "\tDefault: config.yaml\n";
 
     std::cout << help;

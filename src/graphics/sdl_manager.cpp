@@ -7,12 +7,13 @@
 
 void toggle_fullscreen (SDL_Window* Window)
 {
-    bool IsFullscreen = SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN;
-    SDL_SetWindowFullscreen(Window, IsFullscreen ? 0 : SDL_WINDOW_FULLSCREEN);
-    SDL_ShowCursor(IsFullscreen);
+    bool IsFullscreen = SDL_GetWindowFlags (Window) & SDL_WINDOW_FULLSCREEN;
+    SDL_SetWindowFullscreen (Window, IsFullscreen ? 0 : SDL_WINDOW_FULLSCREEN);
+    SDL_ShowCursor (IsFullscreen);
 }
 
-void main_window (SDL_Window *&window, SDL_Renderer *&renderer)
+
+void create_sdl_window (SDL_Window *&window, SDL_Renderer *&renderer)
 {
     int window_width  = configurator::get_instance ()["resolution"]["width"].as<int> ();
     int window_height = configurator::get_instance ()["resolution"]["height"].as<int> ();
@@ -21,13 +22,28 @@ void main_window (SDL_Window *&window, SDL_Renderer *&renderer)
     SDL_CreateWindowAndRenderer (window_width, window_height, 0, &window, &renderer);
     SDL_SetWindowSize (window, window_width,window_height);
     SDL_SetWindowPosition (window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    SDL_SetWindowTitle (window, "lbnes");
+    SDL_RenderSetVSync (renderer, (int) (configurator::get_instance ()["vsync"].as <bool> () ? 1 : 0));
 
     if (configurator::get_instance ()["fullscreen"].as<bool> ())
         SDL_SetWindowFullscreen (window, SDL_WINDOW_FULLSCREEN);
 }
 
-void draw_tiles (ppu *my_ppu)
+
+void surface_set_pixel (SDL_Surface *surface, size_t x, size_t y, uint32_t pixel)
+{
+    *((uint32_t*) (((uint8_t*) surface -> pixels) + (y * surface -> pitch) +
+    (x * surface -> format -> BytesPerPixel))) = pixel;
+}
+
+
+void update_vsync (SDL_Renderer *renderer)
+{
+    SDL_RenderSetVSync (renderer, (int) (configurator::get_instance ()["vsync"].as <bool> () ? 1 : 0));
+}
+
+
+#ifdef DEBUG
+[[maybe_unused]] void draw_tiles (ppu *my_ppu)
 {
     int top = 10;
     int left = 810;
@@ -56,7 +72,8 @@ void draw_tiles (ppu *my_ppu)
     }
 }
 
-void draw_palette (SDL_Renderer *renderer, ppu *my_ppu)
+
+[[maybe_unused]] void draw_palette (SDL_Renderer *renderer, ppu *my_ppu)
 {
     int top  = 0;
     int left = 0;
@@ -80,7 +97,8 @@ void draw_palette (SDL_Renderer *renderer, ppu *my_ppu)
     }
 }
 
-void draw_whole_palette (SDL_Renderer *renderer, ppu *my_ppu)
+
+[[maybe_unused]] void draw_whole_palette (SDL_Renderer *renderer, ppu *my_ppu)
 {
 
     int top  = 600;
@@ -104,12 +122,4 @@ void draw_whole_palette (SDL_Renderer *renderer, ppu *my_ppu)
         }
     }
 }
-
-
-void surface_set_pixel (SDL_Surface *surface, int x, int y, uint32_t pixel)
-{
-    auto direct_access_pixel = (uint32_t*) (((uint8_t*) surface -> pixels) + (y * surface -> pitch) +
-                                            (x * surface -> format -> BytesPerPixel));
-
-    *direct_access_pixel = pixel;
-}
+#endif
