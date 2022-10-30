@@ -21,6 +21,38 @@ nes::nes ()
     this -> options.speed       = configurator::get_instance ()["speed"].as <int> ();
     this -> options.quit        = false;
 
+    if (configurator::get_instance ()["server"].as <bool> ())
+    {
+        this -> is_server = true;
+
+        std::cout << "Starting server on " << configurator::get_instance ()["server_ip"].as <std::string> ()
+                << ":" << configurator::get_instance ()["port"].as <short> ()
+                << ". Waiting for connections..." << std::endl;
+
+        this -> screen_server = std::make_unique <class server> (
+                configurator::get_instance ()["server_ip"].as <std::string> ().c_str (),
+                configurator::get_instance ()["port"].as <short> ());
+
+        std::cout << "Client connected!";
+    }
+
+    if (configurator::get_instance ()["client"].as <bool> ())
+    {
+        this -> is_client = true;
+
+        this -> client_screen_surface = SDL_CreateRGBSurface (0, 256, 240, 24, 0, 0, 0, 0);
+        this -> client_screen_texture = SDL_CreateTextureFromSurface (this -> game_renderer, this -> client_screen_surface);
+
+        std::cout << "Connecting to server on " << configurator::get_instance ()["server_ip"].as <std::string> ()
+                  << ":" << configurator::get_instance ()["port"].as <short> () << "..." << std::endl;
+
+        this -> screen_client = std::make_unique <class client> (
+                configurator::get_instance ()["server_ip"].as <std::string> ().c_str (),
+                configurator::get_instance ()["port"].as <short> ());
+
+        std::cout << "Connected!";
+    }
+
     if (!rom_file.empty ())
         this -> reload (rom_file, true);
 }
@@ -42,11 +74,12 @@ void nes::start ()
 
     while (!this -> options.quit)
     {
-        frame_start = std::chrono::high_resolution_clock::now ();
+        frame_start = std::chrono::high_resolution_clock::now();
 
         this -> process_events ();
         this -> render_frame ();
-        this -> sleep_until_next_frame (frame_start);
+        if (!this -> is_client)
+            this -> sleep_until_next_frame (frame_start);
         this -> set_title ();
     }
 }
@@ -68,19 +101,38 @@ uint32_t *nes::render_frame ()
     SDL_SetRenderDrawColor (this -> game_renderer, 128, 128, 128, 255);
     SDL_RenderClear (this -> game_renderer);
 
-    if (this -> rom_loaded)
+    if (this -> is_client)
     {
-        for (int i = 0; i < (262 * 341) + (this -> nes_ppu -> is_odd_frame () ? 1 : 0); i++)
-        {
-            this -> nes_ppu -> clock ();
-            if (this -> total_cycles % 3 == 0)
-                (this -> nes_cpu) -> clock ();
+        this -> screen_client -> receive_screen (this -> client_pixels);
 
-            (this -> total_cycles)++;
+        for (int i = 0; i < 240; i++)
+            for (int j = 0; j < 256; j++)
+                surface_set_pixel (this -> client_screen_surface, j, i, this -> client_pixels[i * 240 + j]);
+
+        SDL_DestroyTexture (this -> client_screen_texture);
+        this -> client_screen_texture = SDL_CreateTextureFromSurface (this -> game_renderer, this -> client_screen_surface);
+        SDL_RenderCopy (this -> game_renderer, this -> client_screen_texture, nullptr, nullptr);
+    }
+    else
+    {
+        if (this -> rom_loaded)
+        {
+            for (int i = 0; i < (262 * 341) + (this -> nes_ppu -> is_odd_frame () ? 1 : 0); i++)
+            {
+                this -> nes_ppu -> clock ();
+                if (this -> total_cycles % 3 == 0)
+                    (this -> nes_cpu) -> clock ();
+
+                (this -> total_cycles)++;
+            }
         }
     }
 
     this -> imgui_manager -> draw_menu ();
+
+    if (this -> is_server)
+        this -> screen_server -> send_screen (this -> nes_ppu -> get_pixels ());
+
     SDL_RenderPresent (this -> game_renderer);
 
     return (this -> nes_ppu -> get_pixels ());

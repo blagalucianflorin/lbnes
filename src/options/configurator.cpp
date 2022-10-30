@@ -62,6 +62,18 @@ void configurator::set_defaults ()
     if (!(this -> config)["vsync"])
         (this -> config)["vsync"] = false;
 
+    if (!(this -> config)["server"])
+        (this -> config)["server"] = false;
+
+    if (!(this -> config)["client"])
+        (this -> config)["client"] = false;
+
+    if (!(this -> config)["server_ip"])
+        (this -> config)["server_ip"] = "localhost";
+
+    if (!this -> config["port"])
+        (this -> config)["port"] = 5035;
+
     // Controls defaults
     if (!(this -> config)["joypads"])
     {

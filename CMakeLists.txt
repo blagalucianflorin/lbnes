@@ -37,12 +37,14 @@ if(NOT CMAKE_CXX_COMPILER)
     set(CMAKE_CXX_COMPILER g++)
 endif()
 
+
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui)
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui/backends)
 include_directories(${PROJECT_SOURCE_DIR}/lib/portable-file-dialogs)
 include_directories(${PROJECT_SOURCE_DIR}/lib/CppSockets)
+
 
 set(SOURCES
     src/bus/bus.cpp
@@ -63,7 +65,10 @@ set(SOURCES
     src/options/configurator.cpp
     src/options/arguments_manager.cpp
     src/misc/base64.cpp
-    src/graphics/imgui_manager.cpp)
+    src/graphics/imgui_manager.cpp
+    src/network/server.cpp
+    src/network/client.cpp)
+
 
 set (INCLUDES
     include/bus/bus.h
@@ -86,7 +91,10 @@ set (INCLUDES
     include/options/configurator.hpp
     include/options/arguments_manager.hpp
     include/misc/base64.h
-    include/graphics/imgui_manager.hpp)
+    include/graphics/imgui_manager.hpp
+    include/network/server.hpp
+    include/network/client.hpp)
+
 
 set (IMGUI_SOURCES_AND_INCLUDES
     lib/imgui/imconfig.h
@@ -105,6 +113,7 @@ set (IMGUI_SOURCES_AND_INCLUDES
     lib/imgui/backends/imgui_impl_sdlrenderer.h
     lib/imgui/backends/imgui_impl_sdlrenderer.cpp)
 
+
 set (INCLUDES
     ${INCLUDES}
     lib/portable-file-dialogs/portable-file-dialogs.h)
@@ -115,7 +124,10 @@ set (INCLUDES
     lib/CppSockets/SocketCompat.hpp
     lib/CppSockets/TcpServerSocket.hpp
     lib/CppSockets/TcpClientSocket.hpp
-    lib/CppSockets/TcpSocket.hpp)
+    lib/CppSockets/TcpSocket.hpp
+    lib/CppSockets/UdpClientSocket.hpp
+    lib/CppSockets/UdpServerSocket.hpp
+    lib/CppSockets/UdpSocket.hpp)
 
 
 file(GLOB IMGUI_SOURCES ${IMGUI_SOURCES_AND_INCLUDES})
@@ -125,7 +137,7 @@ target_include_directories(imgui PUBLIC "lib/imgui/backends")
 
 if(NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
-    set(INCLUDES ${INCLUDES} include/debugging/nes_debugger.h)
+    set(INCLUDES ${INCLUDES} include/debugging/nes_debugger.h src/network/server.cpp)
 endif()
 
 add_executable(lbnes main.cpp ${SOURCES} ${INCLUDES})
@@ -166,7 +178,7 @@ if(WIN32)
     target_include_directories(lbnes PUBLIC $ENV{SDL_PATH}/include)
     target_link_directories(lbnes PUBLIC ${SDL_LIB_DIRECTORY})
     target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
-    target_link_libraries(lbnes PUBLIC SDL2main SDL2 -l${YAML-CPP_LIB} imgui)
+    target_link_libraries(lbnes PUBLIC SDL2main SDL2 -l${YAML-CPP_LIB} imgui -lws2_32)
 
     file(COPY ${SDL_LIB_DIRECTORY}/SDL2.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     add_definitions(-DSDL_MAIN_HANDLED)
@@ -176,6 +188,9 @@ if(WIN32)
     # Add IFileDialog for mingw64
     add_compile_definitions(NTDDI_VERSION=0x0A000006)
     add_compile_definitions(_WIN32_WINNT=0x0A00)
+
+    add_compile_definitions(UNICODE)
+    add_compile_definitions(_UNICODE)
 
 #    Commented at the moment because printing to terminal doesn't work on windows while this is enabled
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-subsystem,windows")

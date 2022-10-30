@@ -30,6 +30,9 @@
 #include "options/configurator.hpp"
 #include "yaml-cpp/yaml.h"
 
+#include "network/client.hpp"
+#include "network/server.hpp"
+
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -61,6 +64,14 @@ private:
     double    average_fps  = 60.098814;
     double    current_fps  = 60.098814;
 
+    bool is_server = false;
+    bool is_client = false;
+    std::unique_ptr <class server> screen_server;
+    std::unique_ptr <class client> screen_client;
+
+    uint32_t     client_pixels[240 * 256];
+    SDL_Texture  *client_screen_texture = nullptr;
+    SDL_Surface  *client_screen_surface = nullptr;
 
     struct options
     {

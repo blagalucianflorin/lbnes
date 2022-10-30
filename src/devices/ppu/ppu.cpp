@@ -889,3 +889,14 @@ void ppu::populate_palette_2C02()
     (this -> color_palette)[0x3E] = {0, 0, 0};       (this -> color_palette)[0x3F] = {0, 0, 0};
 }
 
+void ppu::update_whole_screen ()
+{
+    for (int i = 0; i < 240; i++)
+        for (int j = 0; j < 256; j++)
+            surface_set_pixel (this -> screen_surface, j, i, this -> pixels[i * 240 + j]);
+
+    SDL_DestroyTexture (this -> screen);
+    this -> screen = SDL_CreateTextureFromSurface (this -> renderer, this -> screen_surface);
+    SDL_RenderCopy (this -> renderer, this -> screen, nullptr, nullptr);
+}
+

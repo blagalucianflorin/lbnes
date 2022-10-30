@@ -159,6 +159,54 @@ int arguments_manager::process (int argc, char **argv)
             goto SKIP_ARGUMENT_CHECKS;
         }
 
+        if (current_argument == "--client")
+        {
+            if (i <= argc - 2)
+            {
+                next_argument = argv[i + 1];
+
+                if (next_argument[0] != '-')
+                    configurator::get_instance ()["client"] = next_argument == "true";
+                else
+                    configurator::get_instance ()["client"] = true;
+            }
+            else
+                configurator::get_instance ()["client"] = true;
+
+            goto SKIP_ARGUMENT_CHECKS;
+        }
+
+        if (current_argument == "--server")
+        {
+            if (i <= argc - 2)
+            {
+                next_argument = argv[i + 1];
+
+                if (next_argument[0] != '-')
+                    configurator::get_instance ()["server"] = next_argument == "true";
+                else
+                    configurator::get_instance ()["server"] = true;
+            }
+            else
+                configurator::get_instance ()["server"] = true;
+
+            goto SKIP_ARGUMENT_CHECKS;
+        }
+
+        if (current_argument == "-p" or current_argument == "--port")
+        {
+            configurator::get_instance ()["vsync"] = std::stoi (std::string (argv[i + 1]));
+
+            goto SKIP_ARGUMENT_CHECKS;
+        }
+
+        if (current_argument == "--server_ip")
+        {
+            configurator::get_instance ()["server_ip"] = std::string (argv[i + 1]);
+
+            goto SKIP_ARGUMENT_CHECKS;
+        }
+
 SKIP_ARGUMENT_CHECKS:
         continue;
     }
@@ -218,6 +266,21 @@ void arguments_manager::print_help ()
         "\t--vsync [true/false]: VSync option. Only works for 60 FPS.\n"
         "\tNot specifying true/false will default to true.\n"
         "\tDefault: false\n\n"
+
+        "\t--client [true/false]: Use lbnes as a client (Player 2).\n"
+        "\tNot specifying true/false will default to true.\n"
+        "\tNote: You'll most likely also want to specify --server_ip if you use lbnes as a client.\n"
+        "\tDefault: false\n\n"
+
+        "\t--server [true/false]: Use lbnes as a server (Player 1).\n"
+        "\tNot specifying true/false will default to true.\n"
+        "\tDefault: false\n\n"
+
+        "\t-p / --port <port>: Port to be used when lbnes is used as client or a server.\n"
+        "\tDefault: 5035\n\n"
+
+        "\t--server_ip <ip>: IP of the server. Used by both client and server.\n"
+        "\tDefault: localhost\n\n"
 
         "\t-c / --config_file <config_file_path>: The config file to load at startup.\n"
         "\tDefault: config.yaml\n";

@@ -252,6 +252,8 @@ public:
     long long frames_rendered = 0;
 
     void      draw_tile (uint16_t chr, int x, int y);
+
+    void      update_whole_screen ();
 };
 
 #endif //NEMULATOR_PPU_H

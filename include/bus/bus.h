@@ -13,6 +13,7 @@
 #include "devices/device.h"
 #include "misc/state.h"
 
+
 class bus: public state
 {
 private:
