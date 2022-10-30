@@ -46,7 +46,7 @@ void imgui_manager::draw_menu ()
     if (this -> nes -> options.show_menu)
     {
         ImGui::SetNextWindowPos (ImVec2 (0, 0));
-        ImGui::SetNextWindowSize (ImVec2 (290, 310));
+        ImGui::SetNextWindowSize (ImVec2 (290, 350));
         ImGui::Begin ("Menu");
 
         ImGui::Text ("Press P to toggle the menu");
@@ -62,8 +62,10 @@ void imgui_manager::draw_menu ()
             ImGui::EndDisabled ();
         ImGui::NewLine ();
 
-        if (ImGui::Button ("Load ROM")) {
+        if (ImGui::Button ("Load ROM"))
+        {
             auto selection = pfd::open_file ("Select a file").result ();
+
             if (!selection.empty ()) {
                 this -> nes -> reload (selection[0], this -> nes -> joypads.empty ());
             }
@@ -94,6 +96,10 @@ void imgui_manager::draw_menu ()
                 this -> nes -> options.speed = 100;
             }
         }
+        ImGui::NewLine ();
+
+        if (ImGui::Button ("Reset"))
+            this -> nes -> reset ();
         ImGui::NewLine ();
 
         if (ImGui::Button ("Quit"))

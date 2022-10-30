@@ -54,6 +54,9 @@ void nes::start ()
 
 void nes::reset ()
 {
+    if (!this -> rom_loaded)
+        return;
+
     this -> nes_cpu -> reset ();
     this -> nes_cartridge -> reset ();
     this -> nes_ppu -> reset ();
