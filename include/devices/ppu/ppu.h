@@ -198,6 +198,8 @@ private:
     bool sprite_zero_included = false;
     bool drawing_sprite_zero  = false;
 
+    cartridge::MIRRORING_TYPE mirroring_type = cartridge::HORIZONTAL;
+
 public:
     ppu () : device (0x2000, 0x3FFF) {}
 
@@ -217,15 +219,15 @@ public:
 
     uint8_t  set_control_flag (CONTROL_FLAG flag, uint8_t value);
 
-    uint8_t  get_control_flag (CONTROL_FLAG flag);
+    uint8_t  get_control_flag (CONTROL_FLAG flag) const;
 
     uint8_t  set_mask_flag (MASK_FLAG flag, uint8_t value);
 
-    uint8_t  get_mask_flag (MASK_FLAG flag);
+    uint8_t  get_mask_flag (MASK_FLAG flag) const;
 
     uint8_t  set_status_flag (STATUS_FLAG flag, uint8_t value);
 
-    uint8_t  get_status_flag (STATUS_FLAG flag);
+    uint8_t  get_status_flag (STATUS_FLAG flag) const;
 
     inline uint32_t *get_pixels () { return (this -> pixels); }
 
@@ -237,7 +239,11 @@ public:
 
     inline void attach (SDL_Renderer *new_renderer) { this -> renderer = new_renderer; }
 
-    inline void attach (class cartridge *new_cartridge) { this -> cartridge = new_cartridge; }
+    inline void attach (class cartridge *new_cartridge)
+    {
+        this -> cartridge       = new_cartridge;
+        this -> mirroring_type  = this -> cartridge -> get_mirroring ();
+    }
 
     inline bool is_odd_frame () { return (this -> odd_frame); }
 

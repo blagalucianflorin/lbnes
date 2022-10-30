@@ -43,18 +43,18 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
         {
             address &= 0x0FFF;
 
-            if (this -> cartridge -> get_mirroring () == cartridge::VERTICAL)
+            if (this -> mirroring_type == cartridge::VERTICAL)
             {
                 if (IS_BETWEEN (0x0000, address, 0x03FF) || IS_BETWEEN (0x0800, address, 0x0DFF))
                     (this -> nametable_memory)[address & 0x03FF] = data;
-                else if (IS_BETWEEN (0x0400, address, 0x07FF) || IS_BETWEEN (0x0C00, address, 0x0FFF))
+                else
                     (this -> nametable_memory)[0x0400 + (address & 0x03FF)] = data;
             }
-            else if (this -> cartridge -> get_mirroring () == cartridge::HORIZONTAL)
+            else if (this -> mirroring_type == cartridge::HORIZONTAL)
             {
                 if (IS_BETWEEN (0x0000, address, 0x07FF))
                     (this -> nametable_memory)[address & 0x03FF] = data;
-                else if (IS_BETWEEN (0x0800, address, 0x0FFF))
+                else
                     (this -> nametable_memory)[0x0400 + (address & 0x03FF)] = data;
             }
         }
@@ -63,13 +63,25 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
         {
             address &= 0x001F;
 
-            if (address == 0x0010) address = 0x0000;
-            if (address == 0x0014) address = 0x0004;
-            if (address == 0x0018) address = 0x0008;
-            if (address == 0x001C) address = 0x000C;
+            switch (address)
+            {
+                case 0x0010:
+                    address = 0x0000;
+                    break;
+                case 0x0014:
+                    address = 0x0004;
+                    break;
+                case 0x0018:
+                    address = 0x0008;
+                    break;
+                case 0x001C:
+                    address = 0x000C;
+                    break;
+                default:
+                    break;
+            }
 
             this -> palette_memory[address] = data;
-//            this -> child_bus -> write (address, data);
         }
         return;
     }
@@ -78,6 +90,7 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
     if (address == 0x4014)
     {
         this -> cpu -> dma (this, data);
+        return;
     }
     // Registers
     switch ((address - 0x2000) % 8)
@@ -156,18 +169,18 @@ uint8_t ppu::read (uint16_t address, bool from_parent_bus) // NOLINT
         {
             address &= 0x0FFF;
 
-            if (this -> cartridge -> get_mirroring () == cartridge::VERTICAL)
+            if (this -> mirroring_type == cartridge::VERTICAL)
             {
                 if (IS_BETWEEN (0x0000, address, 0x03FF) || IS_BETWEEN (0x0800, address, 0x0DFF))
                     return ((this -> nametable_memory)[address & 0x03FF]);
-                else if (IS_BETWEEN (0x0400, address, 0x07FF) || IS_BETWEEN (0x0C00, address, 0x0FFF))
+                else
                     return ((this -> nametable_memory)[0x0400 + (address & 0x03FF)]);
             }
-            else if (this -> cartridge -> get_mirroring () == cartridge::HORIZONTAL)
+            else if (this -> mirroring_type == cartridge::HORIZONTAL)
             {
                 if (IS_BETWEEN (0x0000, address, 0x07FF))
                     return ((this -> nametable_memory)[address & 0x03FF]);
-                else if (IS_BETWEEN (0x0800, address, 0x0FFF))
+                else
                     return ((this -> nametable_memory)[0x0400 + (address & 0x03FF)]);
             }
         }
@@ -176,13 +189,25 @@ uint8_t ppu::read (uint16_t address, bool from_parent_bus) // NOLINT
         {
             address &= 0x001F;
 
-            if (address == 0x0010) address = 0x0000;
-            if (address == 0x0014) address = 0x0004;
-            if (address == 0x0018) address = 0x0008;
-            if (address == 0x001C) address = 0x000C;
+            switch (address)
+            {
+                case 0x0010:
+                    address = 0x0000;
+                    break;
+                case 0x0014:
+                    address = 0x0004;
+                    break;
+                case 0x0018:
+                    address = 0x0008;
+                    break;
+                case 0x001C:
+                    address = 0x000C;
+                    break;
+                default:
+                    break;
+            }
 
             return (this -> palette_memory[address]);
-//            return memory::read(address, to_parent_bus);
         }
     }
 
@@ -239,7 +264,7 @@ uint8_t ppu::set_control_flag (ppu::CONTROL_FLAG flag, uint8_t value)
     return (this -> control_register);
 }
 
-uint8_t ppu::get_control_flag (ppu::CONTROL_FLAG flag)
+uint8_t ppu::get_control_flag (ppu::CONTROL_FLAG flag) const
 {
     return (((this -> control_register) >> flag) & 1);
 }
@@ -254,7 +279,7 @@ uint8_t ppu::set_mask_flag (ppu::MASK_FLAG flag, uint8_t value)
     return (this -> mask_register);
 }
 
-uint8_t ppu::get_mask_flag (ppu::MASK_FLAG flag)
+uint8_t ppu::get_mask_flag (ppu::MASK_FLAG flag) const
 {
     return (((this -> mask_register) >> flag) & 1);
 }
@@ -269,7 +294,7 @@ uint8_t ppu::set_status_flag (ppu::STATUS_FLAG flag, uint8_t value)
     return (this -> status_register);
 }
 
-uint8_t ppu::get_status_flag (ppu::STATUS_FLAG flag)
+uint8_t ppu::get_status_flag (ppu::STATUS_FLAG flag) const
 {
     return (((this -> status_register) >> flag) & 1);
 }

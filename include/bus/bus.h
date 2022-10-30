@@ -31,9 +31,9 @@ public:
 
     void    add_devices (const std::vector <device*>& new_devices);
 
-    void    write (uint16_t address, uint8_t data);
+    void    write (const uint16_t &address, const uint8_t &data);
 
-    uint8_t read (uint16_t address);
+    uint8_t read (const uint16_t &address);
 
     std::string save_state (const std::string& name) override;
 

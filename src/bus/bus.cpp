@@ -17,27 +17,40 @@ void bus::add_devices (const std::vector<device*>& new_devices)
         this -> add_device (new_device);
 }
 
-void bus::write (uint16_t address, uint8_t data)
+void bus::write (const uint16_t &address, const uint8_t &data)
 {
-    if (!IS_BETWEEN (this -> lower_bound, address, this -> upper_bound))
-        throw std::invalid_argument ("Bus: Tried to write outside of addressable range");
+//    if (!IS_BETWEEN (this -> lower_bound, address, this -> upper_bound))
+//        throw std::invalid_argument ("Bus: Tried to write outside of addressable range");
 
-    for (auto device : this -> devices)
-        if (device -> responds_to (address) && device -> is_memory ())
+    static device *current_device;
+
+    for (size_t i = 0; i < this -> devices.size (); i++)
+    {
+        current_device = devices[i];
+
+        if (current_device -> responds_to (address))
         {
-            device -> write (address, data);
-            break;
+            current_device -> write (address, data);
+
+            return;
         }
+    }
 }
 
-uint8_t bus::read (uint16_t address)
+uint8_t bus::read (const uint16_t &address)
 {
-    if (!IS_BETWEEN (this -> lower_bound, address, this -> upper_bound))
-        throw std::invalid_argument ("Bus: Tried to read from outside of addressable range");
+//    if (!IS_BETWEEN (this -> lower_bound, address, this -> upper_bound))
+//        throw std::invalid_argument ("Bus: Tried to read from outside of addressable range");
 
-    for (auto device : this -> devices)
-        if (device -> responds_to (address) && device -> is_memory ())
-            return (device -> read (address));
+    static device *current_device;
+
+    for (size_t i = 0; i < this -> devices.size (); i++)
+    {
+        current_device = devices[i];
+
+        if (current_device -> responds_to (address))
+            return (current_device -> read (address));
+    }
 
     return (0);
 }
