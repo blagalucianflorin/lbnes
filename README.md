@@ -4,6 +4,10 @@ A Nintendo Entertainment System emulator in the works. Written in C++ with SDL2 
 Cross-platform support (currently Linux, Windows, Raspberry Pi and macOS). Actively developing new features and adding game support.
 Not 100% accurate but it works pretty well.
 
+<p align="center">
+<img src="./images/screenshot.png" alt="Screenshot Super Mario Bros." width="500"/>
+</p>
+
 ## Releases
 Check out the latest stable release on the [releases page](https://github.com/blagalucianflorin/lbnes/releases).
 Currently only Ubuntu and Windows-x86, Raspberry Pi 4 builds are available. macOS builds are in the works.
