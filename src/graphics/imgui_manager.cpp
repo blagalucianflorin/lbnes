@@ -65,7 +65,6 @@ void imgui_manager::draw_menu ()
         if (ImGui::Button ("Load ROM")) {
             auto selection = pfd::open_file ("Select a file").result ();
             if (!selection.empty ()) {
-                std::cout << "Loading ROM:" << selection[0];
                 this -> nes -> reload (selection[0], this -> nes -> joypads.empty ());
             }
         }

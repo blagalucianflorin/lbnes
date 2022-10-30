@@ -15,7 +15,7 @@ joypads:
     player:           2
     controller_index: 1
 
-rom: smb.nes
+#rom: smb.nes
 
 #resolution:
 #  width: 768
