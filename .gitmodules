@@ -9,4 +9,4 @@
 	url = https://github.com/samhocevar/portable-file-dialogs
 [submodule "lib/CppSockets"]
 	path = lib/CppSockets
-	url = https://github.com/simondlevy/CppSockets
+	url = https://github.com/blagalucianflorin/CppSockets
