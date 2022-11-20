@@ -5,14 +5,13 @@
 #ifndef LBNES_SERVER_HPP
 #define LBNES_SERVER_HPP
 
-#include "TcpServerSocket.hpp"
-
 #include <memory>
+
 
 class server
 {
 private:
-    std::shared_ptr<TcpServerSocket> socket;
+    // TODO socket
 
 public:
     server (const char *host, short port);

@@ -120,17 +120,6 @@ set (INCLUDES
     lib/portable-file-dialogs/portable-file-dialogs.h)
 
 
-set (INCLUDES
-    ${INCLUDES}
-    lib/CppSockets/SocketCompat.hpp
-    lib/CppSockets/TcpServerSocket.hpp
-    lib/CppSockets/TcpClientSocket.hpp
-    lib/CppSockets/TcpSocket.hpp
-    lib/CppSockets/UdpClientSocket.hpp
-    lib/CppSockets/UdpServerSocket.hpp
-    lib/CppSockets/UdpSocket.hpp)
-
-
 file(GLOB IMGUI_SOURCES ${IMGUI_SOURCES_AND_INCLUDES})
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PRIVATE "lib/imgui")

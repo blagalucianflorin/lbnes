@@ -5,15 +5,13 @@
 #ifndef LBNES_CLIENT_HPP
 #define LBNES_CLIENT_HPP
 
-#include "TcpClientSocket.hpp"
-
 #include <memory>
 
 
 class client
 {
 private:
-    std::shared_ptr<TcpClientSocket> socket;
+    // TODO socket
 
 public:
     client (const char *host, short port);
