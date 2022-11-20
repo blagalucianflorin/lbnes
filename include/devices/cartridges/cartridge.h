@@ -9,6 +9,7 @@
 #include "devices/cartridges/exceptions/cartridge_exception.h"
 
 #include "misc/macros.h"
+#include "misc/logger.hpp"
 
 #include <string>
 #include <fstream>

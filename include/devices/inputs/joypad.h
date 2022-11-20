@@ -6,17 +6,15 @@
 #define NEMULATOR_JOYPAD_H
 
 #include "devices/device.h"
+#include "network/client.hpp"
+#include "network/server.hpp"
 
 #include <utility>
 #include <vector>
 #include <string>
 #include <map>
 
-#ifdef _WIN32
 #include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 
 class joypad : public device
 {
@@ -48,7 +46,7 @@ private:
     int                 controller_number   = 0;
     int                 controller_deadzone = 5000;
 
-    std::vector <std::string> mapping = {"d", "a", "s", "w", "t", "r", "f", "g"};
+    std::vector <std::string> mapping {"d", "a", "s", "w", "t", "r", "f", "g"};
 
     std::map <std::string, SDL_Scancode> sdl_scancode_translations =
     {
@@ -98,6 +96,10 @@ public:
     inline void change_player_number (int new_player_number) { this -> player_number = new_player_number; }
 
     inline void change_controller_number (int new_controller_number) { this -> controller_number = new_controller_number; }
+
+    inline void                  set_state (const uint8_t new_state) { this -> saved_state = new_state; }
+
+    [[nodiscard]] inline uint8_t get_state () const { return (this -> saved_state); }
 };
 
 #endif //NEMULATOR_JOYPAD_H

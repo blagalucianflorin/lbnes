@@ -93,7 +93,8 @@ set (INCLUDES
     include/misc/base64.h
     include/graphics/imgui_manager.hpp
     include/network/server.hpp
-    include/network/client.hpp)
+    include/network/client.hpp
+    include/misc/logger.hpp)
 
 
 set (IMGUI_SOURCES_AND_INCLUDES
@@ -147,14 +148,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(YAML-CPP_LIB yaml-cppd)
 else()
     set(YAML-CPP_LIB yaml-cpp)
-endif()
-
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-DDEBUG)
-    set(GCC_OPTIMIZATION_FLAGS "-O0")
-else()
-    set(GCC_OPTIMIZATION_FLAGS "-O3")
 endif()
 
 add_definitions(-DIMGUI_RENDERER_SDL)
@@ -211,5 +204,24 @@ endif()
 
 configure_file(${PROJECT_SOURCE_DIR}/config.yaml ${CMAKE_CURRENT_BINARY_DIR}/config.yaml)
 
-set(CXX_WARNINGS_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS_COMPILE_FLAGS} ${GCC_OPTIMIZATION_FLAGS}")
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+    -Wall \
+    -Wextra \
+    -Wno-maybe-uninitialized \
+    -Wno-unused-parameter \
+    -Wvla \
+    -Wimplicit-fallthrough \
+    -fsanitize-undefined-trap-on-error \
+    -D_FORTIFY_SOURCE=3 \
+    -fstack-protector-strong \
+    -fPIE \
+    -ftrivial-auto-var-init=zero \
+    -fsanitize=bounds")

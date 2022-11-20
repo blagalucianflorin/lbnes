@@ -11,9 +11,17 @@ joypads:
       start:      k
       a:          n
       b:          m
-  - type:             controller
+  - type:             keyboard
     player:           2
-    controller_index: 1
+    mapping:
+      dpad-up:    arrows-up
+      dpad-down:  arrows-down
+      dpad-left:  arrows-left
+      dpad-right: arrows-right
+      select:     keypad-4
+      start:      keypad-5
+      a:          keypad-1
+      b:          keypad-2
 
 #rom: smb.nes
 

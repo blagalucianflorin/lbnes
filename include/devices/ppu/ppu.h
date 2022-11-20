@@ -142,6 +142,7 @@ private:
     SDL_Texture  *screen         = nullptr;
     SDL_Surface  *screen_surface = nullptr;
     uint32_t     pixels[240 * 256];
+    uint8_t      pixels_small[240 * 256];
 
 #ifndef INSPECT
     int          x_offset  = 0;
@@ -230,6 +231,8 @@ public:
     uint8_t  get_status_flag (STATUS_FLAG flag) const;
 
     inline uint32_t *get_pixels () { return (this -> pixels); }
+
+    inline uint8_t  *get_pixels_small () { return (this -> pixels_small); }
 
     // DMA
     inline uint8_t *dma () { return (this -> oam); }

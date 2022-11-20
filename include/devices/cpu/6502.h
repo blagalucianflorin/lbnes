@@ -114,7 +114,7 @@ public:
 
     void    reset ();
 
-    void    clock ();
+    void    clock () noexcept;
 
     void    step ();
 

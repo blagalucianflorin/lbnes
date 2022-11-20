@@ -11,12 +11,52 @@ int arguments_manager::process (int argc, char **argv)
     std::string current_argument;
     std::string next_argument;
 
+    // Special loop for log file
     for (int i = 1; i < argc; i++)
     {
         current_argument = argv[i];
+        if (current_argument == "-l" or current_argument == "--log")
+        {
+            if (i >= argc - 1)
+                LOGGER_ERROR_STD ("No log file specified.");
+
+            next_argument = argv[i + 1];
+
+            if (!configurator::get_instance ()["log_file"])
+                configurator::get_instance ()["log_file"] = next_argument;
+        }
+    }
+
+    logger::init (configurator::get_instance ()["log_file"].as<std::string> ());
+    LOGGER_INFO ("lbnes v" LBNES_VERSION ".");
+    LOGGER_INFO ("Built at " __TIMESTAMP__ ".");
+
+#if defined (_WIN32) or defined (_WIN64)
+    LOGGER_INFO ("Built for Windows.");
+#elif defined (UNIX) and not defined (APPLE)
+    LOGGER_INFO ("Built for Linux.");
+#elif defined (APPLE)
+    LOGGER_INFO ("Built for macOS.");
+#endif
+
+#ifdef DEBUG
+    LOGGER_INFO ("Debug build.");
+#else
+    LOGGER_INFO ("Release build.");
+#endif
+
+    LOGGER_INFO ("Loaded config defaults. Parsing CLI arguments.");
+
+    for (int i = 1; i < argc; i++)
+    {
+        current_argument = argv[i];
+        if (current_argument[0] != '-')
+            LOGGER_INFO ("Got argument '" + current_argument + "'.");
 
         if (current_argument == "-h" or current_argument == "--help")
         {
+            LOGGER_INFO ("Exiting.");
+
             arguments_manager::print_help ();
 
             return (1);
@@ -24,6 +64,8 @@ int arguments_manager::process (int argc, char **argv)
 
         if (current_argument == "-v" or current_argument == "--version")
         {
+            LOGGER_INFO ("Exiting.");
+
             std::cout << "lbnes v" LBNES_VERSION << std::endl;
 
             return (1);
@@ -31,7 +73,12 @@ int arguments_manager::process (int argc, char **argv)
 
         if (current_argument == "-r" or current_argument == "--rom")
         {
+            if (i == argc - 1 or argv[i + 1][0] == '-')
+                LOGGER_ERROR ("No ROM file provided.");
+
             configurator::get_instance ()["rom"] = std::string (argv[i + 1]);
+
+            LOGGER_INFO ("Set ROM file to: '" + std::string (argv[i + 1]) + "'.");
 
             goto SKIP_ARGUMENT_CHECKS;
         }
@@ -50,6 +97,9 @@ int arguments_manager::process (int argc, char **argv)
             else
                 configurator::get_instance ()["fullscreen"] = true;
 
+            LOGGER_INFO (std::string ("Set fullscreen to '") +
+                                (configurator::get_instance ()["fullscreen"].as <bool> () ? "true" : "false")+ "'.");
+
             goto SKIP_ARGUMENT_CHECKS;
         }
 
@@ -62,6 +112,8 @@ int arguments_manager::process (int argc, char **argv)
 
             configurator::get_instance ()["resolution"]["width"] = std::stoi (next_argument);
 
+            LOGGER_INFO ("Set window width to '" + next_argument + "'.");
+
             goto SKIP_ARGUMENT_CHECKS;
         }
 
@@ -73,6 +125,8 @@ int arguments_manager::process (int argc, char **argv)
                 configurator::get_instance ()["resolution"] = YAML::Node ();
 
             configurator::get_instance ()["resolution"]["height"] = std::stoi (next_argument);
+
+            LOGGER_INFO ("Set window height to '" + next_argument + "'.");
 
             goto SKIP_ARGUMENT_CHECKS;
         }
@@ -91,12 +145,17 @@ int arguments_manager::process (int argc, char **argv)
             else
                 configurator::get_instance ()["display_fps"] = true;
 
+            LOGGER_INFO (std::string ("Set display-fps to '") +
+                         (configurator::get_instance ()["fullscreen"].as <bool> () ? "true" : "false")+ "'.");
+
             goto SKIP_ARGUMENT_CHECKS;
         }
 
         if (current_argument == "-s" or current_argument == "--speed")
         {
             configurator::get_instance ()["speed"] = std::stoi (std::string (argv[i + 1]));
+
+            LOGGER_INFO ("Set emulation speed to " + std::string (argv[i + 1]) + "'.");
 
             goto SKIP_ARGUMENT_CHECKS;
         }
@@ -115,6 +174,9 @@ int arguments_manager::process (int argc, char **argv)
             else
                 configurator::get_instance ()["new_controller_replaces_player_one"] = true;
 
+            LOGGER_INFO (std::string ("Set new_controller_replaces_player_one to '") +
+                         (configurator::get_instance ()["fullscreen"].as <bool> () ? "true" : "false")+ "'.");
+
             goto SKIP_ARGUMENT_CHECKS;
         }
 
@@ -132,12 +194,20 @@ int arguments_manager::process (int argc, char **argv)
             else
                 configurator::get_instance ()["show_menu"] = true;
 
+            LOGGER_INFO (std::string ("Set show_menu to '") +
+                         (configurator::get_instance ()["fullscreen"].as <bool> () ? "true" : "false")+ "'.");
+
             goto SKIP_ARGUMENT_CHECKS;
         }
 
         if (current_argument == "-c" or current_argument == "--config_file")
         {
+            if (i >= argc - 1)
+                LOGGER_ERROR ("No config file specified!");
+
             configurator::config_file = std::string (argv[i + 1]);
+
+            LOGGER_INFO ("Set config_file to " + std::string (argv[i + 1]) + "'.");
 
             goto SKIP_ARGUMENT_CHECKS;
         }
@@ -156,6 +226,9 @@ int arguments_manager::process (int argc, char **argv)
             else
                 configurator::get_instance ()["vsync"] = true;
 
+            LOGGER_INFO (std::string ("Set vsync to '") +
+                         (configurator::get_instance ()["fullscreen"].as <bool> () ? "true" : "false")+ "'.");
+
             goto SKIP_ARGUMENT_CHECKS;
         }
 
@@ -172,6 +245,8 @@ int arguments_manager::process (int argc, char **argv)
             }
             else
                 configurator::get_instance ()["client"] = true;
+
+            // TODO Log
 
             goto SKIP_ARGUMENT_CHECKS;
         }
@@ -190,12 +265,16 @@ int arguments_manager::process (int argc, char **argv)
             else
                 configurator::get_instance ()["server"] = true;
 
+            // TODO Log
+
             goto SKIP_ARGUMENT_CHECKS;
         }
 
         if (current_argument == "-p" or current_argument == "--port")
         {
             configurator::get_instance ()["vsync"] = std::stoi (std::string (argv[i + 1]));
+
+            // TODO Log
 
             goto SKIP_ARGUMENT_CHECKS;
         }
@@ -204,12 +283,17 @@ int arguments_manager::process (int argc, char **argv)
         {
             configurator::get_instance ()["server_ip"] = std::string (argv[i + 1]);
 
+            // TODO Log
+
             goto SKIP_ARGUMENT_CHECKS;
         }
 
+        // This simulates a switch for strings.
 SKIP_ARGUMENT_CHECKS:
         continue;
     }
+
+    LOGGER_INFO ("Initial configuration set:\n" + YAML::Dump (configurator::get_instance ().get_whole_config ()));
 
     return (0);
 }
@@ -283,7 +367,11 @@ void arguments_manager::print_help ()
         "\tDefault: localhost\n\n"
 
         "\t-c / --config_file <config_file_path>: The config file to load at startup.\n"
-        "\tDefault: config.yaml\n";
+        "\tDefault: config.yaml\n\n"
+
+        "\t -l / --log_file <log_file_path>: The file where the logs for the gaming session will be saved.\n"
+        "\tNote: <log_file_path> will pe appended with the current date and time, as well as the .log extension.\n"
+        "\tDefault: lbnes\n\n";
 
     std::cout << help;
 }

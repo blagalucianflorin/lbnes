@@ -12,6 +12,8 @@
 #include "imgui_impl_sdlrenderer.h"
 
 #include "portable-file-dialogs.h"
+#include "options/configurator.hpp"
+#include "misc/logger.hpp"
 
 #include "nes.h"
 

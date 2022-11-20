@@ -708,12 +708,14 @@ void ppu::clock ()
             }
         }
 
-        rgb_triplet color =
-                this -> color_palette [this -> read (0x3F00 + (final_palette << 2) + final_pixel, false) & 0x3F];
+        auto palette_entry = this -> read (0x3F00 + (final_palette << 2) + final_pixel, false) & 0x3F;
+        rgb_triplet color = this -> color_palette [palette_entry];
 
         uint32_t sdl_color = 0x00000000 | (color.r << 24) | (color.g << 16) | (color.b << 8) | (0x00 << 0);
         sdl_color >>= 8;
         surface_set_pixel (this -> screen_surface, this -> scandot - 1, this -> scanline, sdl_color);
+        this -> pixels[this -> scanline * 256 + (this -> scandot - 1)] = sdl_color;
+        this -> pixels_small[this -> scanline * 256 + (this -> scandot - 1)] = palette_entry;
     }
 
     (this -> scandot)++;
@@ -888,15 +890,3 @@ void ppu::populate_palette_2C02()
     (this -> color_palette)[0x3C] = {160, 214, 228}; (this -> color_palette)[0x3D] = {160, 162, 160};
     (this -> color_palette)[0x3E] = {0, 0, 0};       (this -> color_palette)[0x3F] = {0, 0, 0};
 }
-
-void ppu::update_whole_screen ()
-{
-    for (int i = 0; i < 240; i++)
-        for (int j = 0; j < 256; j++)
-            surface_set_pixel (this -> screen_surface, j, i, this -> pixels[i * 240 + j]);
-
-    SDL_DestroyTexture (this -> screen);
-    this -> screen = SDL_CreateTextureFromSurface (this -> renderer, this -> screen_surface);
-    SDL_RenderCopy (this -> renderer, this -> screen, nullptr, nullptr);
-}
-

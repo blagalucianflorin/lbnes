@@ -74,6 +74,9 @@ void configurator::set_defaults ()
     if (!this -> config["port"])
         (this -> config)["port"] = 5035;
 
+    if (!this -> config["log_file"])
+        (this -> config)["log_file"] = "lbnes";
+
     // Controls defaults
     if (!(this -> config)["joypads"])
     {

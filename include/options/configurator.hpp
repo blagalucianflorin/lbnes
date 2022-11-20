@@ -24,7 +24,9 @@ protected:
 public:
     static configurator &get_instance ();
 
-    inline YAML::Node   operator[] (const std::string &value) { return (config[value]); }
+    inline YAML::Node   operator[] (const std::string &value) { return (this -> config[value]); }
+
+    inline YAML::Node   get_whole_config () { return (this -> config); }
 
     static std::string config_file;
 };
