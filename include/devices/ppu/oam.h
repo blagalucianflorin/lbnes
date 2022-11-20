@@ -15,10 +15,9 @@
 class oam : public device
 {
 private:
-    uint8_t   *memory      = nullptr;
-    class cpu *cpu         = nullptr;
-    class ppu *ppu         = nullptr;
-    uint8_t   dma_register = 0x00;
+    uint8_t   *memory = nullptr;
+    class cpu *cpu    = nullptr;
+    class ppu *ppu    = nullptr;
 
 public:
     oam ();

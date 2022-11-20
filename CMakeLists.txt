@@ -39,11 +39,11 @@ endif()
 
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
-include_directories(${PROJECT_SOURCE_DIR}/lib/imgui)
-include_directories(${PROJECT_SOURCE_DIR}/lib/imgui/backends)
-include_directories(${PROJECT_SOURCE_DIR}/lib/portable-file-dialogs)
-include_directories(${PROJECT_SOURCE_DIR}/lib/CppSockets)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/imgui)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/imgui/backends)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/portable-file-dialogs)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/CppSockets)
 
 
 set(SOURCES
@@ -133,8 +133,8 @@ set (INCLUDES
 
 file(GLOB IMGUI_SOURCES ${IMGUI_SOURCES_AND_INCLUDES})
 add_library(imgui STATIC ${IMGUI_SOURCES})
-target_include_directories(imgui PUBLIC "lib/imgui")
-target_include_directories(imgui PUBLIC "lib/imgui/backends")
+target_include_directories(imgui PRIVATE "lib/imgui")
+target_include_directories(imgui PRIVATE "lib/imgui/backends")
 
 if(NES_DEBUGGER)
     set(SOURCES ${SOURCES} src/debugging/nes_debugger.cpp)
@@ -191,16 +191,16 @@ if(WIN32)
 elseif(UNIX AND NOT APPLE)
     find_package(SDL2 REQUIRED)
     find_library(SDL2_LIBRARY SDL2)
-    include_directories(lbnes "${SDL2_INCLUDE_DIRS}")
-    target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
-    target_link_libraries(lbnes PUBLIC -lSDL2 -l${YAML-CPP_LIB} imgui)
+    include_directories(lbnes PRIVATE "${SDL2_INCLUDE_DIRS}")
+    target_link_directories(lbnes PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
+    target_link_libraries(lbnes PRIVATE -lSDL2 -l${YAML-CPP_LIB} imgui)
 elseif(APPLE)
     find_package(SDL2 REQUIRED)
     find_library(SDL2_LIBRARY SDL2)
-    include_directories(lbnes ${SDL2_INCLUDE_DIRS})
-    include_directories(imgui ${SDL2_LIBRARY})
-    target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
-    target_link_libraries(lbnes PUBLIC ${SDL2_LIBRARY} -l${YAML-CPP_LIB} imgui)
+    include_directories(lbnes PRIVATE ${SDL2_INCLUDE_DIRS})
+    include_directories(imgui PRIVATE ${SDL2_LIBRARY})
+    target_link_directories(lbnes PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
+    target_link_libraries(lbnes PRIVATE ${SDL2_LIBRARY} -l${YAML-CPP_LIB} imgui)
 endif()
 
 configure_file(${PROJECT_SOURCE_DIR}/config.yaml ${CMAKE_CURRENT_BINARY_DIR}/config.yaml)
@@ -216,7 +216,7 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -Wall \
     -Wextra \
-    -Wno-maybe-uninitialized \
+    -Wno-uninitialized \
     -Wno-unused-parameter \
     -Wvla \
     -Wimplicit-fallthrough \
@@ -224,5 +224,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -D_FORTIFY_SOURCE=3 \
     -fstack-protector-strong \
     -fPIE \
-    -ftrivial-auto-var-init=zero \
     -fsanitize=bounds")

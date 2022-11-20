@@ -62,7 +62,7 @@ void imgui_manager::draw_menu ()
 
         if (this -> nes -> options.is_client)
         {
-            ImGui::Text ((std::string ("Client connected to ") +
+            ImGui::Text ("%s", (std::string ("Client connected to ") +
                                 configurator::get_instance ()["server_ip"].as <std::string> () +
                                 std::string (":") +
                                 configurator::get_instance ()["port"].as <std::string> ()).c_str ());
@@ -71,7 +71,8 @@ void imgui_manager::draw_menu ()
 
         if (this -> nes -> options.is_server)
         {
-            ImGui::Text ((std::string ("Server on ") + configurator::get_instance ()["server_ip"].as <std::string> ()
+            ImGui::Text ("%s", (std::string ("Server on ")
+                          + configurator::get_instance ()["server_ip"].as <std::string> ()
                           + std::string (":") + configurator::get_instance ()["port"].as <std::string> ()).c_str ());
             ImGui::NewLine ();
         }
