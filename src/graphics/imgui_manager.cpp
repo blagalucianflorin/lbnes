@@ -24,6 +24,7 @@ imgui_manager::imgui_manager (SDL_Renderer *renderer, SDL_Window *window, class 
 
 imgui_manager::~imgui_manager ()
 {
+    LOGGER_INFO ("Deleting ImGui manager");
 #ifdef IMGUI_RENDERER_SDL
     ImGui_ImplSDLRenderer_Shutdown ();
     ImGui_ImplSDL2_Shutdown ();
@@ -46,36 +47,72 @@ void imgui_manager::draw_menu ()
     if (this -> nes -> options.show_menu)
     {
         ImGui::SetNextWindowPos (ImVec2 (0, 0));
-        ImGui::SetNextWindowSize (ImVec2 (290, 350));
+
+        float menu_height = 350;
+        if (this -> nes -> options.is_client)
+            menu_height = 250;
+        else if (this -> nes -> options.is_server)
+            menu_height = 380;
+
+        ImGui::SetNextWindowSize (ImVec2 (290, menu_height));
         ImGui::Begin ("Menu");
 
         ImGui::Text ("Press P to toggle the menu");
         ImGui::NewLine ();
 
-        ImGui::Text ("Emulation speed");
-        if (this -> nes -> options.vsync)
+        if (this -> nes -> options.is_client)
         {
-            ImGui::BeginDisabled();
+            ImGui::Text ((std::string ("Client connected to ") +
+                                configurator::get_instance ()["server_ip"].as <std::string> () +
+                                std::string (":") +
+                                configurator::get_instance ()["port"].as <std::string> ()).c_str ());
+            ImGui::NewLine ();
         }
-        ImGui::SliderInt (" ", &this -> nes -> options.speed, 1, 300);
-        if (this -> nes -> options.vsync)
-            ImGui::EndDisabled ();
-        ImGui::NewLine ();
 
-        if (ImGui::Button ("Load ROM"))
+        if (this -> nes -> options.is_server)
         {
-            auto selection = pfd::open_file ("Select a file").result ();
+            ImGui::Text ((std::string ("Server on ") + configurator::get_instance ()["server_ip"].as <std::string> ()
+                          + std::string (":") + configurator::get_instance ()["port"].as <std::string> ()).c_str ());
+            ImGui::NewLine ();
+        }
 
-            if (!selection.empty ()) {
-                this -> nes -> reload (selection[0], this -> nes -> joypads.empty ());
+        if (!this -> nes -> options.is_client)
+        {
+            ImGui::Text ("Emulation speed");
+            if (this -> nes -> options.vsync)
+            {
+                ImGui::BeginDisabled();
             }
+            ImGui::SliderInt (" ", &this -> nes -> options.speed, 1, 300);
+            if (this -> nes -> options.vsync)
+                ImGui::EndDisabled ();
+            ImGui::NewLine ();
         }
-        ImGui::NewLine ();
+
+
+        if (!this -> nes -> options.is_client)
+        {
+            if (ImGui::Button ("Load ROM"))
+            {
+                LOGGER_INFO ("Loading ROM file from GUI.");
+                auto selection = pfd::open_file ("Select a file").result ();
+
+                if (!selection.empty ())
+                {
+                    LOGGER_INFO ("Trying to load '" + selection[0] + "'.");
+                    this -> nes -> reload (selection[0], this -> nes -> joypads.empty ());
+                }
+            }
+            ImGui::NewLine ();
+        }
 
         bool old_fullscreen_checkbox = this -> nes -> options.fullscreen;
         ImGui::Checkbox ("Fullscreen", &(this -> nes -> options.fullscreen));
         if (old_fullscreen_checkbox != this -> nes -> options.fullscreen)
-            ::toggle_fullscreen (this -> window);
+        {
+            LOGGER_INFO ("Toggled fullscreen.");
+            ::toggle_fullscreen(this->window);
+        }
         ImGui::NewLine ();
 
         ImGui::Checkbox ("Display FPS", &this -> nes -> options.display_fps);
@@ -85,6 +122,8 @@ void imgui_manager::draw_menu ()
         ImGui::Checkbox ("VSync", &(this -> nes -> options.vsync));
         if (old_vsync_checkbox != this -> nes -> options.vsync)
         {
+            LOGGER_INFO ("Toggled VSync.");
+
             configurator::get_instance ()["vsync"] = this -> nes -> options.vsync;
             update_vsync (this -> renderer);
 
@@ -98,12 +137,21 @@ void imgui_manager::draw_menu ()
         }
         ImGui::NewLine ();
 
-        if (ImGui::Button ("Reset"))
-            this -> nes -> reset ();
-        ImGui::NewLine ();
+        if (!this -> nes -> options.is_client)
+        {
+            if (ImGui::Button ("Reset"))
+            {
+                LOGGER_INFO ("Clicked reset button.");
+                this -> nes -> reset ();
+            }
+            ImGui::NewLine ();
+        }
 
         if (ImGui::Button ("Quit"))
+        {
+            LOGGER_INFO ("Clicked quit button.");
             this -> nes -> options.quit = true;
+        }
 
         ImGui::End ();
     }

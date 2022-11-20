@@ -29,6 +29,7 @@
 #include "graphics/sdl_manager.h"
 #include "options/configurator.hpp"
 #include "yaml-cpp/yaml.h"
+#include "misc/logger.hpp"
 
 #include "network/client.hpp"
 #include "network/server.hpp"
@@ -64,12 +65,11 @@ private:
     double    average_fps  = 60.098814;
     double    current_fps  = 60.098814;
 
-    bool is_server = false;
-    bool is_client = false;
     std::unique_ptr <class server> screen_server;
     std::unique_ptr <class client> screen_client;
 
-    uint32_t     client_pixels[240 * 256];
+    uint8_t      client_pixels_small[240 * 256] {};
+    uint32_t     client_pixels[240 * 256] {};
     SDL_Texture  *client_screen_texture = nullptr;
     SDL_Surface  *client_screen_surface = nullptr;
 
@@ -81,8 +81,20 @@ private:
         bool show_menu;
         bool fullscreen;
         int  speed;
+        bool is_server = false;
+        bool is_client = false;
     } options {};
 
+    struct rgb_triplet
+    {
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
+    };
+
+    rgb_triplet color_palette[64]{};
+
+    void  populate_palette_2C02 ();
 
     void load_joypads ();
 
@@ -91,6 +103,12 @@ private:
     void sleep_until_next_frame (std::chrono::time_point<std::chrono::high_resolution_clock> &frame_start);
 
     void set_title ();
+
+    void synchronize_joypads ();
+
+    void start_server ();
+
+    void start_client ();
 
 public:
     nes ();

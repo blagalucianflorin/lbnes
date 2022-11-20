@@ -9,8 +9,6 @@
 
 #include <memory>
 
-#define SCREEN_SIZE (240 * 256 * 4)
-
 
 class client
 {
@@ -20,7 +18,9 @@ private:
 public:
     client (const char *host, short port);
 
-    void receive_screen (uint32_t *pixels);
+    void receive_data (uint8_t *data, size_t size);
+
+    void send_data (uint8_t *data, size_t size);
 };
 
 #endif //LBNES_CLIENT_HPP

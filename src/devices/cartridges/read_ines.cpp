@@ -13,7 +13,10 @@ void cartridge::read_ines (const std::string& file_path)
     std::ifstream file (file_path, std::ios_base::binary);
 
     if (!file.good ())
-        throw cartridge_exception ("NES: ROM file doesn't exist");
+    {
+        LOGGER_ERROR ("Provided ROM file doesn't exist.");
+        throw cartridge_exception("NES: ROM file doesn't exist");
+    }
 
     // Read header and check integrity
     format_check[4] = padding[7] = '\0';

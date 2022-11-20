@@ -6,6 +6,7 @@
 #define LBNES_ARGUMENTS_MANAGER_HPP
 
 #include "configurator.hpp"
+#include "misc/logger.hpp"
 #include <iostream>
 
 

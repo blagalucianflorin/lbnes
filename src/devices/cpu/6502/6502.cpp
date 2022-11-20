@@ -54,7 +54,7 @@ void cpu::reset ()
 
 [[maybe_unused]] void nop (){} // NOLINT
 
-void cpu::clock ()
+void cpu::clock () noexcept
 {
     if (this -> dma_active)
     {

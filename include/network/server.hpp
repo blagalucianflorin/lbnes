@@ -9,9 +9,6 @@
 
 #include <memory>
 
-#define SCREEN_SIZE (240 * 256 * 4)
-
-
 class server
 {
 private:
@@ -20,7 +17,9 @@ private:
 public:
     server (const char *host, short port);
 
-    void send_screen (uint32_t *pixels);
+    void send_data (uint8_t *data, size_t size);
+
+    void receive_data (uint8_t *data, size_t size);
 };
 
 #endif //LBNES_SERVER_HPP
