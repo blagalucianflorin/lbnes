@@ -31,11 +31,11 @@ int arguments_manager::process (int argc, char **argv)
     LOGGER_INFO ("lbnes v" LBNES_VERSION ".");
     LOGGER_INFO ("Built at " __TIMESTAMP__ ".");
 
-#if defined (_WIN32) or defined (_WIN64)
+#if defined (_WIN32)
     LOGGER_INFO ("Built for Windows.");
-#elif defined (UNIX) and not defined (APPLE)
+#elif defined (UNIX) and not defined (__APPLE__)
     LOGGER_INFO ("Built for Linux.");
-#elif defined (APPLE)
+#elif defined (__APPLE__)
     LOGGER_INFO ("Built for macOS.");
 #endif
 
