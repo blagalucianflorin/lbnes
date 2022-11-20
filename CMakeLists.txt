@@ -221,7 +221,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -Wvla \
     -Wimplicit-fallthrough \
     -fsanitize-undefined-trap-on-error \
-    -D_FORTIFY_SOURCE=3 \
+    -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 \
     -fstack-protector-strong \
     -fPIE \
     -fsanitize=bounds")

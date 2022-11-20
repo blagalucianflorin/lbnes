@@ -12,7 +12,12 @@
 #include <string>
 #include <chrono>
 
+#if defined (unix) and not defined (__APPLE__)
+#define LOGGER_BASE(level, message, output_std) logger::log (level, message, __FILE__, __LINE__, output_std)
+#else
 #define LOGGER_BASE(level, message, output_std) logger::log (level, message, __FILE_NAME__, __LINE__, output_std)
+#endif
+
 
 #define LOGGER_INFO(message) LOGGER_BASE (logger::INFO, message, false)
 #define LOGGER_DEBUG(message) LOGGER_BASE (logger::DBG, message, false)
@@ -28,9 +33,15 @@
 
 #if _WIN32
 #include <windows.h>
-inline void cross_platform_mkdir (const std::string& folder_name) { CreateDirectoryA (folder_name.c_str (), nullptr); }
+inline int cross_platform_mkdir (const std::string& folder_name)\
+{
+    return (CreateDirectoryA (folder_name.c_str (), nullptr));
+}
 #else
-inline void cross_platform_mkdir (const std::string& folder_name) { system ((std::string ("mkdir ") + folder_name).c_str ()); }
+inline int cross_platform_mkdir (const std::string& folder_name)
+{
+    return (system ((std::string ("mkdir -p ") + folder_name).c_str ()));
+}
 #endif
 
 
@@ -68,8 +79,14 @@ public:
         logger::output_file.open ("logs/" + output_file_path);
     }
 
-    static void log (level log_level, const std::string& message, const char *file, long long line, bool output_to_std)
+    static void log (level log_level, const std::string& message, const char *file_path, long long line, bool output_to_std)
     {
+        std::string file = file_path;
+
+#if defined (unix) and not defined (__APPLE__)
+        file = file.substr(file.find_last_of("/\\") + 1);
+#endif
+
         std::string log = get_current_time_date () + " " + file + ":" + std::to_string(line) + ":";
 
         switch (log_level)
