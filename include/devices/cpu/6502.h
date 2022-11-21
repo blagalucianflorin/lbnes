@@ -43,8 +43,8 @@ class cpu : public device
         uint8_t (cpu::*instruction) ()     = &cpu::UNK;
         uint8_t (cpu::*addressing_mode) () = &cpu::IMP;
         uint8_t cycles_required            = 0;
-    }       operations[256];
-    uint8_t opcode;
+    }  operations[256] {};
+    uint8_t opcode {};
 
     enum FLAG
     {

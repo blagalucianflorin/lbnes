@@ -206,7 +206,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -Wall \
     -Wextra \
     -Werror \
-    -Wno-uninitialized \
     -Wno-unused-parameter \
     -Wvla \
     -Wimplicit-fallthrough \
@@ -215,3 +214,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -fstack-protector-strong \
     -fPIE \
     -fsanitize=bounds")
+
+# Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+if(WIN32 OR (UNIX AND NOT APPLE))
+set_source_files_properties(src/devices/cpu/6502/6502.cpp PROPERTIES COMPILE_FLAGS "-Wno-uninitialized")
+endif()
