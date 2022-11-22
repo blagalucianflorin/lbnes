@@ -12,7 +12,7 @@ oam::oam () : device (0x4014, 0x4014)
 }
 
 
-void oam::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLINT
+void oam::write (uint16_t /*address*/, uint8_t data, bool /*to_parent_bus*/) // NOLINT
 {
     this -> cpu -> wait (this -> cpu -> get_cycles_elapsed () % 2 == 0 ? 513 : 514);
 
@@ -27,7 +27,7 @@ void oam::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLINT
 }
 
 
-uint8_t oam::read (uint16_t address, bool from_parent_bus) // NOLINT
+uint8_t oam::read (uint16_t /*address*/, bool /*from_parent_bus*/) // NOLINT
 {
     throw ppu_exception ("OAM: Tried to read from OAM DMA register");
 }

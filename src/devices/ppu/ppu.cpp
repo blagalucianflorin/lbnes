@@ -97,9 +97,9 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
     {
         // Control
         case 0x0000:
-            this -> control_register              = data;
-            this -> temporary_address.nametable_x = this -> get_control_flag (CONTROL_FLAG::F_NAME_TABLE_ADDRESS_ONE);
-            this -> temporary_address.nametable_y = this -> get_control_flag (CONTROL_FLAG::F_NAME_TABLE_ADDRESS_TWO);
+            this -> control_register                     = data;
+            this -> temporary_address.fields.nametable_x = this -> get_control_flag (CONTROL_FLAG::F_NAME_TABLE_ADDRESS_ONE);
+            this -> temporary_address.fields.nametable_y = this -> get_control_flag (CONTROL_FLAG::F_NAME_TABLE_ADDRESS_TWO);
             break;
             // Mask
         case 0x0001:
@@ -121,12 +121,12 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
             if (!(this -> address_latch))
             {
                 this -> fine_x                     = (data & 0b00000111) >> 0;
-                this -> temporary_address.coarse_x = (data & 0b11111000) >> 3;
+                this -> temporary_address.fields.coarse_x = (data & 0b11111000) >> 3;
             }
             else
             {
-                this -> temporary_address.fine_y   = (data & 0b00000111) >> 0;
-                this -> temporary_address.coarse_y = (data & 0b11111000) >> 3;
+                this -> temporary_address.fields.fine_y   = (data & 0b00000111) >> 0;
+                this -> temporary_address.fields.coarse_y = (data & 0b11111000) >> 3;
             }
 
             this -> address_latch = !(this -> address_latch);
@@ -136,7 +136,7 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
             this -> address_register = data;
 
             if (!(this -> address_latch))
-                this -> temporary_address.data = ((uint16_t) (data & 0x3F) << 8) |
+                this -> temporary_address.data = (static_cast <uint16_t> (data & 0x3F) << 8) |
                                                  ((this -> temporary_address.data) & 0x00FF);
             else
             {
@@ -151,6 +151,8 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
             this -> data_register = data;
             this -> write (this -> actual_address.data, data, false);
             this -> actual_address.data += this -> get_control_flag (F_ADDRESS_INCREMENT) ? 32 : 1;
+            break;
+        default:
             break;
     }
 }
@@ -246,12 +248,15 @@ uint8_t ppu::read (uint16_t address, bool from_parent_bus) // NOLINT
             this -> actual_address.data += (get_control_flag (F_ADDRESS_INCREMENT) == 1 ? 32 : 1);
 
             return (result);
+
+        default:
+            break;
     }
 
     return (result);
 }
 
-uint8_t ppu::set_control_flag (ppu::CONTROL_FLAG flag, uint8_t value)
+[[maybe_unused]] uint8_t ppu::set_control_flag (ppu::CONTROL_FLAG flag, uint8_t value)
 {
     value = value ? 1 : 0;
 
@@ -269,7 +274,7 @@ uint8_t ppu::get_control_flag (ppu::CONTROL_FLAG flag) const
     return (((this -> control_register) >> flag) & 1);
 }
 
-uint8_t ppu::set_mask_flag (ppu::MASK_FLAG flag, uint8_t value)
+[[maybe_unused]] uint8_t ppu::set_mask_flag (ppu::MASK_FLAG flag, uint8_t value)
 {
     value = value ? 1 : 0;
 
@@ -349,13 +354,13 @@ void ppu::increment_coarse_x ()
     if (!(this -> rendering_enabled ()))
         return;
 
-    if (this -> actual_address.coarse_x == 31)
+    if (this -> actual_address.fields.coarse_x == 31)
     {
-        this -> actual_address.coarse_x    = 0;
-        this -> actual_address.nametable_x = ~(this -> actual_address.nametable_x);
+        this -> actual_address.fields.coarse_x    = 0;
+        this -> actual_address.fields.nametable_x = ~(this -> actual_address.fields.nametable_x);
     }
     else
-        (this -> actual_address.coarse_x)++;
+        (this -> actual_address.fields.coarse_x)++;
 }
 
 void ppu::increment_coarse_fine_y ()
@@ -363,23 +368,23 @@ void ppu::increment_coarse_fine_y ()
     if (!(this -> rendering_enabled ()))
         return;
 
-    if (this -> actual_address.fine_y < 7)
+    if (this -> actual_address.fields.fine_y < 7)
     {
-        this -> actual_address.fine_y += 1;
+        this -> actual_address.fields.fine_y += 1;
         return;
     }
 
-    this -> actual_address.fine_y = 0;
+    this -> actual_address.fields.fine_y = 0;
 
-    if (this -> actual_address.coarse_y == 29)
+    if (this -> actual_address.fields.coarse_y == 29)
     {
-        this -> actual_address.coarse_y    = 0;
-        this -> actual_address.nametable_y = ~(this -> actual_address.nametable_y);
+        this -> actual_address.fields.coarse_y    = 0;
+        this -> actual_address.fields.nametable_y = ~(this -> actual_address.fields.nametable_y);
     }
-    else if (this -> actual_address.coarse_y == 31)
-        this -> actual_address.coarse_y = 0;
+    else if (this -> actual_address.fields.coarse_y == 31)
+        this -> actual_address.fields.coarse_y = 0;
     else
-        this -> actual_address.coarse_y += 1;
+        this -> actual_address.fields.coarse_y += 1;
 }
 
 void ppu::move_x_data ()
@@ -387,8 +392,8 @@ void ppu::move_x_data ()
     if (!(this -> rendering_enabled ()))
         return;
 
-    this -> actual_address.coarse_x    = this -> temporary_address.coarse_x;
-    this -> actual_address.nametable_x = this -> temporary_address.nametable_x;
+    this -> actual_address.fields.coarse_x    = this -> temporary_address.fields.coarse_x;
+    this -> actual_address.fields.nametable_x = this -> temporary_address.fields.nametable_x;
 }
 
 void ppu::move_y_data ()
@@ -396,9 +401,9 @@ void ppu::move_y_data ()
     if (!(this -> rendering_enabled ()))
         return;
 
-    this -> actual_address.coarse_y    = this -> temporary_address.coarse_y;
-    this -> actual_address.nametable_y = this -> temporary_address.nametable_y;
-    this -> actual_address.fine_y      = this -> temporary_address.fine_y;
+    this -> actual_address.fields.coarse_y    = this -> temporary_address.fields.coarse_y;
+    this -> actual_address.fields.nametable_y = this -> temporary_address.fields.nametable_y;
+    this -> actual_address.fields.fine_y      = this -> temporary_address.fields.fine_y;
 }
 
 void ppu::build_shifters ()
@@ -471,35 +476,37 @@ void ppu::clock ()
                     this -> next_background_chr = this -> read (address, false);
                     break;
                 case 2:
-                    address = 0x23C0 | this -> actual_address.nametable_y << 11;
-                    address |= this -> actual_address.nametable_x << 10;
-                    address |= (this -> actual_address.coarse_y >> 2) << 3;
-                    address |= this -> actual_address.coarse_x >> 2;
+                    address = 0x23C0 | this -> actual_address.fields.nametable_y << 11;
+                    address |= this -> actual_address.fields.nametable_x << 10;
+                    address |= (this -> actual_address.fields.coarse_y >> 2) << 3;
+                    address |= this -> actual_address.fields.coarse_x >> 2;
 
                     this -> next_background_attribute = this -> read (address, false);
 
-                    if (this -> actual_address.coarse_y & 0x02)
+                    if (this -> actual_address.fields.coarse_y & 0x02)
                         this -> next_background_attribute >>= 4;
-                    if (this -> actual_address.coarse_x & 0x02)
+                    if (this -> actual_address.fields.coarse_x & 0x02)
                         this -> next_background_attribute >>= 2;
 
                     this -> next_background_attribute &= 0b00000011;
                     break;
                 case 4:
                     address = (this -> get_control_flag (CONTROL_FLAG::F_BACKGROUND_PATTERN_TABLE)) ? 0x1000 : 0x0000;
-                    address += (uint16_t) this -> next_background_chr << 4;
-                    address += this -> actual_address.fine_y;
+                    address += static_cast <uint16_t> (this -> next_background_chr) << 4;
+                    address += this -> actual_address.fields.fine_y;
                     this -> next_background_low_byte = this -> read (address, false);
                     break;
                 case 6:
                     address = (this -> get_control_flag (CONTROL_FLAG::F_BACKGROUND_PATTERN_TABLE)) ? 0x1000 : 0x0000;
-                    address += (uint16_t) this -> next_background_chr << 4;
-                    address += this -> actual_address.fine_y;
+                    address += static_cast <uint16_t> (this -> next_background_chr) << 4;
+                    address += this -> actual_address.fields.fine_y;
                     address += 8;
                     this -> next_background_high_byte = this -> read (address, false);
                     break;
                 case 7:
                     this -> increment_coarse_x ();
+                    break;
+                default:
                     break;
             }
         }
@@ -536,7 +543,7 @@ void ppu::clock ()
 
             for (uint8_t i = 0; i < 64 && this -> scanline_sprites_count < 9; i++)
             {
-                int difference  = (int) this -> scanline - (int) this -> get_oam_property (i, OE_Y);
+                int difference  = static_cast <int> (this -> scanline) - static_cast <int> (this -> get_oam_property (i, OE_Y));
                 int upper_bound = this -> get_control_flag (CONTROL_FLAG::F_SPRITE_SIZE) ? 15 : 7;
 
                 if (IS_BETWEEN (0, difference, upper_bound) && this -> scanline_sprites_count < 8)
@@ -711,9 +718,11 @@ void ppu::clock ()
         auto palette_entry = this -> read (0x3F00 + (final_palette << 2) + final_pixel, false) & 0x3F;
         rgb_triplet color = this -> color_palette [palette_entry];
 
-        uint32_t sdl_color = 0x00000000 | (color.r << 24) | (color.g << 16) | (color.b << 8) | (0x00 << 0);
+        auto sdl_color = static_cast <uint32_t> (0x00000000 | (color.r << 24) | (color.g << 16) | (color.b << 8) |
+                                                   (0x00 << 0));
         sdl_color >>= 8;
-        surface_set_pixel (this -> screen_surface, this -> scandot - 1, this -> scanline, sdl_color);
+        surface_set_pixel (this -> screen_surface, static_cast <size_t> (this -> scandot - 1),
+                           static_cast <size_t> (this -> scanline), sdl_color);
         this -> pixels[this -> scanline * 256 + (this -> scandot - 1)] = sdl_color;
         this -> pixels_small[this -> scanline * 256 + (this -> scandot - 1)] = palette_entry;
     }
@@ -737,7 +746,7 @@ void ppu::clock ()
     }
 }
 
-void ppu::get_background_pixel (uint8_t &pixel, uint8_t &palette)
+void ppu::get_background_pixel (uint8_t &pixel, uint8_t &palette) const
 {
     if (!this -> get_mask_flag (MASK_FLAG::F_SHOW_BACKGROUND))
         return;
@@ -782,7 +791,8 @@ void ppu::get_foreground_pixel (uint8_t &pixel, uint8_t &palette, uint8_t &prior
         }
 }
 
-void ppu::draw_nametable ()
+// Debug
+[[maybe_unused]] void ppu::draw_nametable ()
 {
     auto     *nametable             = new uint8_t[1024];
     uint16_t background_chr_address = this -> get_control_flag (F_BACKGROUND_PATTERN_TABLE) ? 0x1000 : 0x0000;

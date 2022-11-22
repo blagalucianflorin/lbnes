@@ -96,6 +96,7 @@ public:
             case WARNING:  log += " [WARNING] ";  break;
             case ERR:      log += " [ERROR] ";    break;
             case CRITICAL: log += " [CRITICAL] "; break;
+            default:                              break;
         }
 
         log += message;

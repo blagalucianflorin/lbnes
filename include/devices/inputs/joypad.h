@@ -79,7 +79,7 @@ public:
 
     uint8_t set_button (BUTTON button, uint8_t value = 1);
 
-    uint8_t get_button (BUTTON button);
+    uint8_t get_button (BUTTON button) const;
 
     void    change_type (INPUT_DEVICE new_input_device);
 

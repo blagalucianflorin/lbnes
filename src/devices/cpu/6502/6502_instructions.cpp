@@ -3,7 +3,6 @@
 //
 
 #include "devices/cpu/6502.h"
-#include "debugging/nes_debugger.h"
 
 
 void cpu::populate_operations ()
@@ -430,8 +429,8 @@ uint8_t cpu::ADC ()
     uint8_t  overflow;
 
     result   = this -> accumulator + input_data + this -> get_flag (cpu::F_CARRY);
-    overflow = ~((uint16_t) this -> accumulator ^ (uint16_t) input_data);
-    overflow &= (uint16_t) this -> accumulator ^ (uint16_t) result;
+    overflow = ~(static_cast <uint16_t> (this -> accumulator) ^ static_cast <uint16_t> (input_data));
+    overflow &= static_cast <uint16_t> (this -> accumulator) ^ static_cast <uint16_t> (result);
     overflow >>= 7;
 
     this -> set_flag (cpu::F_CARRY, result >> 8);
@@ -590,8 +589,8 @@ uint8_t cpu::BRK ()
     this -> push_to_stack (pc_high_byte);
     this -> push_to_stack (pc_low_byte);
     this -> push_to_stack (this -> flags_register);
-    this -> program_counter = ((uint16_t) pc_new_low_byte) & 0x00FF;
-    this -> program_counter += (uint16_t) pc_new_high_byte << 8;
+    this -> program_counter = (static_cast <uint16_t> (pc_new_low_byte)) & 0x00FF;
+    this -> program_counter += static_cast <uint16_t> (pc_new_high_byte) << 8;
     this -> set_flag (F_BREAK, 0);
 
     return (0);
@@ -660,7 +659,7 @@ uint8_t cpu::CLV ()
 uint8_t cpu::CMP ()
 {
     uint8_t input_data = this -> get_input_data ();
-    uint8_t diff       = ((uint16_t) this -> accumulator) - (uint16_t) input_data;
+    uint8_t diff       = (static_cast <uint16_t> (this -> accumulator)) - static_cast <uint16_t> (input_data);
 
     this -> set_flag (cpu::F_CARRY, this -> accumulator >= input_data);
     this -> set_flag (cpu::F_ZERO, this -> accumulator == input_data);
@@ -672,7 +671,7 @@ uint8_t cpu::CMP ()
 uint8_t cpu::CPX ()
 {
     uint8_t input_data = this -> get_input_data ();
-    auto diff      = (uint16_t) this -> x_register - (uint16_t) input_data;
+    auto diff      = static_cast <uint16_t> (this -> x_register) - static_cast <uint16_t> (input_data);
 
     this -> set_flag (cpu::F_CARRY, this -> x_register >= input_data);
     this -> set_flag (cpu::F_ZERO, this -> x_register == input_data);
@@ -684,7 +683,7 @@ uint8_t cpu::CPX ()
 uint8_t cpu::CPY ()
 {
     uint8_t input_data = this -> get_input_data ();
-    auto diff          = (uint16_t) this -> y_register - (uint16_t) input_data;
+    auto diff      = static_cast <uint16_t> (this -> y_register) - static_cast <uint16_t> (input_data);
 
     this -> set_flag (cpu::F_CARRY, this -> y_register >= input_data);
     this -> set_flag (cpu::F_ZERO, this -> y_register == input_data);
@@ -926,7 +925,7 @@ uint8_t cpu::RTI ()
     uint8_t pc_low_byte    = pull_from_stack();
     uint8_t pc_high_byte   = pull_from_stack();
 
-    this -> program_counter = (((uint16_t) pc_high_byte) << 8) + pc_low_byte;
+    this -> program_counter = ((static_cast <uint16_t> (pc_high_byte)) << 8) + pc_low_byte;
     this -> set_flag (cpu::F_BREAK, 0);
 
     return (0);
@@ -937,7 +936,7 @@ uint8_t cpu::RTS ()
     uint8_t low_byte  = this -> pull_from_stack ();
     uint8_t high_byte = this -> pull_from_stack ();
 
-    this -> program_counter = ((uint16_t) high_byte << 8) + low_byte + 1;
+    this -> program_counter = (static_cast <uint16_t> (high_byte) << 8) + low_byte + 1;
 
     return (0);
 }
@@ -950,10 +949,10 @@ uint8_t cpu::SBC ()
     uint16_t overflow;
 
     input_data     = this -> get_input_data ();
-    inverted_input = ((uint16_t) input_data) ^ 0x00FF;
-    result         = ((uint16_t) this -> accumulator) + inverted_input;
-    result         += (uint16_t) this -> get_flag (cpu::F_CARRY);
-    overflow       = result ^ ((uint16_t) this -> accumulator);
+    inverted_input = (static_cast <uint16_t> (input_data)) ^ 0x00FF;
+    result         = (static_cast <uint16_t> (this -> accumulator) + inverted_input);
+    result         += static_cast <uint16_t> (this -> get_flag (cpu::F_CARRY));
+    overflow       = result ^ (static_cast <uint16_t> (this -> accumulator));
     overflow       &= result ^ inverted_input;
     overflow       &= 0x0080;
 

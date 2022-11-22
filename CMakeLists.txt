@@ -153,14 +153,14 @@ if(WIN32)
         set(SDL_LIB_DIRECTORY $ENV{SDL_PATH}/lib/x86)
     endif()
 
-    target_include_directories(imgui PUBLIC $ENV{SDL_PATH}/include)
-    target_link_directories(imgui PUBLIC ${SDL_LIB_DIRECTORY})
-    target_link_libraries(imgui PUBLIC SDL2main SDL2)
+    target_include_directories(imgui PRIVATE $ENV{SDL_PATH}/include)
+    target_link_directories(imgui PRIVATE ${SDL_LIB_DIRECTORY})
+    target_link_libraries(imgui PRIVATE SDL2main SDL2)
 
-    target_include_directories(lbnes PUBLIC $ENV{SDL_PATH}/include)
-    target_link_directories(lbnes PUBLIC ${SDL_LIB_DIRECTORY})
-    target_link_directories(lbnes PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
-    target_link_libraries(lbnes PUBLIC SDL2main SDL2 -l${YAML-CPP_LIB} imgui -lws2_32)
+    target_include_directories(lbnes PRIVATE $ENV{SDL_PATH}/include)
+    target_link_directories(lbnes PRIVATE ${SDL_LIB_DIRECTORY})
+    target_link_directories(lbnes PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
+    target_link_libraries(lbnes PRIVATE SDL2main SDL2 -l${YAML-CPP_LIB} imgui -lws2_32)
 
     file(COPY ${SDL_LIB_DIRECTORY}/SDL2.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     add_definitions(-DSDL_MAIN_HANDLED)
@@ -203,17 +203,16 @@ else()
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-    -Wall \
-    -Wextra \
-    -Werror \
-    -Wno-unused-parameter \
-    -Wvla \
-    -Wimplicit-fallthrough \
-    -fsanitize-undefined-trap-on-error \
+    -Wall -Wextra -Wvla -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 \
+    -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast  -Wsign-promo \
+    -Woverloaded-virtual -Wredundant-decls -Wsign-conversion -Wstrict-null-sentinel -Wundef -Wimplicit-fallthrough \
+    \
     -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 \
-    -fstack-protector-strong \
-    -fPIE \
-    -fsanitize=bounds")
+    -fsanitize-undefined-trap-on-error -fstack-protector-strong -fPIE -fsanitize=bounds \
+    ")
+
+set_source_files_properties(${IMGUI_SOURCES} PROPERTIES COMPILE_FLAGS "-w")
+set_source_files_properties(src/misc/base64.cpp PROPERTIES COMPILE_FLAGS "-w")
 
 # Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 if(WIN32 OR (UNIX AND NOT APPLE))

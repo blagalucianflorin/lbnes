@@ -26,9 +26,9 @@
 class ppu : public device
 {
 private:
-    uint8_t nametable_memory[2048];
-    uint8_t palette_memory[33];
-    uint8_t oam[256];
+    uint8_t nametable_memory[2048]{};
+    uint8_t palette_memory[33]{};
+    uint8_t oam[256]{};
 
     uint8_t control_register     = 0x0000;
     uint8_t mask_register        = 0x0000;
@@ -92,7 +92,7 @@ public:
         uint8_t b;
     };
 
-    rgb_triplet color_palette[64];
+    rgb_triplet color_palette[64]{};
 
 private:
     enum OAM_PROPERTY
@@ -111,25 +111,26 @@ private:
         uint8_t x;
     };
 
+    struct loopy_fields
+    {
+        uint16_t coarse_x    : 5;
+        uint16_t coarse_y    : 5;
+        uint16_t nametable_x : 1;
+        uint16_t nametable_y : 1;
+        uint16_t fine_y      : 3;
+        uint16_t unused      : 1;
+    };
+
     union loopy
     {
-        struct
-        {
-            uint16_t coarse_x    : 5;
-            uint16_t coarse_y    : 5;
-            uint16_t nametable_x : 1;
-            uint16_t nametable_y : 1;
-            uint16_t fine_y      : 3;
-            uint16_t unused      : 1;
-        };
-
+        loopy_fields fields;
         uint16_t data;
     };
 
-    uint8_t fine_x;
+    uint8_t fine_x{};
 
-    loopy temporary_address;
-    loopy actual_address;
+    loopy temporary_address{};
+    loopy actual_address{};
 
     int  scanline  = 0;
     int  scandot   = 0;
@@ -141,8 +142,8 @@ private:
     SDL_Renderer *renderer       = nullptr;
     SDL_Texture  *screen         = nullptr;
     SDL_Surface  *screen_surface = nullptr;
-    uint32_t     pixels[240 * 256];
-    uint8_t      pixels_small[240 * 256];
+    uint32_t     pixels[240 * 256]{};
+    uint8_t      pixels_small[240 * 256]{};
 
 #ifndef INSPECT
     int          x_offset  = 0;
@@ -182,10 +183,10 @@ private:
     void build_shifters ();
     void shift_shifters ();
 
-    void get_background_pixel (uint8_t &pixel, uint8_t &palette);
+    void get_background_pixel (uint8_t &pixel, uint8_t &palette) const;
 
     uint8_t   scanline_sprites_count = 0x00;
-    oam_entry scanline_sprites[8];
+    oam_entry scanline_sprites[8]{};
 
     uint8_t  get_oam_property (uint8_t entry, OAM_PROPERTY property);
 
@@ -218,11 +219,11 @@ public:
 
     uint8_t  read (uint16_t address, bool from_parent_bus = true) override; // NOLINT
 
-    uint8_t  set_control_flag (CONTROL_FLAG flag, uint8_t value);
+    [[maybe_unused]] uint8_t  set_control_flag (CONTROL_FLAG flag, uint8_t value);
 
     uint8_t  get_control_flag (CONTROL_FLAG flag) const;
 
-    uint8_t  set_mask_flag (MASK_FLAG flag, uint8_t value);
+    [[maybe_unused]] uint8_t  set_mask_flag (MASK_FLAG flag, uint8_t value);
 
     uint8_t  get_mask_flag (MASK_FLAG flag) const;
 
@@ -250,7 +251,7 @@ public:
 
     inline bool is_odd_frame () { return (this -> odd_frame); }
 
-    void      draw_nametable ();
+    [[maybe_unused]] void      draw_nametable ();
 
     long long frames_rendered = 0;
 

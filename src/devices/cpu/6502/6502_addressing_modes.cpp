@@ -120,17 +120,17 @@ uint8_t cpu::IND ()
     (this -> program_counter)++;
     pointer_high_byte  = this -> read (this -> program_counter);
 
-    pointer       = (((uint16_t) pointer_high_byte) << 8) + pointer_low_byte;
+    pointer       = ((static_cast <uint16_t> (pointer_high_byte)) << 8) + pointer_low_byte;
     dest_low_byte = this -> read (pointer);
     if (pointer_low_byte == 0xFF)
     {
-        pointer        = (((uint16_t) pointer_high_byte) << 8) & 0xFF00;
+        pointer        = ((static_cast <uint16_t> (pointer_high_byte)) << 8) & 0xFF00;
         dest_high_byte = this -> read (pointer);
     }
     else
         dest_high_byte = this -> read (pointer + 1);
 
-    this -> destination_address = (((uint16_t) dest_high_byte) << 8) + dest_low_byte;
+    this -> destination_address = ((static_cast <uint16_t> (dest_high_byte)) << 8) + dest_low_byte;
 
     return (0);
 }
@@ -144,10 +144,10 @@ uint8_t cpu::IDX ()
     aux_adr = this -> read (this -> program_counter);
     (this -> program_counter)++;
 
-    aux_1 = this -> read ((uint16_t)(aux_adr + ((uint16_t)this -> x_register)) & 0x00FF);
-    aux_2 = this -> read ((uint16_t)(aux_adr + ((uint16_t)this -> x_register) + 1) & 0x00FF);
+    aux_1 = this -> read (static_cast <uint16_t>(aux_adr + (static_cast <uint16_t> (this -> x_register))) & 0x00FF);
+    aux_2 = this -> read (static_cast <uint16_t>(aux_adr + (static_cast <uint16_t> (this -> x_register)) + 1) & 0x00FF);
 
-    this -> destination_address = (uint16_t)(aux_2 << 8) | aux_1;
+    this -> destination_address = static_cast <uint16_t> (aux_2 << 8) | aux_1;
 
     return (0);
 }

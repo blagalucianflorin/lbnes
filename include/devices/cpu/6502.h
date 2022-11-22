@@ -106,7 +106,7 @@ class cpu : public device
 public:
     cpu ();
 
-    inline bool responds_to (uint16_t address) override { return (false); }
+    inline bool responds_to (uint16_t /*address*/) override { return (false); }
 
     void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
 

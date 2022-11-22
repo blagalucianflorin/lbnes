@@ -24,7 +24,7 @@ bool joypad::responds_to (uint16_t address)
     return ((this -> player_number == 1 && address == 0x4016) || (this -> player_number == 2 && address == 0x4017));
 }
 
-void joypad::write (uint16_t address, uint8_t data, bool to_parent_bus)
+void joypad::write (uint16_t /*address*/, uint8_t /*data*/, bool /*to_parent_bus*/) // NOLINT
 {
     if (!activated)
         return;
@@ -34,7 +34,7 @@ void joypad::write (uint16_t address, uint8_t data, bool to_parent_bus)
 
     if (this -> input_device == KEYBOARD)
     {
-        for (int i = 0; i < 8; i++)
+        for (size_t i = 0; i < 8; i++)
             this -> saved_state |= (keyboard_state[this -> sdl_scancode_translations[this -> mapping[i]]] ? 1 : 0) << i;
     }
     else if ((this -> input_device == CONTROLLER) && SDL_NumJoysticks () > 0)
@@ -57,7 +57,7 @@ void joypad::write (uint16_t address, uint8_t data, bool to_parent_bus)
     }
 }
 
-uint8_t joypad::read (uint16_t address, bool to_parent_bus)
+uint8_t joypad::read (uint16_t /*address*/, bool /*to_parent_bus*/) // NOLINT
 {
     uint8_t result = (this -> saved_state & 0b10000000) >> 7;
 
@@ -76,7 +76,7 @@ uint8_t joypad::set_button (joypad::BUTTON button, uint8_t value)
     return (this -> saved_state);
 }
 
-uint8_t joypad::get_button (joypad::BUTTON button)
+uint8_t joypad::get_button (joypad::BUTTON button) const
 {
     return (((this -> saved_state) >> button) & 1);
 }

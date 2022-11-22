@@ -10,7 +10,7 @@ cartridge::cartridge (const std::string &file_path): device (0x4020, 0xFFFF)
     std::string file_format  = file_path.substr (file_path.rfind ('.'));
 
     (this -> sram).reserve (0x2000);
-    for (int i = 0; i < 0x2000; i++) (this -> sram)[i] = 0x00;
+    for (size_t i = 0; i < 0x2000; i++) (this -> sram)[i] = 0x00;
 
     if (supported_formats.find (file_format) == supported_formats.end ())
         throw cartridge_exception (std::string ("Unsupported file format: ") + file_format);
@@ -24,7 +24,7 @@ cartridge::cartridge (const std::string &file_path): device (0x4020, 0xFFFF)
  *  0x6000 - 0x8000 -> SRAM
  *  Others          -> UNASSIGNED (throws)
  */
-void cartridge::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLINT
+void cartridge::write (uint16_t address, uint8_t data, bool /*to_parent_bus*/) // NOLINT
 {
     if (IS_BETWEEN (0x6000, address, 0x7FFF))
         ((this -> sram))[address - 0x6000] = data;
@@ -37,7 +37,7 @@ void cartridge::write (uint16_t address, uint8_t data, bool to_parent_bus) // NO
  *  0x8000 - 0xFFFF -> PRG
  *  Others          -> UNASSIGNED (throws)
  */
-uint8_t cartridge::read (uint16_t address, bool from_parent_bus) // NOLINT
+uint8_t cartridge::read (uint16_t address, bool /*from_parent_bus*/) // NOLINT
 {
     if (IS_BETWEEN (0x8000, address, 0xFFFF))
         return ((this -> program_memory)[address - 0x8000]);

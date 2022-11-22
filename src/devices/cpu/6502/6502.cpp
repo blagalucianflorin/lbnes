@@ -11,12 +11,12 @@ cpu::cpu () : device (0x0000, 0x0000) // NOLINT
     this -> populate_operations ();
 }
 
-void cpu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLINT
+void cpu::write (uint16_t address, uint8_t data, bool /*to_parent_bus*/) // NOLINT
 {
     (this -> parent_bus) -> write (address, data);
 }
 
-uint8_t cpu::read (uint16_t address, bool from_parent_bus) // NOLINT
+uint8_t cpu::read (uint16_t address, bool /*from_parent_bus*/) // NOLINT
 {
     return ((this -> parent_bus) -> read (address));
 }
@@ -52,7 +52,6 @@ void cpu::reset ()
     this -> destination_address    = 0xFFFE;
 }
 
-[[maybe_unused]] void nop (){} // NOLINT
 
 void cpu::clock () noexcept
 {

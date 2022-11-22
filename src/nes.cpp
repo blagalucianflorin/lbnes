@@ -128,7 +128,7 @@ uint32_t *nes::render_frame ()
 {
     (this -> joypads)[player] -> reset_buttons ();
 
-    LOGGER_INFO ("Reset joypad buttons for player '" + std::to_string ((int) player) + "'.");
+    LOGGER_INFO ("Reset joypad buttons for player '" + std::to_string (static_cast <int> (player)) + "'.");
 }
 
 
@@ -136,7 +136,7 @@ uint32_t *nes::render_frame ()
 {
     (this -> joypads)[player] -> toggle_activated ();
 
-    LOGGER_INFO ("Toggled joypad for player '" + std::to_string ((int) player) + "'.");
+    LOGGER_INFO ("Toggled joypad for player '" + std::to_string (static_cast <int> (player)) + "'.");
 }
 
 
@@ -159,19 +159,19 @@ void nes::load_joypads ()
             player_one_mapping.push_back (player["mapping"]["a"].as<std::string>());
             player_one_mapping.push_back (player["mapping"]["b"].as<std::string>());
 
-            (this -> joypads)[player["player"].as<int>() - 1] -> change_type (joypad::KEYBOARD);
-            (this -> joypads)[player["player"].as<int>() - 1] -> set_mapping (player_one_mapping);
-            (this -> joypads)[player["player"].as<int>() - 1] ->
+            (this -> joypads)[static_cast <size_t> (player["player"].as<int>() - 1)] -> change_type (joypad::KEYBOARD);
+            (this -> joypads)[static_cast <size_t> (player["player"].as<int>() - 1)] -> set_mapping (player_one_mapping);
+            (this -> joypads)[static_cast <size_t> (player["player"].as<int>() - 1)] ->
                     change_player_number (player["player"].as<int>());
 
             LOGGER_INFO ("Loaded keyboard joypad for player '" + std::to_string (player["player"].as<int>()) + "'.");
         }
         else
         {
-            (this -> joypads)[player["player"].as<int>() - 1] ->
+            (this -> joypads)[static_cast <size_t> (player["player"].as<int>() - 1)] ->
                     change_controller_number (player["controller_index"].as<int>() - 1);
-            (this -> joypads)[player["player"].as<int>() - 1] -> change_type (joypad::CONTROLLER);
-            (this -> joypads)[player["player"].as<int>() - 1] ->
+            (this -> joypads)[static_cast <size_t> (player["player"].as<int>() - 1)] -> change_type (joypad::CONTROLLER);
+            (this -> joypads)[static_cast <size_t> (player["player"].as<int>() - 1)] ->
                     change_player_number (player["player"].as<int>());
 
             LOGGER_INFO ("Loaded controller joypad for player '" + std::to_string (player["player"].as<int>()) + "'.");
@@ -185,7 +185,7 @@ int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
     if (!configurator::get_instance ()["new_controller_replaces_player_one"].as<bool> ())
         return (1);
 
-    auto joypads = (std::vector <std::unique_ptr <joypad>>*) user_data;
+    auto joypads = static_cast <std::vector <std::unique_ptr <joypad>>*> (user_data);
 
     if (event -> type == SDL_JOYDEVICEADDED)
     {
@@ -233,7 +233,7 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
     if (initialize_controllers)
         this -> joypads.clear ();
 
-    for (int i = 0; i < 2; i++)
+    for (size_t i = 0; i < 2; i++)
     {
         if (initialize_controllers)
             this -> joypads.push_back (std::make_unique <joypad> ());
@@ -274,8 +274,8 @@ void nes::sleep_until_next_frame (std::chrono::time_point<std::chrono::high_reso
     static std::chrono::microseconds fps_period;
     static std::chrono::microseconds sleep_time;
 
-    fps_period = std::chrono::microseconds ((int) ((float) (std::chrono::microseconds
-            ((int) (1000000 / this -> target_fps))).count () * (100.0 / this -> options.speed)));
+    fps_period = std::chrono::microseconds (static_cast <int> (static_cast <float> ((std::chrono::microseconds \
+                    (static_cast <int> ((1000000 / this -> target_fps))).count () * (100.0 / this -> options.speed)))));
     sleep_time = std::chrono::duration_cast <std::chrono::microseconds> (fps_period - std::chrono::duration_cast
             <std::chrono::microseconds>(std::chrono::high_resolution_clock::now () - frame_start));
 
@@ -284,7 +284,7 @@ void nes::sleep_until_next_frame (std::chrono::time_point<std::chrono::high_reso
     // Block the thread for the remaining 5% of the time
     while (frame_start + fps_period > std::chrono::high_resolution_clock::now ()) {}
 
-    current_fps = 1000000000.0 / (double) (std::chrono::high_resolution_clock::now () - frame_start).count ();
+    current_fps = 1000000000.0 / static_cast<double> ((std::chrono::high_resolution_clock::now () - frame_start).count ());
     average_fps = (average_fps + current_fps) / 2;
 }
 

@@ -5,17 +5,19 @@
 #include "network/client.hpp"
 
 
-client::client (const char *host, const short port)
+// Remember to uncomment parameters when starting implementation
+// Used to silence -Wunused-parameter
+client::client (const char* /*host*/, const short /*port*/)
 {
 
 }
 
-void client::receive_data (uint8_t *data, size_t size)
+void client::receive_data (uint8_t* /*data*/, size_t /*size*/)
 {
 
 }
 
-void client::send_data (uint8_t *data, size_t size)
+void client::send_data (uint8_t* /*data*/, size_t /*size*/)
 {
 
 }
