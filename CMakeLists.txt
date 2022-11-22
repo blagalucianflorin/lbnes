@@ -43,81 +43,80 @@ include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/yaml-cpp/include)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/imgui)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/imgui/backends)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/portable-file-dialogs)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/CppSockets)
 
 
 set(SOURCES
-    src/bus/bus.cpp
-    src/devices/cpu/6502/6502.cpp
-    src/devices/cpu/6502/6502_addressing_modes.cpp
-    src/devices/cpu/6502/6502_instructions.cpp
-    src/devices/memories/memory.cpp
-    src/devices/device.cpp
-    src/devices/memories/ram.cpp
-    src/devices/cartridges/cartridge.cpp
-    src/devices/cartridges/read_ines.cpp
-    src/devices/ppu/ppu.cpp
-    src/devices/memories/ppu_palette_ram.cpp
-    src/devices/memories/ppu_nametable_ram.cpp
-    src/devices/ppu/oam.cpp src/devices/inputs/joypad.cpp
-    src/graphics/sdl_manager.cpp
-    src/nes.cpp
-    src/options/configurator.cpp
-    src/options/arguments_manager.cpp
-    src/misc/base64.cpp
-    src/graphics/imgui_manager.cpp
-    src/network/server.cpp
-    src/network/client.cpp)
+        src/bus/bus.cpp
+        src/devices/cpu/6502/6502.cpp
+        src/devices/cpu/6502/6502_addressing_modes.cpp
+        src/devices/cpu/6502/6502_instructions.cpp
+        src/devices/memories/memory.cpp
+        src/devices/device.cpp
+        src/devices/memories/ram.cpp
+        src/devices/cartridges/cartridge.cpp
+        src/devices/cartridges/read_ines.cpp
+        src/devices/ppu/ppu.cpp
+        src/devices/memories/ppu_palette_ram.cpp
+        src/devices/memories/ppu_nametable_ram.cpp
+        src/devices/ppu/oam.cpp src/devices/inputs/joypad.cpp
+        src/graphics/sdl_manager.cpp
+        src/nes.cpp
+        src/options/configurator.cpp
+        src/options/arguments_manager.cpp
+        src/misc/base64.cpp
+        src/graphics/imgui_manager.cpp
+        src/network/server.cpp
+        src/network/client.cpp)
 
 
 set (INCLUDES
-    include/bus/bus.h
-    include/devices/cpu/6502.h
-    include/devices/device.h
-    include/devices/memories/memory.h
-    include/forwards/classes.h
-    include/misc/macros.h
-    include/devices/memories/ram.h
-    include/devices/cartridges/cartridge.h
-    include/devices/cartridges/exceptions/cartridge_exception.h
-    include/devices/ppu/ppu.h
-    include/devices/ppu/exceptions/ppu_exception.h
-    include/devices/memories/ppu_palette_ram.h
-    include/devices/memories/ppu_nametable_ram.h
-    include/devices/ppu/oam.h
-    include/devices/inputs/joypad.h
-    include/graphics/sdl_manager.h
-    include/nes.h
-    include/options/configurator.hpp
-    include/options/arguments_manager.hpp
-    include/misc/base64.h
-    include/graphics/imgui_manager.hpp
-    include/network/server.hpp
-    include/network/client.hpp
-    include/misc/logger.hpp)
+        include/bus/bus.h
+        include/devices/cpu/6502.h
+        include/devices/device.h
+        include/devices/memories/memory.h
+        include/forwards/classes.h
+        include/misc/macros.h
+        include/devices/memories/ram.h
+        include/devices/cartridges/cartridge.h
+        include/devices/cartridges/exceptions/cartridge_exception.h
+        include/devices/ppu/ppu.h
+        include/devices/ppu/exceptions/ppu_exception.h
+        include/devices/memories/ppu_palette_ram.h
+        include/devices/memories/ppu_nametable_ram.h
+        include/devices/ppu/oam.h
+        include/devices/inputs/joypad.h
+        include/graphics/sdl_manager.h
+        include/nes.h
+        include/options/configurator.hpp
+        include/options/arguments_manager.hpp
+        include/misc/base64.h
+        include/graphics/imgui_manager.hpp
+        include/network/server.hpp
+        include/network/client.hpp
+        include/misc/logger.hpp)
 
 
 set (IMGUI_SOURCES_AND_INCLUDES
-    lib/imgui/imconfig.h
-    lib/imgui/imgui.cpp
-    lib/imgui/imgui.h
-    lib/imgui/imgui_internal.h
-    lib/imgui/imgui_tables.cpp
-    lib/imgui/imgui_widgets.cpp
-    lib/imgui/imgui_demo.cpp
-    lib/imgui/imgui_draw.cpp
-    lib/imgui/imstb_rectpack.h
-    lib/imgui/imstb_textedit.h
-    lib/imgui/imstb_truetype.h
-    lib/imgui/backends/imgui_impl_sdl.h
-    lib/imgui/backends/imgui_impl_sdl.cpp
-    lib/imgui/backends/imgui_impl_sdlrenderer.h
-    lib/imgui/backends/imgui_impl_sdlrenderer.cpp)
+        lib/imgui/imconfig.h
+        lib/imgui/imgui.cpp
+        lib/imgui/imgui.h
+        lib/imgui/imgui_internal.h
+        lib/imgui/imgui_tables.cpp
+        lib/imgui/imgui_widgets.cpp
+        lib/imgui/imgui_demo.cpp
+        lib/imgui/imgui_draw.cpp
+        lib/imgui/imstb_rectpack.h
+        lib/imgui/imstb_textedit.h
+        lib/imgui/imstb_truetype.h
+        lib/imgui/backends/imgui_impl_sdl.h
+        lib/imgui/backends/imgui_impl_sdl.cpp
+        lib/imgui/backends/imgui_impl_sdlrenderer.h
+        lib/imgui/backends/imgui_impl_sdlrenderer.cpp)
 
 
 set (INCLUDES
-    ${INCLUDES}
-    lib/portable-file-dialogs/portable-file-dialogs.h)
+        ${INCLUDES}
+        lib/portable-file-dialogs/portable-file-dialogs.h)
 
 
 file(GLOB IMGUI_SOURCES ${IMGUI_SOURCES_AND_INCLUDES})
@@ -174,20 +173,20 @@ if(WIN32)
     add_compile_definitions(UNICODE)
     add_compile_definitions(_UNICODE)
 
-#    Commented at the moment because printing to terminal doesn't work on windows while this is enabled
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-subsystem,windows")
+    #    Commented at the moment because printing to terminal doesn't work on windows while this is enabled
+    #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-subsystem,windows")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 elseif(UNIX AND NOT APPLE)
     find_package(SDL2 REQUIRED)
     find_library(SDL2_LIBRARY SDL2)
-    include_directories(lbnes PRIVATE "${SDL2_INCLUDE_DIRS}")
+    include_directories("${SDL2_INCLUDE_DIRS}")
     target_link_directories(lbnes PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
     target_link_libraries(lbnes PRIVATE -lSDL2 -l${YAML-CPP_LIB} imgui)
 elseif(APPLE)
     find_package(SDL2 REQUIRED)
     find_library(SDL2_LIBRARY SDL2)
-    include_directories(lbnes PRIVATE ${SDL2_INCLUDE_DIRS})
-    include_directories(imgui PRIVATE ${SDL2_LIBRARY})
+    include_directories(lbnes SYSTEM PRIVATE ${SDL2_INCLUDE_DIRS})
+    include_directories(imgui SYSTEM PRIVATE ${SDL2_LIBRARY})
     target_link_directories(lbnes PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/lib/yaml-cpp/)
     target_link_libraries(lbnes PRIVATE ${SDL2_LIBRARY} -l${YAML-CPP_LIB} imgui)
 endif()
@@ -204,8 +203,8 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -Wall -Wextra -Wvla -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 \
-    -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast  -Wsign-promo \
-    -Woverloaded-virtual -Wredundant-decls -Wsign-conversion -Wstrict-null-sentinel -Wundef -Wimplicit-fallthrough \
+    -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast -Wsign-promo \
+    -Woverloaded-virtual -Wredundant-decls -Wsign-conversion -Wundef -Wimplicit-fallthrough \
     \
     -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 \
     -fsanitize-undefined-trap-on-error -fstack-protector-strong -fPIE -fsanitize=bounds \
@@ -216,5 +215,5 @@ set_source_files_properties(src/misc/base64.cpp PROPERTIES COMPILE_FLAGS "-w")
 
 # Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 if(WIN32 OR (UNIX AND NOT APPLE))
-set_source_files_properties(src/devices/cpu/6502/6502.cpp PROPERTIES COMPILE_FLAGS "-Wno-uninitialized")
+    set_source_files_properties(src/devices/cpu/6502/6502.cpp PROPERTIES COMPILE_FLAGS "-Wno-uninitialized")
 endif()

@@ -31,7 +31,7 @@
 #define LOGGER_ERROR_STD(message) LOGGER_BASE (logger::ERR, message, true)
 #define LOGGER_CRITICAL_STD(message) LOGGER_BASE (logger::CRITICAL, message, true)
 
-#if _WIN32
+#ifdef _WIN32
 #include <windows.h>
 inline int cross_platform_mkdir (const std::string& folder_name)\
 {
