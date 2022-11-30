@@ -5,6 +5,8 @@
 #ifndef NEMULATOR_CPU_H
 #define NEMULATOR_CPU_H
 
+#include <memory>
+
 #include "forwards/classes.h"
 #include "devices/device.h"
 #include "bus/bus.h"
@@ -34,8 +36,8 @@ class cpu : public device
     bool      dma_begin  = false;
     uint8_t   dma_entry  = 0x00;
     uint8_t   dma_data   = 0x00;
-    class ppu *dma_ppu   = nullptr;
     uint8_t   dma_page   = 0x00;
+    std::shared_ptr <ppu> dma_ppu {};
 
     // Operations
     struct  operation
@@ -43,7 +45,8 @@ class cpu : public device
         uint8_t (cpu::*instruction) ()     = &cpu::UNK;
         uint8_t (cpu::*addressing_mode) () = &cpu::IMP;
         uint8_t cycles_required            = 0;
-    }  operations[256] {};
+    };
+    std::array <operation, 256> operations {};
     uint8_t opcode {};
 
     enum FLAG
@@ -124,7 +127,7 @@ public:
 
     inline long get_cycles_elapsed () { return (this -> cycles_elapsed); }
 
-    void    dma (ppu *target_ppu, uint8_t page);
+    void    dma (std::shared_ptr <ppu> target_ppu, uint8_t page);
 
     std::string save_state (const std::string& name) override;
 

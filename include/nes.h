@@ -13,6 +13,7 @@
 #include <exception>
 #include <memory>
 #include <iomanip>
+#include <array>
 
 #include <SDL.h>
 
@@ -39,7 +40,7 @@
 #endif
 
 
-class nes
+class nes : public std::enable_shared_from_this <nes>
 {
 private:
     friend class imgui_manager;
@@ -55,7 +56,7 @@ private:
     std::shared_ptr <ram>       cpu_ram;
     std::shared_ptr <cartridge> nes_cartridge;
 
-    std::vector <std::unique_ptr <joypad>> joypads;
+    std::vector <std::shared_ptr <joypad>> joypads;
     std::shared_ptr <class imgui_manager>  imgui_manager;
 
 
@@ -68,8 +69,8 @@ private:
     std::unique_ptr <class server> screen_server;
     std::unique_ptr <class client> screen_client;
 
-    uint8_t      client_pixels_small[240 * 256] {};
-    uint32_t     client_pixels[240 * 256] {};
+    std::array <uint8_t, 240 * 256>  client_pixels_small {};
+    std::array <uint32_t, 240 * 256> client_pixels {};
     SDL_Texture  *client_screen_texture = nullptr;
     SDL_Surface  *client_screen_surface = nullptr;
 
@@ -92,7 +93,7 @@ private:
         uint8_t b;
     };
 
-    rgb_triplet color_palette[64]{};
+    std::array <rgb_triplet, 64> color_palette {};
 
     void  populate_palette_2C02 ();
 
@@ -121,7 +122,7 @@ public:
 
     void     start ();
 
-    uint32_t *render_frame ();
+    std::array <uint32_t, 240 * 256> render_frame ();
 
     [[maybe_unused]] uint8_t set_button (joypad::BUTTON button, uint8_t value = 1, uint8_t player = 1);
 

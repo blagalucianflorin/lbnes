@@ -21,4 +21,6 @@ class ppu_nametable_ram;
 class ppu_palette_ram;
 class oam;
 
+class nes;
+
 #endif //NEMULATOR_CLASSES_H

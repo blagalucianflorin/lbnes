@@ -13,9 +13,6 @@ nes::nes ()
     create_sdl_window (this -> game_window, this -> game_renderer);
     SDL_SetEventFilter (nes::controller_connection_event_manager, &(this -> joypads));
 
-    LOGGER_INFO ("Creating ImGui manager.");
-    this -> imgui_manager = std::make_shared <class imgui_manager> (this -> game_renderer, this -> game_window, this);
-
     this -> options.display_fps = configurator::get_instance ()["display_fps"].as <bool> ();
     this -> options.fullscreen  = configurator::get_instance ()["fullscreen"].as <bool> ();
     this -> options.show_menu   = configurator::get_instance ()["show_menu"].as <bool> ();
@@ -39,7 +36,7 @@ nes::nes ()
 
 nes::~nes ()
 {
-    LOGGER_INFO ("Deleting nes.");
+    LOGGER_INFO ("Deleting my_nes.");
 
     this -> imgui_manager.reset ();
 
@@ -51,6 +48,10 @@ nes::~nes ()
 
 void nes::start ()
 {
+    LOGGER_INFO ("Creating ImGui manager.");
+    this -> imgui_manager = std::make_shared <class imgui_manager> (this -> game_renderer, this -> game_window,
+                                                                    shared_from_this ());
+
     LOGGER_INFO ("Starting emulation.");
 
     auto frame_start = std::chrono::high_resolution_clock::now ();
@@ -80,7 +81,7 @@ void nes::reset ()
     if (!this -> rom_loaded)
         return;
 
-    LOGGER_INFO ("Resetting nes.");
+    LOGGER_INFO ("Resetting my_nes.");
 
     this -> nes_cpu -> reset ();
     this -> nes_cartridge -> reset ();
@@ -88,7 +89,7 @@ void nes::reset ()
 }
 
 
-uint32_t *nes::render_frame ()
+std::array <uint32_t, 240 * 256> nes::render_frame ()
 {
     SDL_SetRenderDrawColor (this -> game_renderer, 128, 128, 128, 255);
     SDL_RenderClear (this -> game_renderer);
@@ -221,7 +222,7 @@ int nes::controller_connection_event_manager (void *user_data, SDL_Event *event)
 
 void nes::reload (const std::string &rom_file, bool initialize_controllers)
 {
-    LOGGER_INFO ("Reloading nes.");
+    LOGGER_INFO ("Reloading my_nes.");
 
     nes_cpu       = std::make_shared<cpu> ();
     cpu_bus       = std::make_shared<bus> (0x0000, 0xFFFF);
@@ -237,16 +238,15 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
     {
         if (initialize_controllers)
             this -> joypads.push_back (std::make_unique <joypad> ());
-        this -> cpu_bus -> add_device (this -> joypads[i].get ());
+        this -> cpu_bus -> add_device (this -> joypads[i]);
     }
     if (initialize_controllers)
         this -> load_joypads ();
 
-    this -> nes_ppu -> attach (this -> nes_cpu.get ());
-    this -> nes_ppu -> attach (this -> nes_cartridge.get ());
-    this -> nes_ppu -> set_child_bus (*(this -> ppu_bus));
-    this -> cpu_bus -> add_devices ({this -> nes_cpu.get (), this -> cpu_ram.get (), this -> nes_cartridge.get (),
-                                     (this -> nes_ppu).get ()});
+    this -> nes_ppu -> attach (this -> nes_cpu);
+    this -> nes_ppu -> attach (this -> nes_cartridge);
+    this -> nes_ppu -> set_child_bus (this -> ppu_bus);
+    this -> cpu_bus -> add_devices ({this -> nes_cpu, this -> cpu_ram, this -> nes_cartridge, this -> nes_ppu});
 
     this -> rom_loaded = true;
 

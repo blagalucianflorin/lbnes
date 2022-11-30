@@ -5,6 +5,8 @@
 #ifndef NEMULATOR_MEMORY_H
 #define NEMULATOR_MEMORY_H
 
+#include <vector>
+
 #include "forwards/classes.h"
 #include "devices/device.h"
 #include "misc/base64.h"
@@ -12,12 +14,12 @@
 class memory : public device
 {
 private:
-    uint8_t *internal_memory;
+    std::vector <uint8_t> internal_memory;
 
 public:
     memory (uint16_t lower_bound, uint16_t upper_bound);
 
-    ~memory () noexcept override;
+    ~memory () noexcept override = default;
 
     inline void    write (uint16_t address, uint8_t data, bool /*to_parent_bus = true*/) // NOLINT
                             override

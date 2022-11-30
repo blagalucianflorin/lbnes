@@ -52,3 +52,4 @@ bin
 !lib/googletest-master/.gitignore
 lib/googletest-master/*
 lib/*
+lib

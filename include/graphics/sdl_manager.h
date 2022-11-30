@@ -8,7 +8,8 @@
 #include "devices/ppu/ppu.h"
 #include "options/configurator.hpp"
 
-extern "C" {
+extern "C"
+{
 #include <SDL.h>
 };
 

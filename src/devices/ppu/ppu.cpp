@@ -89,7 +89,7 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
     // OAM
     if (address == 0x4014)
     {
-        this -> cpu -> dma (this, data);
+        this -> cpu -> dma (shared_from_this (), data);
         return;
     }
     // Registers
@@ -248,15 +248,12 @@ uint8_t ppu::read (uint16_t address, bool from_parent_bus) // NOLINT
             this -> actual_address.data += (get_control_flag (F_ADDRESS_INCREMENT) == 1 ? 32 : 1);
 
             return (result);
-
-        default:
-            break;
     }
 
     return (result);
 }
 
-[[maybe_unused]] uint8_t ppu::set_control_flag (ppu::CONTROL_FLAG flag, uint8_t value)
+uint8_t ppu::set_control_flag (ppu::CONTROL_FLAG flag, uint8_t value)
 {
     value = value ? 1 : 0;
 
@@ -274,7 +271,7 @@ uint8_t ppu::get_control_flag (ppu::CONTROL_FLAG flag) const
     return (((this -> control_register) >> flag) & 1);
 }
 
-[[maybe_unused]] uint8_t ppu::set_mask_flag (ppu::MASK_FLAG flag, uint8_t value)
+uint8_t ppu::set_mask_flag (ppu::MASK_FLAG flag, uint8_t value)
 {
     value = value ? 1 : 0;
 
@@ -306,7 +303,7 @@ uint8_t ppu::get_status_flag (ppu::STATUS_FLAG flag) const
 
 uint8_t ppu::get_oam_property (uint8_t entry, ppu::OAM_PROPERTY property)
 {
-    return ((this -> oam)[(entry * 4) + property]);
+    return ((this -> oam)[(static_cast <size_t> (entry) * 4) + static_cast <size_t> (property)]);
 }
 
 uint8_t ppu::flip (uint8_t byte)
@@ -715,16 +712,13 @@ void ppu::clock ()
             }
         }
 
-        auto palette_entry = this -> read (0x3F00 + (final_palette << 2) + final_pixel, false) & 0x3F;
-        rgb_triplet color = this -> color_palette [palette_entry];
+        rgb_triplet color =
+                this -> color_palette [this -> read (0x3F00 + (final_palette << 2) + final_pixel, false) & 0x3F];
 
-        auto sdl_color = static_cast <uint32_t> (0x00000000 | (color.r << 24) | (color.g << 16) | (color.b << 8) |
-                                                   (0x00 << 0));
+        auto sdl_color = static_cast<uint32_t> (0x00000000 | (color.r << 24) | (color.g << 16) | (color.b << 8) |
+                                                (0x00 << 0));
         sdl_color >>= 8;
-        surface_set_pixel (this -> screen_surface, static_cast <size_t> (this -> scandot - 1),
-                           static_cast <size_t> (this -> scanline), sdl_color);
-        this -> pixels[this -> scanline * 256 + (this -> scandot - 1)] = sdl_color;
-        this -> pixels_small[this -> scanline * 256 + (this -> scandot - 1)] = palette_entry;
+        surface_set_pixel (this -> screen_surface, static_cast <size_t> (this -> scandot) - 1, static_cast <size_t> (this -> scanline), sdl_color);
     }
 
     (this -> scandot)++;
@@ -791,76 +785,6 @@ void ppu::get_foreground_pixel (uint8_t &pixel, uint8_t &palette, uint8_t &prior
         }
 }
 
-// Debug
-[[maybe_unused]] void ppu::draw_nametable ()
-{
-    auto     *nametable             = new uint8_t[1024];
-    uint16_t background_chr_address = this -> get_control_flag (F_BACKGROUND_PATTERN_TABLE) ? 0x1000 : 0x0000;
-//    uint16_t sprite_chr_address     = this -> get_control_flag (F_SPRITE_PATTERN_TABLE) ? 0x1000 : 0x0000;
-    uint16_t nametable_address      = 0x2000 + (0x0400 * (this -> get_control_flag(F_NAME_TABLE_ADDRESS_ONE) + (
-            2 * this -> get_control_flag(F_NAME_TABLE_ADDRESS_TWO))));
-    uint8_t  chr;
-
-
-//    if (this -> get_mask_flag (MASK_FLAG::F_SHOW_BACKGROUND))
-//    {
-    for (int j = 0; j < 2; j++)
-    {
-        for (uint16_t i = 0; i < 1024; i++)
-            nametable[i] = this -> read (nametable_address + (j * 0x0800) + i, false);
-
-        for (uint8_t row = 0; row < 30; row++) {
-            for (uint8_t column = 0; column < 32; column++) {
-                chr = nametable[row * 32 + column];
-
-                this -> draw_tile (background_chr_address + (chr * 16), this -> x_offset + (column * 8),
-                                   this -> y_offset + 300 + (row * 8) + (j * 300));
-            }
-        }
-    }
-//    }
-
-    if (this -> get_mask_flag (MASK_FLAG::F_SHOW_SPRITES))
-    {
-        // TODO Draw sprites
-    }
-
-    (this -> frames_rendered)++;
-}
-
-void ppu::draw_tile (uint16_t chr, int x, int y)
-{
-    std::map <int, std::vector <int>> aux_palette =
-            {
-                    {0, {0, 0, 0}},
-                    {1, {255, 0, 0}},
-                    {2, {0, 255, 0}},
-                    {3, {0, 0, 255}},
-            };
-
-    uint8_t sprite[16];
-
-    for (uint16_t i = 0; i < 16; i++)
-        sprite[i] = (this -> cartridge -> character_memory)[chr + i];
-
-    for (uint8_t tile_row = 0; tile_row < 8; tile_row++)
-    {
-        uint8_t low  = sprite[tile_row];
-        uint8_t high = sprite[tile_row + 8];
-
-        for (int tile_pixel = 7; tile_pixel >= 0; tile_pixel--)
-        {
-            uint8_t color = (high & 1) * 2 + (low & 1);
-            low >>= 1;
-            high >>= 1;
-
-            SDL_SetRenderDrawColor(renderer, aux_palette[color][0], aux_palette[color][1],
-                                   aux_palette[color][2], 255);
-
-            SDL_RenderDrawPoint(renderer, x + tile_pixel, y + tile_row);
-        }
-    }
-}
 
 void ppu::populate_palette_2C02()
 {

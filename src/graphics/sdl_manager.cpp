@@ -104,21 +104,21 @@ void update_vsync (SDL_Renderer *renderer)
 [[maybe_unused]] void draw_whole_palette (SDL_Renderer *renderer, ppu *my_ppu)
 {
 
-    int top  = 600;
-    int left = 100;
-    int size = 10;
+    size_t top  = 600;
+    size_t left = 100;
+    size_t size = 10;
 
-    for (uint16_t i = 0; i < 4; i++)
+    for (size_t i = 0; i < 4; i++)
     {
-        for (uint16_t j = 0; j < 16; j++)
+        for (size_t j = 0; j < 16; j++)
         {
             ppu::rgb_triplet color = (my_ppu -> color_palette)[i * 16 + j];
             SDL_Rect rect;
 
-            rect.x = left + j * size;
-            rect.y = top + i * size;
-            rect.h = size;
-            rect.w = size;
+            rect.x = static_cast <int> (left + j * size);
+            rect.y = static_cast <int> (top + i * size);
+            rect.h = static_cast <int> (size);
+            rect.w = static_cast <int> (size);
 
             SDL_SetRenderDrawColor (renderer, color.r, color.g, color.b, 0);
             SDL_RenderFillRect(renderer, &rect);

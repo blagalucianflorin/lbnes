@@ -1,7 +1,7 @@
 // Taken from https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
 
-#ifndef _BASE64_H_
-#define _BASE64_H_
+#ifndef BASE64_H
+#define BASE64_H
 
 #include <vector>
 #include <string>

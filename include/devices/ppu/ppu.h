@@ -6,7 +6,6 @@
 #define NEMULATOR_PPU_H
 
 #include "forwards/classes.h"
-
 #include "devices/device.h"
 #include "devices/ppu/exceptions/ppu_exception.h"
 #include "bus/bus.h"
@@ -15,20 +14,18 @@
 #include "devices/cpu/6502.h"
 #include "devices/ppu/oam.h"
 
-#ifdef _WIN32
 #include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 
 #include <map>
+#include <array>
 
-class ppu : public device
+
+class ppu : public device, public std::enable_shared_from_this <ppu>
 {
 private:
-    uint8_t nametable_memory[2048]{};
-    uint8_t palette_memory[33]{};
-    uint8_t oam[256]{};
+    std::array <uint8_t, 2048> nametable_memory {};
+    std::array <uint8_t, 33>   palette_memory {};
+    std::array <uint8_t, 256>  oam {};
 
     uint8_t control_register     = 0x0000;
     uint8_t mask_register        = 0x0000;
@@ -92,7 +89,7 @@ public:
         uint8_t b;
     };
 
-    rgb_triplet color_palette[64]{};
+    std::array <rgb_triplet, 64> color_palette {};
 
 private:
     enum OAM_PROPERTY
@@ -124,13 +121,13 @@ private:
     union loopy
     {
         loopy_fields fields;
-        uint16_t data;
+        uint16_t     data;
     };
 
-    uint8_t fine_x{};
+    loopy temporary_address {};
+    loopy actual_address {};
 
-    loopy temporary_address{};
-    loopy actual_address{};
+    uint8_t fine_x {};
 
     int  scanline  = 0;
     int  scandot   = 0;
@@ -142,20 +139,13 @@ private:
     SDL_Renderer *renderer       = nullptr;
     SDL_Texture  *screen         = nullptr;
     SDL_Surface  *screen_surface = nullptr;
-    uint32_t     pixels[240 * 256]{};
-    uint8_t      pixels_small[240 * 256]{};
 
-#ifndef INSPECT
-    int          x_offset  = 0;
-    int          y_offset  = 0;
-#else
-    int          x_offset  = 1050;
-    int          y_offset  = 10;
-#endif
+    std::array <uint32_t, 240 * 256> pixels {};
+    std::array <uint8_t, 240 * 256>  pixels_small {};
 
     // Directly attached devices
-    class cpu       *cpu       = nullptr;
-    class cartridge *cartridge = nullptr;
+    std::shared_ptr <cpu>       cpu;
+    std::shared_ptr <cartridge> cartridge;
 
     void  populate_palette_2C02 ();
 
@@ -185,13 +175,13 @@ private:
 
     void get_background_pixel (uint8_t &pixel, uint8_t &palette) const;
 
-    uint8_t   scanline_sprites_count = 0x00;
-    oam_entry scanline_sprites[8]{};
+    uint8_t                   scanline_sprites_count = 0x00;
+    std::array <oam_entry, 8> scanline_sprites {};
 
     uint8_t  get_oam_property (uint8_t entry, OAM_PROPERTY property);
 
-    uint8_t sprite_shift_pattern_low_byte[8] {};
-    uint8_t sprite_shift_pattern_high_byte[8] {};
+    std::array <uint8_t, 8> sprite_shift_pattern_low_byte {};
+    std::array <uint8_t, 8> sprite_shift_pattern_high_byte {};
 
     static uint8_t flip (uint8_t byte);
 
@@ -231,33 +221,27 @@ public:
 
     uint8_t  get_status_flag (STATUS_FLAG flag) const;
 
-    inline uint32_t *get_pixels () { return (this -> pixels); }
+    inline std::array <uint32_t, 240 * 256> &get_pixels () { return (this -> pixels); }
 
-    inline uint8_t  *get_pixels_small () { return (this -> pixels_small); }
+    inline std::array <uint8_t, 240 * 256>  &get_pixels_small () { return (this -> pixels_small); }
 
     // DMA
-    inline uint8_t *dma () { return (this -> oam); }
+    inline std::array <uint8_t, 256> &dma () { return (this -> oam); }
 
     // Attach devices for direct access
-    inline void attach (class cpu *new_cpu) { this -> cpu = new_cpu; }
+    inline void attach (std::shared_ptr <class cpu> cpu) { this -> cpu = cpu; }
 
     inline void attach (SDL_Renderer *new_renderer) { this -> renderer = new_renderer; }
 
-    inline void attach (class cartridge *new_cartridge)
+    inline void attach (std::shared_ptr <class cartridge> cartridge)
     {
-        this -> cartridge       = new_cartridge;
+        this -> cartridge       = cartridge;
         this -> mirroring_type  = this -> cartridge -> get_mirroring ();
     }
 
     inline bool is_odd_frame () { return (this -> odd_frame); }
 
-    [[maybe_unused]] void      draw_nametable ();
-
     long long frames_rendered = 0;
-
-    void      draw_tile (uint16_t chr, int x, int y);
-
-    void      update_whole_screen ();
 };
 
 #endif //NEMULATOR_PPU_H

@@ -9,16 +9,10 @@
 
 memory::memory (uint16_t lower_bound, uint16_t upper_bound) : device (lower_bound, upper_bound)
 {
-    this -> internal_memory = new uint8_t[upper_bound - lower_bound];
+    this -> internal_memory.resize (upper_bound - lower_bound);
 
     for (uint16_t i = 0; i < upper_bound - lower_bound; i++)
         (this -> internal_memory)[i] = 0x00;
-}
-
-
-memory::~memory () noexcept
-{
-    delete[] (this -> internal_memory);
 }
 
 
@@ -29,7 +23,7 @@ std::string memory::save_state (const std::string& name)
 
     final_node[name]                    = YAML::Node ();
     final_node[name]["memory_device"]   = YAML::Node ();
-    final_node[name]["internal_memory"] = base64::encode (this -> internal_memory,
+    final_node[name]["internal_memory"] = base64::encode (this -> internal_memory.data (),
                                                           this -> upper_bound - this -> lower_bound);
 
     for (auto pair : base_device_node["base_device"])
@@ -45,8 +39,7 @@ void memory::load_state (std::string saved_state)
     auto       decoded_memory = base64::decode (saved_node["internal_memory"].as<std::string> ());
     device::load_state (YAML::Dump(saved_node["base_device"]));
 
-    delete[] (this -> internal_memory);
-    this -> internal_memory = new uint8_t[this -> upper_bound - this -> lower_bound];
+    this -> internal_memory.resize (upper_bound - lower_bound);
     for (uint16_t i = 0; i < this -> upper_bound - this -> lower_bound; i++)
         (this -> internal_memory)[i] = decoded_memory[i];
 }

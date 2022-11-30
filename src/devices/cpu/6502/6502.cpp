@@ -163,7 +163,7 @@ void cpu::interrupt (bool force)
     this -> cycles_left = (force ? 8 : 7);
 }
 
-void cpu::dma (ppu *target_ppu, uint8_t page)
+void cpu::dma (std::shared_ptr <ppu> target_ppu, uint8_t page)
 {
     this -> dma_ppu     = target_ppu;
     this -> dma_page    = page;
