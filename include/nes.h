@@ -122,7 +122,7 @@ public:
 
     void     start ();
 
-    std::array <uint32_t, 240 * 256> render_frame ();
+    const std::array <uint32_t, 240 * 256> &render_frame ();
 
     [[maybe_unused]] uint8_t set_button (joypad::BUTTON button, uint8_t value = 1, uint8_t player = 1);
 

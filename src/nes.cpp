@@ -89,7 +89,7 @@ void nes::reset ()
 }
 
 
-std::array <uint32_t, 240 * 256> nes::render_frame ()
+const std::array <uint32_t, 240 * 256> &nes::render_frame ()
 {
     SDL_SetRenderDrawColor (this -> game_renderer, 128, 128, 128, 255);
     SDL_RenderClear (this -> game_renderer);

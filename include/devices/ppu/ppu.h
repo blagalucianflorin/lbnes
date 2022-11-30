@@ -144,8 +144,8 @@ private:
     std::array <uint8_t, 240 * 256>  pixels_small {};
 
     // Directly attached devices
-    std::shared_ptr <cpu>       cpu;
-    std::shared_ptr <cartridge> cartridge;
+    std::shared_ptr <class cpu>       cpu;
+    std::shared_ptr <class cartridge> cartridge;
 
     void  populate_palette_2C02 ();
 
@@ -221,7 +221,7 @@ public:
 
     uint8_t  get_status_flag (STATUS_FLAG flag) const;
 
-    inline std::array <uint32_t, 240 * 256> &get_pixels () { return (this -> pixels); }
+    inline const std::array <uint32_t, 240 * 256> &get_pixels () { return (this -> pixels); }
 
     inline std::array <uint8_t, 240 * 256>  &get_pixels_small () { return (this -> pixels_small); }
 
