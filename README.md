@@ -30,8 +30,6 @@ You can also build the emulator yourself, check out the 'Requirements, Clone & B
 
 ## Requirements, Clone & Build
 
-## (Currently submodule refs are broken, so the clone commands will not work)
-
 ### Linux (Debian) - Ubuntu / Raspberry Pi
 ```bash
 sudo apt install cmake g++ libsdl2-dev
