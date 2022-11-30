@@ -30,13 +30,13 @@ private:
     uint8_t control_register     = 0x0000;
     uint8_t mask_register        = 0x0000;
     uint8_t status_register      = 0x0000;
-    uint8_t oam_address_register = 0x0000;
-    uint8_t oam_data_register    = 0x0000;
-    uint8_t scroll_register      = 0x0000;
     uint8_t address_register     = 0x0000;
     uint8_t data_register        = 0x0000;
+    uint8_t oam_address_register = 0x0000;
+    /*uint8_t oam_data_register    = 0x0000;
+    uint8_t scroll_register      = 0x0000;
 
-    uint8_t oam_dma_register     = 0x0000;
+    uint8_t oam_dma_register     = 0x0000;*/
 
     /*
      * Determines which byte of destination_address will be written next
