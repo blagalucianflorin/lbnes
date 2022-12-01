@@ -2,6 +2,8 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
+#include <utility>
+
 #include "devices/cpu/6502.h"
 
 
@@ -165,7 +167,7 @@ void cpu::interrupt (bool force)
 
 void cpu::dma (std::shared_ptr <ppu> target_ppu, uint8_t page)
 {
-    this -> dma_ppu     = target_ppu;
+    this -> dma_ppu     = std::move (target_ppu);
     this -> dma_page    = page;
     this -> dma_active  = true;
     this -> dma_entry   = 0x00;

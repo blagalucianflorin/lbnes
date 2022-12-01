@@ -14,6 +14,7 @@
 #include <memory>
 #include <iomanip>
 #include <array>
+#include <functional>
 
 #include <SDL.h>
 
@@ -71,17 +72,16 @@ private:
 
     std::array <uint8_t, 240 * 256>  client_pixels_small {};
     std::array <uint32_t, 240 * 256> client_pixels {};
-    SDL_Texture  *client_screen_texture = nullptr;
     SDL_Surface  *client_screen_surface = nullptr;
 
     struct options
     {
         bool quit        = false;
         bool vsync       = false;
-        bool display_fps;
-        bool show_menu;
-        bool fullscreen;
-        int  speed;
+        bool display_fps {};
+        bool show_menu {};
+        bool fullscreen {};
+        int  speed {};
         bool is_server = false;
         bool is_client = false;
     } options {};
@@ -95,7 +95,7 @@ private:
 
     std::array <rgb_triplet, 64> color_palette {};
 
-    void  populate_palette_2C02 ();
+    void populate_palette_2C02 ();
 
     void load_joypads ();
 
@@ -103,9 +103,13 @@ private:
 
     void sleep_until_next_frame (std::chrono::time_point<std::chrono::high_resolution_clock> &frame_start);
 
-    void set_title ();
 
-    void synchronize_joypads ();
+    inline void             set_title_simple () { SDL_SetWindowTitle (this -> game_window, "lbnes v" LBNES_VERSION); };
+
+    void                    set_title_fps ();
+
+    std::function <void ()> set_title = std::bind (&nes::set_title_simple, this); // NOLINT
+
 
     void start_server ();
 
@@ -121,6 +125,11 @@ public:
     void     reload (const std::string& rom_file, bool initialize_controllers = false);
 
     void     start ();
+
+
+    void emulate_frame_real ();
+
+    std::function <void ()> emulate_frame = [] () {};
 
     const std::array <uint32_t, 240 * 256> &render_frame ();
 

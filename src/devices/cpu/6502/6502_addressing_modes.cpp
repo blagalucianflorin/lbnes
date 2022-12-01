@@ -10,7 +10,7 @@ uint8_t cpu::IMP () // NOLINT
     return (0);
 }
 
-uint8_t cpu::ACC ()
+uint8_t cpu::ACC () // NOLINT
 {
     return (0);
 }

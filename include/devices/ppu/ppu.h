@@ -18,6 +18,7 @@
 
 #include <map>
 #include <array>
+#include <utility>
 
 
 class ppu : public device, public std::enable_shared_from_this <ppu>
@@ -154,7 +155,7 @@ private:
     uint8_t next_background_attribute = 0x00;
     uint8_t next_background_chr       = 0x00;
 
-    inline bool rendering_enabled ()
+    inline bool rendering_enabled () const
     {
         return (this -> get_mask_flag (MASK_FLAG::F_SHOW_BACKGROUND)
                 || this -> get_mask_flag (MASK_FLAG::F_SHOW_SPRITES));
@@ -223,23 +224,23 @@ public:
 
     inline const std::array <uint32_t, 240 * 256> &get_pixels () { return (this -> pixels); }
 
-    inline std::array <uint8_t, 240 * 256>  &get_pixels_small () { return (this -> pixels_small); }
+    [[maybe_unused]] inline std::array <uint8_t, 240 * 256>  &get_pixels_small () { return (this -> pixels_small); }
 
     // DMA
     inline std::array <uint8_t, 256> &dma () { return (this -> oam); }
 
     // Attach devices for direct access
-    inline void attach (std::shared_ptr <class cpu> cpu) { this -> cpu = cpu; }
+    inline void attach (std::shared_ptr <class cpu> new_cpu) { this -> cpu = std::move (new_cpu); }
 
-    inline void attach (SDL_Renderer *new_renderer) { this -> renderer = new_renderer; }
+    [[maybe_unused]] inline void attach (SDL_Renderer *new_renderer) { this -> renderer = new_renderer; }
 
-    inline void attach (std::shared_ptr <class cartridge> cartridge)
+    inline void attach (std::shared_ptr <class cartridge> new_cartridge)
     {
-        this -> cartridge       = cartridge;
+        this -> cartridge       = std::move (new_cartridge);
         this -> mirroring_type  = this -> cartridge -> get_mirroring ();
     }
 
-    inline bool is_odd_frame () { return (this -> odd_frame); }
+    inline bool is_odd_frame () const { return (this -> odd_frame); }
 
     long long frames_rendered = 0;
 };

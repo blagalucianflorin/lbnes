@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 
-class ppu_exception : public std::exception
+class [[maybe_unused]] ppu_exception : public std::exception
 {
 private:
     std::string message;

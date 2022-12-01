@@ -16,7 +16,7 @@ class cartridge_exception;
 class cartridge;
 
 class ppu;
-class ppu_exception;
+class [[maybe_unused]] ppu_exception;
 class ppu_nametable_ram;
 class ppu_palette_ram;
 class oam;

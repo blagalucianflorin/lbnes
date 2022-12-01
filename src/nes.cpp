@@ -68,8 +68,6 @@ void nes::start ()
 
         this -> process_events ();
         this -> render_frame ();
-        if (this -> options.is_server || this -> options.is_client)
-            this -> synchronize_joypads ();
         this -> sleep_until_next_frame (frame_start);
         this -> set_title ();
     }
@@ -89,22 +87,30 @@ void nes::reset ()
 }
 
 
+void nes::emulate_frame_real ()
+{
+    // NOT CLOCK CYCLE ACCURATE
+    size_t clocks = (262 * 341) + (this -> nes_ppu -> is_odd_frame () ? 1 : 0);
+
+    for (size_t i = 0; i < clocks; i += 3)
+    {
+        this -> nes_ppu -> clock ();
+        this -> nes_ppu -> clock ();
+        this -> nes_ppu -> clock ();
+
+        this -> nes_cpu -> clock ();
+
+        this -> total_cycles += 3;
+    }
+}
+
+
 const std::array <uint32_t, 240 * 256> &nes::render_frame ()
 {
     SDL_SetRenderDrawColor (this -> game_renderer, 128, 128, 128, 255);
     SDL_RenderClear (this -> game_renderer);
 
-    if (this -> rom_loaded)
-    {
-        for (int i = 0; i < (262 * 341) + (this -> nes_ppu -> is_odd_frame () ? 1 : 0); i++)
-        {
-            this -> nes_ppu -> clock ();
-            if (this -> total_cycles % 3 == 0)
-                (this -> nes_cpu) -> clock ();
-
-            (this -> total_cycles)++;
-        }
-    }
+    this -> emulate_frame ();
 
     this -> imgui_manager -> draw_menu ();
     SDL_RenderPresent (this -> game_renderer);
@@ -248,7 +254,8 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
     this -> nes_ppu -> set_child_bus (this -> ppu_bus);
     this -> cpu_bus -> add_devices ({this -> nes_cpu, this -> cpu_ram, this -> nes_cartridge, this -> nes_ppu});
 
-    this -> rom_loaded = true;
+    this -> rom_loaded   = true;
+    this -> emulate_frame = std::bind (&nes::emulate_frame_real, this); // NOLINT
 
     this -> reset ();
 }
@@ -274,8 +281,10 @@ void nes::sleep_until_next_frame (std::chrono::time_point<std::chrono::high_reso
     static std::chrono::microseconds fps_period;
     static std::chrono::microseconds sleep_time;
 
-    fps_period = std::chrono::microseconds (static_cast <int> (static_cast <float> ((std::chrono::microseconds \
-                    (static_cast <int> ((1000000 / this -> target_fps))).count () * (100.0 / this -> options.speed)))));
+    // TODO Solve this mess
+    fps_period = std::chrono::microseconds (
+            static_cast <int> (static_cast <long long> (( static_cast <double> (std::chrono::microseconds
+                    (static_cast <int> ((1000000 / this -> target_fps))).count ()) * (100.0 / this -> options.speed)))));
     sleep_time = std::chrono::duration_cast <std::chrono::microseconds> (fps_period - std::chrono::duration_cast
             <std::chrono::microseconds>(std::chrono::high_resolution_clock::now () - frame_start));
 
@@ -289,19 +298,14 @@ void nes::sleep_until_next_frame (std::chrono::time_point<std::chrono::high_reso
 }
 
 
-void nes::set_title ()
+void nes::set_title_fps ()
 {
-    static std::string title;
+    static std::string       title;
     static std::stringstream fps_string_stream;
 
-    if (this -> options.display_fps)
-    {
-        fps_string_stream.str (std::string ());
-        fps_string_stream << std::fixed << std::setprecision (2) << this -> current_fps;
-        title = std::string ("lbnes v" LBNES_VERSION " - FPS: ") + fps_string_stream.str ();
-    }
-    else
-        title = "lbnes v" LBNES_VERSION;
+    fps_string_stream.str (std::string ());
+    fps_string_stream << std::fixed << std::setprecision (2) << this -> current_fps;
+    title = std::string ("lbnes v" LBNES_VERSION " - FPS: ") + fps_string_stream.str ();
 
     SDL_SetWindowTitle (this -> game_window, title.c_str ());
 }
@@ -347,26 +351,6 @@ void nes::populate_palette_2C02()
 }
 
 
-void nes::synchronize_joypads ()
-{
-    if (this -> options.is_server)
-    {
-        uint8_t state = this -> joypads[0] -> get_state ();
-        this -> screen_server -> send_data (&state, 1);
-        this -> screen_server -> receive_data (&state, 1);
-        this -> joypads[1] -> set_state (state);
-    }
-    else if (this -> options.is_client)
-    {
-        uint8_t saved_state = this -> joypads[1] -> get_state ();
-        uint8_t state;
-        this -> screen_client -> receive_data (&state, 1);
-        this -> screen_client -> send_data (&saved_state, 1);
-        this -> joypads[0] -> set_state (state);
-    }
-}
-
-
 void nes::start_server ()
 {
     LOGGER_INFO ("Starting server on '" + configurator::get_instance ()["server_ip"].as <std::string> () + ":" \
@@ -386,7 +370,7 @@ void nes::start_client ()
     this -> options.is_client = true;
 
     this -> client_screen_surface = SDL_CreateRGBSurface (0, 256, 240, 24, 0, 0, 0, 0);
-    this -> client_screen_texture = SDL_CreateTextureFromSurface (this -> game_renderer, this -> client_screen_surface);
+    SDL_CreateTextureFromSurface(this->game_renderer, this->client_screen_surface);
 
     LOGGER_INFO ("Connecting to server on '" + configurator::get_instance ()["server_ip"].as <std::string> () + ":" \
                      + std::to_string (configurator::get_instance ()["port"].as <short> ()) + "'.");

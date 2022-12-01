@@ -63,7 +63,7 @@ class cpu : public device
 
     uint8_t set_flag (FLAG flag, uint8_t value);
 
-    uint8_t get_flag (FLAG flag) const;
+    [[nodiscard]] uint8_t get_flag (FLAG flag) const;
 
     void    push_to_stack (uint8_t value);
 
@@ -125,7 +125,7 @@ public:
 
     inline void wait (long cycles) { this -> cycles_left += cycles; }
 
-    inline long get_cycles_elapsed () { return (this -> cycles_elapsed); }
+    [[nodiscard]] inline long get_cycles_elapsed () const { return (this -> cycles_elapsed); }
 
     void    dma (std::shared_ptr <ppu> target_ppu, uint8_t page);
 

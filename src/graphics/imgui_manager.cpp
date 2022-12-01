@@ -118,7 +118,17 @@ void imgui_manager::draw_menu ()
         }
         ImGui::NewLine ();
 
+        bool old_fps_checkbox = this -> my_nes -> options.display_fps;
         ImGui::Checkbox ("Display FPS", &this -> my_nes -> options.display_fps);
+        if (old_fps_checkbox != this -> my_nes -> options.display_fps)
+        {
+            LOGGER_INFO ("Toggled Display FPS.");
+
+            if (this -> my_nes -> options.display_fps)
+                this -> my_nes -> set_title = std::bind (&nes::set_title_fps, this -> my_nes); // NOLINT
+            else
+                this -> my_nes -> set_title = std::bind (&nes::set_title_simple, this -> my_nes); // NOLINT
+        }
         ImGui::NewLine ();
 
         bool old_vsync_checkbox = this -> my_nes -> options.vsync;

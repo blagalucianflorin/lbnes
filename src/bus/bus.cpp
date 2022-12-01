@@ -20,7 +20,7 @@ void bus::add_devices (const std::vector <std::shared_ptr<device>>& new_devices)
 void bus::write (const uint16_t &address, const uint8_t &data)
 {
 //    if (!IS_BETWEEN (this -> lower_bound, address, this -> upper_bound))
-//        throw std::invalid_argument ("Bus: Tried to write outside of addressable range");
+//        throw std::invalid_argument ("Bus: Tried to write outside addressable range");
 
     for (const auto& device : this -> devices)
         if (device -> responds_to (address))
@@ -30,7 +30,7 @@ void bus::write (const uint16_t &address, const uint8_t &data)
 uint8_t bus::read (const uint16_t &address)
 {
 //    if (!IS_BETWEEN (this -> lower_bound, address, this -> upper_bound))
-//        throw std::invalid_argument ("Bus: Tried to read from outside of addressable range");
+//        throw std::invalid_argument ("Bus: Tried to read from outside addressable range");
 
     for (const auto& device : this -> devices)
         if (device -> responds_to (address))
