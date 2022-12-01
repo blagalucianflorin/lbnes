@@ -23,20 +23,6 @@ uint8_t cpu::read (uint16_t address, bool /*from_parent_bus*/) // NOLINT
     return ((this -> parent_bus) -> read (address));
 }
 
-uint8_t cpu::set_flag (cpu::FLAG flag, uint8_t value)
-{
-    value = value ? 1 : 0;
-
-    if (this -> get_flag (flag) != value)
-        this -> flags_register ^= 1 << flag;
-
-    return (this -> flags_register);
-}
-
-uint8_t cpu::get_flag (cpu::FLAG flag) const
-{
-    return (((this -> flags_register) >> flag) & 1);
-}
 
 void cpu::reset ()
 {
@@ -57,7 +43,23 @@ void cpu::reset ()
 
 void cpu::clock () noexcept
 {
-    if (this -> dma_active)
+    if (this -> cycles_left == 0)
+    {
+        this -> set_flag (cpu::F_UNUSED, 1);
+        this -> opcode = this -> read (this -> program_counter);
+
+        (this -> program_counter)++;
+
+        this -> cycles_left += (this -> operations[this -> opcode].cycles_required);
+        this -> cycles_left += (this ->* operations[this -> opcode].addressing_mode)();
+
+        this -> accumulator_addressing = this -> operations[this -> opcode].addressing_mode == &cpu::ACC;
+
+        this -> cycles_left += (this ->* operations[this -> opcode].instruction)();
+
+        this -> set_flag (cpu::F_UNUSED, 1);
+    }
+    else if (this -> dma_active)
     {
         if (!(this -> dma_begin))
         {
@@ -79,22 +81,6 @@ void cpu::clock () noexcept
                 this -> dma_active = false;
             }
         }
-    }
-    else if (this -> cycles_left == 0)
-    {
-        this -> set_flag (cpu::F_UNUSED, 1);
-        this -> opcode = this -> read (this -> program_counter);
-
-        (this -> program_counter)++;
-
-        this -> cycles_left += (this -> operations[this -> opcode].cycles_required);
-        this -> cycles_left += (this ->* operations[this -> opcode].addressing_mode)();
-
-        this -> accumulator_addressing = this -> operations[this -> opcode].addressing_mode == &cpu::ACC;
-
-        this -> cycles_left += (this ->* operations[this -> opcode].instruction)();
-
-        this -> set_flag (cpu::F_UNUSED, 1);
     }
 
     if (this -> cycles_left != 0)

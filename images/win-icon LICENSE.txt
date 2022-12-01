@@ -1,0 +1,9 @@
+The win-icon.ico is taken from:
+https://iconarchive.com/show/console-icons-by-sykonist/Nintendo-mix-icon.html
+
+The icon's author is Sykonist and the icon is distributed under the CC Attribution-Noncommercial-No Derivate 4.0 license.
+
+The license can be found at:
+https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+The current icon will be modified in the future.

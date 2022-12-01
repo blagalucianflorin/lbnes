@@ -15,6 +15,7 @@
 
 class cpu : public device
 {
+private:
     bool     accumulator_addressing = false;
     uint16_t jump_relative_address  = 0xFFFF;
     uint16_t destination_address    = 0xFFFE;
@@ -61,9 +62,20 @@ class cpu : public device
         F_NEGATIVE          = 7
     };
 
-    uint8_t set_flag (FLAG flag, uint8_t value);
+    inline uint8_t set_flag (FLAG flag, uint8_t value)
+    {
+        value = value ? 1 : 0;
 
-    [[nodiscard]] uint8_t get_flag (FLAG flag) const;
+        if (this -> get_flag (flag) != value)
+            this -> flags_register ^= 1 << flag;
+
+        return (this -> flags_register);
+    }
+
+    [[nodiscard]] inline uint8_t get_flag (FLAG flag) const
+    {
+        return (((this -> flags_register) >> flag) & 1);
+    }
 
     void    push_to_stack (uint8_t value);
 
@@ -132,6 +144,9 @@ public:
     std::string save_state (const std::string& name) override;
 
     void        load_state (std::string saved_state) override;
+
+    static std::size_t dma_access_counter;
+    static std::size_t normal_access_counter;
 };
 
 #endif //NEMULATOR_CPU_H

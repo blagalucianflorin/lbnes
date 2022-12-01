@@ -129,7 +129,17 @@ if(NES_DEBUGGER)
     set(INCLUDES ${INCLUDES} include/debugging/nes_debugger.h src/network/server.cpp)
 endif()
 
-add_executable(lbnes main.cpp ${SOURCES} ${INCLUDES})
+
+# Add Icon to windows builds
+if(WIN32)
+    enable_language("RC")
+
+    add_executable(lbnes WIN32 main.cpp ${SOURCES} ${INCLUDES} images/lbnes.rc)
+else()
+    add_executable(lbnes main.cpp ${SOURCES} ${INCLUDES})
+endif()
+
+
 add_dependencies(lbnes yaml-cpp)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

@@ -237,6 +237,11 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
     nes_cartridge = std::make_shared <cartridge> (rom_file);
     nes_ppu       = std::make_shared <ppu> (this -> game_renderer);
 
+    this -> nes_ppu -> attach (this -> nes_cpu);
+    this -> nes_ppu -> attach (this -> nes_cartridge);
+    this -> nes_ppu -> set_child_bus (this -> ppu_bus);
+    this -> cpu_bus -> add_devices ({this -> nes_ppu, this -> nes_cartridge, this -> cpu_ram, this -> nes_cpu});
+
     if (initialize_controllers)
         this -> joypads.clear ();
 
@@ -249,12 +254,7 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
     if (initialize_controllers)
         this -> load_joypads ();
 
-    this -> nes_ppu -> attach (this -> nes_cpu);
-    this -> nes_ppu -> attach (this -> nes_cartridge);
-    this -> nes_ppu -> set_child_bus (this -> ppu_bus);
-    this -> cpu_bus -> add_devices ({this -> nes_cpu, this -> cpu_ram, this -> nes_cartridge, this -> nes_ppu});
-
-    this -> rom_loaded   = true;
+    this -> rom_loaded    = true;
     this -> emulate_frame = std::bind (&nes::emulate_frame_real, this); // NOLINT
 
     this -> reset ();

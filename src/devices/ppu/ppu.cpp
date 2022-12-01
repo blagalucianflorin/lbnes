@@ -159,35 +159,13 @@ void    ppu::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLIN
 
 uint8_t ppu::read (uint16_t address, bool from_parent_bus) // NOLINT
 {
+
     if (!from_parent_bus)
     {
         address &= 0x3FFF;
 
-        // Pattern
-        if (IS_BETWEEN (0x0000, address, 0x1FFF))
-            return (this -> cartridge -> read (address));
-            // Nametable
-        else if (IS_BETWEEN (0x2000, address, 0x3EFF))
-        {
-            address &= 0x0FFF;
-
-            if (this -> mirroring_type == cartridge::VERTICAL)
-            {
-                if (IS_BETWEEN (0x0000, address, 0x03FF) || IS_BETWEEN (0x0800, address, 0x0DFF))
-                    return ((this -> nametable_memory)[address & 0x03FF]);
-                else
-                    return ((this -> nametable_memory)[0x0400 + (address & 0x03FF)]);
-            }
-            else if (this -> mirroring_type == cartridge::HORIZONTAL)
-            {
-                if (IS_BETWEEN (0x0000, address, 0x07FF))
-                    return ((this -> nametable_memory)[address & 0x03FF]);
-                else
-                    return ((this -> nametable_memory)[0x0400 + (address & 0x03FF)]);
-            }
-        }
-            // Palettes
-        else if (IS_BETWEEN (0x3F00, address, 0x3FFF))
+        // Palette
+        if (IS_BETWEEN (0x3F00, address, 0x3FFF))
         {
             address &= 0x001F;
 
@@ -210,6 +188,31 @@ uint8_t ppu::read (uint16_t address, bool from_parent_bus) // NOLINT
             }
 
             return (this -> palette_memory[address]);
+        }
+        // Nametable
+        else if (IS_BETWEEN (0x2000, address, 0x3EFF))
+        {
+            address &= 0x0FFF;
+
+            if (this -> mirroring_type == cartridge::VERTICAL)
+            {
+                if (IS_BETWEEN (0x0000, address, 0x03FF) || IS_BETWEEN (0x0800, address, 0x0DFF))
+                    return ((this -> nametable_memory)[address & 0x03FF]);
+                else
+                    return ((this -> nametable_memory)[0x0400 + (address & 0x03FF)]);
+            }
+            else if (this -> mirroring_type == cartridge::HORIZONTAL)
+            {
+                if (IS_BETWEEN (0x0000, address, 0x07FF))
+                    return ((this -> nametable_memory)[address & 0x03FF]);
+                else
+                    return ((this -> nametable_memory)[0x0400 + (address & 0x03FF)]);
+            }
+        }
+        // Pattern
+        else if (IS_BETWEEN (0x0000, address, 0x1FFF))
+        {
+            return (this -> cartridge -> read (address));
         }
     }
 
