@@ -2,23 +2,19 @@
 // Created by lblaga on 26.03.2022.
 //
 
-#ifndef NEMULATOR_OAM_H
-#define NEMULATOR_OAM_H
+#ifndef OAM_HPP
+#define OAM_HPP
 
-#include "devices/device.h"
+#include "devices/device.hpp"
 
-#include "forwards/classes.h"
-#include "devices/cpu/6502.h"
-#include "devices/ppu/ppu.h"
+#include "forwards/classes.hpp"
+#include "devices/cpu/6502.hpp"
+#include "devices/ppu/ppu.hpp"
 #include "devices/ppu/exceptions/ppu_exception.h"
 
+// Unused
 class oam : public device
 {
-private:
-    uint8_t   *memory = nullptr;
-    class cpu *cpu    = nullptr;
-    class ppu *ppu    = nullptr;
-
 public:
     oam ();
 
@@ -31,6 +27,11 @@ public:
     inline void    attach (class cpu *new_cpu) { this -> cpu = new_cpu; }
 
     inline void    attach (class ppu *new_ppu) { this -> ppu = new_ppu; }
+
+private:
+    uint8_t   *memory = nullptr;
+    class cpu *cpu    = nullptr;
+    class ppu *ppu    = nullptr;
 };
 
-#endif //NEMULATOR_OAM_H
+#endif //OAM_HPP

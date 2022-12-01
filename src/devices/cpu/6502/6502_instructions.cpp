@@ -2,7 +2,7 @@
 // Created by Blaga Lucian-Florin on 07-Mar-21.
 //
 
-#include "devices/cpu/6502.h"
+#include "devices/cpu/6502.hpp"
 
 
 void cpu::populate_operations ()

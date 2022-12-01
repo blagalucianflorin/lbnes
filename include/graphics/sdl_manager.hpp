@@ -2,11 +2,8 @@
 // Created by lblaga on 22.05.2022.
 //
 
-#ifndef NEMULATOR_SDL_MANAGER_H
-#define NEMULATOR_SDL_MANAGER_H
-
-#include "devices/ppu/ppu.h"
-#include "options/configurator.hpp"
+#ifndef SDL_MANAGER_HPP
+#define SDL_MANAGER_HPP
 
 extern "C"
 {
@@ -14,6 +11,9 @@ extern "C"
 }
 
 #include <iostream>
+
+#include "devices/ppu/ppu.hpp"
+#include "options/configurator.hpp"
 
 
 void toggle_fullscreen (SDL_Window* Window);
@@ -24,4 +24,4 @@ void surface_set_pixel (SDL_Surface *surface, size_t x, size_t y, uint32_t pixel
 
 void update_vsync (SDL_Renderer *renderer);
 
-#endif //NEMULATOR_SDL_MANAGER_H
+#endif //SDL_MANAGER_HPP

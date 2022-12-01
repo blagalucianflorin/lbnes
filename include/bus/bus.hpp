@@ -2,16 +2,16 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#ifndef NEMULATOR_BUS_H
-#define NEMULATOR_BUS_H
+#ifndef BUS_HPP
+#define BUS_HPP
 
 #include <cstdint>
 #include <vector>
 #include <stdexcept>
 #include <memory>
 
-#include "forwards/classes.h"
-#include "devices/device.h"
+#include "forwards/classes.hpp"
+#include "devices/device.hpp"
 #include "misc/state.h"
 
 
@@ -43,4 +43,4 @@ public:
     void        load_state (std::string saved_state) override;
 };
 
-#endif //NEMULATOR_BUS_H
+#endif //BUS_HPP

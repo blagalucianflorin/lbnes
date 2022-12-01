@@ -2,7 +2,7 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#include "bus/bus.h"
+#include "bus/bus.hpp"
 
 
 void bus::add_device (const std::shared_ptr<device>& new_device)

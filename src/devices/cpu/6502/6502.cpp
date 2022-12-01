@@ -4,7 +4,7 @@
 
 #include <utility>
 
-#include "devices/cpu/6502.h"
+#include "devices/cpu/6502.hpp"
 
 
 cpu::cpu () : device (0x0000, 0x0000) // NOLINT

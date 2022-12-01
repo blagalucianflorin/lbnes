@@ -2,12 +2,13 @@
 // Created by lblaga on 19.03.2022.
 //
 
-#ifndef NEMULATOR_CARTRIDGE_EXCEPTION_H
-#define NEMULATOR_CARTRIDGE_EXCEPTION_H
+#ifndef CARTRIDGE_EXCEPTION_HPP
+#define CARTRIDGE_EXCEPTION_HPP
 
 #include <exception>
 #include <string>
 #include <utility>
+
 
 class cartridge_exception : public std::exception
 {
@@ -20,4 +21,4 @@ public:
     inline virtual const char *what () const noexcept { return message.c_str (); } // NOLINT
 };
 
-#endif //NEMULATOR_CARTRIDGE_EXCEPTION_H
+#endif //CARTRIDGE_EXCEPTION_HPP

@@ -2,27 +2,20 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#ifndef NEMULATOR_DEVICE_H
-#define NEMULATOR_DEVICE_H
+#ifndef DEVICE_HPP
+#define DEVICE_HPP
 
 #include <cstdint>
 #include <memory>
 #include <utility>
 
-#include "forwards/classes.h"
+#include "forwards/classes.hpp"
 #include "misc/macros.h"
 #include "misc/state.h"
 
 
 class device: public state
 {
-protected:
-    bool                  is_mem      = true;
-    uint16_t              lower_bound;
-    uint16_t              upper_bound;
-    std::shared_ptr <bus> parent_bus;
-    std::shared_ptr <bus> child_bus;
-
 public:
     device (uint16_t lower_bound, uint16_t upper_bound) : lower_bound (lower_bound), upper_bound (upper_bound) {}
 
@@ -51,6 +44,13 @@ public:
     std::string     save_state (const std::string& name) override;
 
     void            load_state (std::string saved_state) override;
+
+protected:
+    bool                  is_mem      = true;
+    uint16_t              lower_bound;
+    uint16_t              upper_bound;
+    std::shared_ptr <bus> parent_bus;
+    std::shared_ptr <bus> child_bus;
 };
 
-#endif //NEMULATOR_DEVICE_H
+#endif //DEVICE_HPP

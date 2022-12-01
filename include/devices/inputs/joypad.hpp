@@ -2,12 +2,8 @@
 // Created by lblaga on 18.05.2022.
 //
 
-#ifndef NEMULATOR_JOYPAD_H
-#define NEMULATOR_JOYPAD_H
-
-#include "devices/device.h"
-#include "network/client.hpp"
-#include "network/server.hpp"
+#ifndef JOYPAD_HPP
+#define JOYPAD_HPP
 
 #include <utility>
 #include <vector>
@@ -15,6 +11,11 @@
 #include <map>
 
 #include <SDL.h>
+
+#include "devices/device.hpp"
+#include "network/client.hpp"
+#include "network/server.hpp"
+
 
 class joypad : public device
 {
@@ -73,13 +74,13 @@ public:
 
     bool    responds_to (uint16_t address) override;
 
-    void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override;
+    void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
 
-    uint8_t read (uint16_t address, bool to_parent_bus = true) override;
+    uint8_t read (uint16_t address, bool to_parent_bus = true) override; // NOLINT
 
     uint8_t set_button (BUTTON button, uint8_t value = 1);
 
-    uint8_t get_button (BUTTON button) const;
+    [[nodiscard]] uint8_t get_button (BUTTON button) const;
 
     void    change_type (INPUT_DEVICE new_input_device);
 
@@ -102,4 +103,4 @@ public:
     [[nodiscard]] inline uint8_t get_state () const { return (this -> saved_state); }
 };
 
-#endif //NEMULATOR_JOYPAD_H
+#endif //JOYPAD_HPP

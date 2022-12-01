@@ -9,18 +9,11 @@
 #include <fstream>
 
 #include "yaml-cpp/yaml.h"
+#include "options/arguments_manager.hpp"
+
 
 class configurator
 {
-protected:
-    static     configurator *instance;
-
-    YAML::Node config;
-
-    explicit   configurator ();
-
-    void       set_defaults ();
-
 public:
     static configurator &get_instance ();
 
@@ -28,7 +21,17 @@ public:
 
     inline YAML::Node   get_whole_config () { return (this -> config); }
 
-    static std::string config_file;
+    static std::string  config_file;
+
+protected:
+    static configurator *instance;
+
+    YAML::Node          config;
+
+
+    explicit configurator ();
+
+    void     set_defaults ();
 };
 
 #endif //LBNES_CONFIGURATOR_HPP

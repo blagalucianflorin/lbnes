@@ -2,15 +2,15 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#ifndef NEMULATOR_CPU_H
-#define NEMULATOR_CPU_H
+#ifndef CPU_HPP
+#define CPU_HPP
 
 #include <memory>
 
-#include "forwards/classes.h"
-#include "devices/device.h"
-#include "bus/bus.h"
-#include "devices/ppu/ppu.h"
+#include "forwards/classes.hpp"
+#include "devices/device.hpp"
+#include "bus/bus.hpp"
+#include "devices/ppu/ppu.hpp"
 
 
 class cpu : public device
@@ -135,18 +135,17 @@ public:
 
     void    interrupt (bool force);
 
-    inline void wait (long cycles) { this -> cycles_left += cycles; }
+
+    inline void               wait (long cycles) { this -> cycles_left += cycles; }
 
     [[nodiscard]] inline long get_cycles_elapsed () const { return (this -> cycles_elapsed); }
 
-    void    dma (std::shared_ptr <ppu> target_ppu, uint8_t page);
+
+    void        dma (std::shared_ptr <ppu> target_ppu, uint8_t page);
 
     std::string save_state (const std::string& name) override;
 
     void        load_state (std::string saved_state) override;
-
-    static std::size_t dma_access_counter;
-    static std::size_t normal_access_counter;
 };
 
-#endif //NEMULATOR_CPU_H
+#endif //CPU_HPP

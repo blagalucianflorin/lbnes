@@ -2,7 +2,7 @@
 // Created by lblaga on 27.05.2022.
 //
 
-#include "nes.h"
+#include "nes.hpp"
 
 
 nes::nes ()

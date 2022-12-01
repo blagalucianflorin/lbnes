@@ -2,7 +2,7 @@
 // Created by lblaga on 20.03.2022.
 //
 
-#include "devices/memories/ppu_nametable_ram.h"
+#include "devices/memories/ppu_nametable_ram.hpp"
 
 void ppu_nametable_ram::write (uint16_t address, uint8_t data, bool to_parent_bus) // NOLINT
 {

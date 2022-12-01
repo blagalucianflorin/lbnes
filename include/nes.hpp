@@ -2,8 +2,8 @@
 // Created by lblaga on 27.05.2022.
 //
 
-#ifndef NEMULATOR_NES_H
-#define NEMULATOR_NES_H
+#ifndef NES_HPP
+#define NES_HPP
 
 #include <iostream>
 #include <vector>
@@ -18,17 +18,17 @@
 
 #include <SDL.h>
 
-#include "bus/bus.h"
-#include "devices/cpu/6502.h"
-#include "devices/ppu/ppu.h"
-#include "devices/cartridges/cartridge.h"
-#include "devices/inputs/joypad.h"
-#include "devices/memories/ram.h"
-#include "devices/memories/ppu_nametable_ram.h"
-#include "devices/memories/ppu_palette_ram.h"
+#include "bus/bus.hpp"
+#include "devices/cpu/6502.hpp"
+#include "devices/ppu/ppu.hpp"
+#include "devices/cartridges/cartridge.hpp"
+#include "devices/inputs/joypad.hpp"
+#include "devices/memories/ram.hpp"
+#include "devices/memories/ppu_nametable_ram.hpp"
+#include "devices/memories/ppu_palette_ram.hpp"
 
 #include "graphics/imgui_manager.hpp"
-#include "graphics/sdl_manager.h"
+#include "graphics/sdl_manager.hpp"
 #include "options/configurator.hpp"
 #include "yaml-cpp/yaml.h"
 #include "misc/logger.hpp"
@@ -43,6 +43,13 @@
 
 class nes : public std::enable_shared_from_this <nes>
 {
+public:
+    nes ();
+
+    ~nes ();
+
+    void start ();
+
 private:
     friend class imgui_manager;
 
@@ -72,7 +79,7 @@ private:
 
     std::array <uint8_t, 240 * 256>  client_pixels_small {};
     std::array <uint32_t, 240 * 256> client_pixels {};
-    SDL_Surface  *client_screen_surface = nullptr;
+    SDL_Surface                      *client_screen_surface = nullptr;
 
     struct options
     {
@@ -95,6 +102,7 @@ private:
 
     std::array <rgb_triplet, 64> color_palette {};
 
+
     void populate_palette_2C02 ();
 
     void load_joypads ();
@@ -104,9 +112,12 @@ private:
     void sleep_until_next_frame (std::chrono::time_point<std::chrono::high_resolution_clock> &frame_start);
 
 
-    inline void             set_title_simple () { SDL_SetWindowTitle (this -> game_window, "lbnes v" LBNES_VERSION); };
-
     void                    set_title_fps ();
+
+    inline void             set_title_simple ()
+    {
+        SDL_SetWindowTitle (this -> game_window, "lbnes v" LBNES_VERSION);
+    };
 
     std::function <void ()> set_title = std::bind (&nes::set_title_simple, this); // NOLINT
 
@@ -115,23 +126,13 @@ private:
 
     void start_client ();
 
-public:
-    nes ();
 
-    ~nes ();
+    void                                   emulate_frame_real ();
 
-    void     reset ();
-
-    void     reload (const std::string& rom_file, bool initialize_controllers = false);
-
-    void     start ();
-
-
-    void emulate_frame_real ();
-
-    std::function <void ()> emulate_frame = [] () {};
+    std::function <void ()>                emulate_frame = [] () {};
 
     const std::array <uint32_t, 240 * 256> &render_frame ();
+
 
     [[maybe_unused]] uint8_t set_button (joypad::BUTTON button, uint8_t value = 1, uint8_t player = 1);
 
@@ -142,6 +143,11 @@ public:
     [[maybe_unused]] void    reset_buttons (uint8_t player = 1);
 
     static int SDLCALL       controller_connection_event_manager (void *userdata, SDL_Event * event);
+
+
+    void reload (const std::string& rom_file, bool initialize_controllers = false);
+
+    void reset ();
 };
 
-#endif //NEMULATOR_NES_H
+#endif //NES_HPP

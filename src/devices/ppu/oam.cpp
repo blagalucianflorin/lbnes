@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "devices/ppu/oam.h"
+#include "devices/ppu/oam.hpp"
 
 
 oam::oam () : device (0x4014, 0x4014)

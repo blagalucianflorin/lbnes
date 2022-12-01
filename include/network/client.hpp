@@ -10,15 +10,15 @@
 
 class client
 {
-private:
-    // TODO socket
-
 public:
     client (const char *host, short port);
 
     void receive_data (uint8_t *data, size_t size);
 
     void send_data (uint8_t *data, size_t size);
+
+private:
+    // TODO socket
 };
 
 #endif //LBNES_CLIENT_HPP

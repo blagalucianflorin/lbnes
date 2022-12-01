@@ -2,10 +2,11 @@
 // Created by lblaga on 19.03.2022.
 //
 
-#ifndef NEMULATOR_RAM_H
-#define NEMULATOR_RAM_H
+#ifndef RAM_HPP
+#define RAM_HPP
 
-#include "devices/memories/memory.h"
+#include "devices/memories/memory.hpp"
+
 
 class ram : public memory
 {
@@ -19,4 +20,4 @@ public:
     uint8_t read (uint16_t address, bool to_parent_bus = true) override; // NOLINT
 };
 
-#endif //NEMULATOR_RAM_H
+#endif //RAM_HPP

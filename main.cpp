@@ -1,6 +1,6 @@
 #include <memory>
 
-#include "nes.h"
+#include "nes.hpp"
 #include "options/arguments_manager.hpp"
 
 

@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "devices/cartridges/cartridge.h"
+#include "devices/cartridges/cartridge.hpp"
 
 cartridge::cartridge (const std::string &file_path): device (0x4020, 0xFFFF)
 {

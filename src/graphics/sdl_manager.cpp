@@ -2,7 +2,7 @@
 // Created by lblaga on 22.05.2022.
 //
 
-#include "graphics/sdl_manager.h"
+#include "graphics/sdl_manager.hpp"
 
 
 void toggle_fullscreen (SDL_Window* Window)

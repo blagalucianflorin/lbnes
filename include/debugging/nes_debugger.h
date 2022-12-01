@@ -18,11 +18,11 @@
 #include <SDL2/SDL.h>
 #endif
 
-#include "bus/bus.h"
-#include "devices/memories/memory.h"
-#include "devices/cpu/6502.h"
-#include "devices/ppu/ppu.h"
-#include "graphics/sdl_manager.h"
+#include "bus/bus.hpp"
+#include "devices/memories/memory.hpp"
+#include "devices/cpu/6502.hpp"
+#include "devices/ppu/ppu.hpp"
+#include "graphics/sdl_manager.hpp"
 
 struct t_coords
 {

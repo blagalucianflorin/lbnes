@@ -2,10 +2,11 @@
 // Created by lblaga on 20.03.2022.
 //
 
-#ifndef NEMULATOR_PPU_NAMETABLE_RAM_H
-#define NEMULATOR_PPU_NAMETABLE_RAM_H
+#ifndef PPU_NAMETABLE_RAM_HPP
+#define PPU_NAMETABLE_RAM_HPP
 
-#include "devices/memories/memory.h"
+#include "devices/memories/memory.hpp"
+
 
 class ppu_nametable_ram : public memory
 {
@@ -19,4 +20,4 @@ public:
     uint8_t read (uint16_t address, bool to_parent_bus = true) override; // NOLINT
 };
 
-#endif //NEMULATOR_PPU_NAMETABLE_RAM_H
+#endif //PPU_NAMETABLE_RAM_HPP

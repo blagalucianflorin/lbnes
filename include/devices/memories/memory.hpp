@@ -2,27 +2,24 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#ifndef NEMULATOR_MEMORY_H
-#define NEMULATOR_MEMORY_H
+#ifndef MEMORY_HPP
+#define MEMORY_HPP
 
 #include <vector>
 
-#include "forwards/classes.h"
-#include "devices/device.h"
+#include "forwards/classes.hpp"
+#include "devices/device.hpp"
 #include "misc/base64.h"
+
 
 class memory : public device
 {
-private:
-    std::vector <uint8_t> internal_memory;
-
 public:
     memory (uint16_t lower_bound, uint16_t upper_bound);
 
     ~memory () noexcept override = default;
 
-    inline void    write (uint16_t address, uint8_t data, bool /*to_parent_bus = true*/) // NOLINT
-                            override
+    inline void    write (uint16_t address, uint8_t data, bool /*to_parent_bus = true*/) override // NOLINT
     {
         internal_memory[address - (this -> lower_bound)] = data;
     }
@@ -35,6 +32,9 @@ public:
     std::string save_state (const std::string& name) override;
 
     void        load_state (std::string saved_state) override;
+
+private:
+    std::vector <uint8_t> internal_memory;
 };
 
-#endif //NEMULATOR_MEMORY_H
+#endif //MEMORY_HPP

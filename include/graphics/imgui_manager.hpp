@@ -5,8 +5,8 @@
 #ifndef LBNES_IMGUI_MANAGER_HPP
 #define LBNES_IMGUI_MANAGER_HPP
 
-#include "forwards/classes.h"
-#include "nes.h"
+#include "forwards/classes.hpp"
+#include "nes.hpp"
 
 #include <SDL.h>
 
@@ -23,19 +23,19 @@
 
 class imgui_manager
 {
-private:
-    SDL_Renderer *renderer;
-    SDL_Window   *window;
-    std::shared_ptr <class nes> my_nes;
-
 public:
     imgui_manager (SDL_Renderer *renderer, SDL_Window *window, std::shared_ptr <class nes> new_nes);
 
     ~imgui_manager ();
 
-    void draw_menu ();
+    void        draw_menu ();
 
     static void process_event (SDL_Event *event);
+
+private:
+    SDL_Renderer                *renderer;
+    SDL_Window                  *window;
+    std::shared_ptr <class nes> my_nes;
 };
 
 #endif //LBNES_IMGUI_MANAGER_HPP

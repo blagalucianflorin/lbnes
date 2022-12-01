@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "devices/ppu/ppu.h"
+#include "devices/ppu/ppu.hpp"
 #include "debugging/nes_debugger.h"
 
 

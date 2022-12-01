@@ -2,8 +2,8 @@
 // Created by Blaga Lucian-Florin on 05-Mar-21.
 //
 
-#ifndef NEMULATOR_CLASSES_H
-#define NEMULATOR_CLASSES_H
+#ifndef CLASSES_HPP
+#define CLASSES_HPP
 
 class device;
 class bus;
@@ -23,4 +23,4 @@ class oam;
 
 class nes;
 
-#endif //NEMULATOR_CLASSES_H
+#endif //CLASSES_HPP

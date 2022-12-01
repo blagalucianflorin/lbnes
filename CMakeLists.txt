@@ -70,23 +70,23 @@ set(SOURCES
 
 
 set (INCLUDES
-        include/bus/bus.h
-        include/devices/cpu/6502.h
-        include/devices/device.h
-        include/devices/memories/memory.h
-        include/forwards/classes.h
+        include/bus/bus.hpp
+        include/devices/cpu/6502.hpp
+        include/devices/device.hpp
+        include/devices/memories/memory.hpp
+        include/forwards/classes.hpp
         include/misc/macros.h
-        include/devices/memories/ram.h
-        include/devices/cartridges/cartridge.h
+        include/devices/memories/ram.hpp
+        include/devices/cartridges/cartridge.hpp
         include/devices/cartridges/exceptions/cartridge_exception.h
-        include/devices/ppu/ppu.h
+        include/devices/ppu/ppu.hpp
         include/devices/ppu/exceptions/ppu_exception.h
-        include/devices/memories/ppu_palette_ram.h
-        include/devices/memories/ppu_nametable_ram.h
-        include/devices/ppu/oam.h
-        include/devices/inputs/joypad.h
-        include/graphics/sdl_manager.h
-        include/nes.h
+        include/devices/memories/ppu_palette_ram.hpp
+        include/devices/memories/ppu_nametable_ram.hpp
+        include/devices/ppu/oam.hpp
+        include/devices/inputs/joypad.hpp
+        include/graphics/sdl_manager.hpp
+        include/nes.hpp
         include/options/configurator.hpp
         include/options/arguments_manager.hpp
         include/misc/base64.h

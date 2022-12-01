@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "devices/memories/memory.h"
+#include "devices/memories/memory.hpp"
 
 
 memory::memory (uint16_t lower_bound, uint16_t upper_bound) : device (lower_bound, upper_bound)

@@ -2,10 +2,10 @@
 // Created by lblaga on 19.03.2022.
 //
 
-#ifndef NEMULATOR_CARTRIDGE_H
-#define NEMULATOR_CARTRIDGE_H
+#ifndef CARTRIDGE_HPP
+#define CARTRIDGE_HPP
 
-#include "devices/device.h"
+#include "devices/device.hpp"
 #include "devices/cartridges/exceptions/cartridge_exception.h"
 
 #include "misc/macros.h"
@@ -74,4 +74,4 @@ public:
     inline MIRRORING_TYPE get_mirroring () { return (this -> mirroring_type); }
 };
 
-#endif //NEMULATOR_CARTRIDGE_H
+#endif //CARTRIDGE_HPP

@@ -2,23 +2,23 @@
 // Created by lblaga on 20.03.2022.
 //
 
-#ifndef NEMULATOR_PPU_H
-#define NEMULATOR_PPU_H
-
-#include "forwards/classes.h"
-#include "devices/device.h"
-#include "devices/ppu/exceptions/ppu_exception.h"
-#include "bus/bus.h"
-#include "devices/cartridges/cartridge.h"
-#include "misc/macros.h"
-#include "devices/cpu/6502.h"
-#include "devices/ppu/oam.h"
+#ifndef PPU_HPP
+#define PPU_HPP
 
 #include <SDL.h>
 
 #include <map>
 #include <array>
 #include <utility>
+
+#include "forwards/classes.hpp"
+#include "devices/device.hpp"
+#include "devices/ppu/exceptions/ppu_exception.h"
+#include "bus/bus.hpp"
+#include "devices/cartridges/cartridge.hpp"
+#include "misc/macros.h"
+#include "devices/cpu/6502.hpp"
+#include "devices/ppu/oam.hpp"
 
 
 class ppu : public device, public std::enable_shared_from_this <ppu>
@@ -245,4 +245,4 @@ public:
     long long frames_rendered = 0;
 };
 
-#endif //NEMULATOR_PPU_H
+#endif //PPU_HPP
