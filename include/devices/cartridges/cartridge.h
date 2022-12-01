@@ -47,8 +47,8 @@ public:
     std::vector<uint8_t> character_memory;
     std::vector<uint8_t> sram;
 
-    [[maybe_unused]] MAPPER mapper         = NROM;
-    MIRRORING_TYPE          mirroring_type = HORIZONTAL;
+    MAPPER         mapper         = NROM;
+    MIRRORING_TYPE mirroring_type = HORIZONTAL;
 
     void read_ines (const std::string& file_path);
 
