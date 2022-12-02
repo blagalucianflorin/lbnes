@@ -827,3 +827,198 @@ void ppu::populate_palette_2C02()
     (this -> color_palette)[0x3C] = {160, 214, 228}; (this -> color_palette)[0x3D] = {160, 162, 160};
     (this -> color_palette)[0x3E] = {0, 0, 0};       (this -> color_palette)[0x3F] = {0, 0, 0};
 }
+
+
+std::string ppu::save_state()
+{
+    YAML::Node base_device_node = YAML::Load (device::save_state());
+    YAML::Node final_node;
+
+    final_node["type"] = "ppu";
+    final_node["data"] = YAML::Node ();
+
+    final_node["data"]["base_device"] = base_device_node;
+
+
+    final_node["data"]["nametable_memory"] = base64::encode (this -> nametable_memory.data (), 2048);
+    final_node["data"]["palette_memory"]   = base64::encode (this -> palette_memory.data (), 33);
+    final_node["data"]["oam_memory"]       = base64::encode (this -> oam.data (), 256);
+
+    final_node["data"]["control_register"]     = static_cast <size_t> (this -> control_register);
+    final_node["data"]["mask_register"]        = static_cast <size_t> (this -> mask_register);
+    final_node["data"]["status_register"]      = static_cast <size_t> (this -> status_register);
+    final_node["data"]["address_register"]     = static_cast <size_t> (this -> address_register);
+    final_node["data"]["data_register"]        = static_cast <size_t> (this -> data_register);
+    final_node["data"]["oam_address_register"] = static_cast <size_t> (this -> oam_address_register);
+
+    final_node["data"]["address_latch"] = this -> address_latch;
+
+    final_node["data"]["color_palette"] = YAML::Node ();
+    for (auto triplet : this -> color_palette)
+    {
+        YAML::Node triplet_node = YAML::Node ();
+
+        triplet_node["r"] = static_cast <size_t> (triplet.r);
+        triplet_node["g"] = static_cast <size_t> (triplet.g);
+        triplet_node["b"] = static_cast <size_t> (triplet.b);
+
+        final_node["data"]["color_palette"].push_back (triplet_node);
+    }
+
+    final_node["data"]["temporary_address"] = static_cast <size_t> (this -> temporary_address.data);
+    final_node["data"]["actual_address"]    = static_cast <size_t> (this -> actual_address.data);
+
+    final_node["data"]["fine_x"] = static_cast <size_t> (this -> fine_x);
+
+    final_node["data"]["scanline"]  = static_cast <size_t> (this -> scanline);
+    final_node["data"]["scandot"]   = static_cast <size_t> (this -> scandot);
+    final_node["data"]["odd_frame"] = this -> odd_frame;
+
+    final_node["data"]["previous_data"]   = static_cast <size_t> (this -> previous_data);
+
+    std::vector <uint8_t> pixels_bytes;
+    for (auto pixel : this -> pixels)
+    {
+        pixels_bytes.push_back (pixel & 0xFF000000 >> 24);
+        pixels_bytes.push_back (pixel & 0x00FF0000 >> 16);
+        pixels_bytes.push_back (pixel & 0x0000FF00 >> 8);
+        pixels_bytes.push_back (pixel & 0x000000FF >> 0);
+    }
+    final_node["data"]["pixels"] = base64::encode (pixels_bytes.data (), pixels_bytes.size ());
+    final_node["data"]["pixels_small"] = base64::encode (this -> pixels_small.data (), 240 * 256);
+
+    final_node["data"]["next_background_low_byte"]  = static_cast <size_t> (this -> next_background_low_byte);
+    final_node["data"]["next_background_high_byte"] = static_cast <size_t> (this -> next_background_high_byte);
+    final_node["data"]["next_background_attribute"] = static_cast <size_t> (this -> next_background_attribute);
+    final_node["data"]["next_background_chr"]       = static_cast <size_t> (this -> next_background_chr);
+
+    final_node["data"]["background_shift_pattern_low_byte"] =
+            static_cast <size_t> (this -> background_shift_pattern_low_byte);
+    final_node["data"]["background_shift_pattern_high_byte"] =
+            static_cast <size_t> (this -> background_shift_pattern_high_byte);
+    final_node["data"]["background_shift_attribute_low_byte"] =
+            static_cast <size_t> (this -> background_shift_attribute_low_byte);
+    final_node["data"]["background_shift_attribute_high_byte"] =
+            static_cast <size_t> (this -> background_shift_attribute_high_byte);
+
+
+    final_node["data"]["scanline_sprites_count"] = static_cast <size_t> (this -> scanline_sprites_count);
+    final_node["data"]["scanline_sprites"] = YAML::Node ();
+    for (auto sprite : this -> scanline_sprites)
+    {
+        YAML::Node triplet_node = YAML::Node ();
+
+        triplet_node["chr_id"] = static_cast <size_t> (sprite.chr_id);
+        triplet_node["y"] = static_cast <size_t> (sprite.y);
+        triplet_node["attribute"] = static_cast <size_t> (sprite.attribute);
+        triplet_node["x"] = static_cast <size_t> (sprite.x);
+
+        final_node["data"]["scanline_sprites"].push_back (triplet_node);
+    }
+
+    final_node["data"]["sprite_shift_pattern_low_byte"]  = YAML::Node ();
+    for (auto sprite_byte : this -> sprite_shift_pattern_low_byte)
+        final_node["data"]["sprite_shift_pattern_low_byte"].push_back (static_cast <size_t> (sprite_byte));
+    final_node["data"]["sprite_shift_pattern_high_byte"] = YAML::Node ();
+    for (auto sprite_byte : this -> sprite_shift_pattern_high_byte)
+        final_node["data"]["sprite_shift_pattern_high_byte"].push_back (static_cast <size_t> (sprite_byte));
+
+    final_node["data"]["sprite_zero_included"] = this -> sprite_zero_included;
+    final_node["data"]["drawing_sprite_zero"]  = this -> drawing_sprite_zero;
+
+    final_node["data"]["frames_rendered"] = static_cast <size_t> (this -> frames_rendered);
+
+    return (YAML::Dump(final_node));
+}
+
+
+void        ppu::load_state (std::string saved_state)
+{
+    YAML::Node saved_node = YAML::Load (saved_state)["data"];
+    device::load_state (YAML::Dump(saved_node["base_device"]));
+
+    auto decoded_nametable_memory = base64::decode (saved_node["nametable_memory"].as<std::string> ());
+    for (size_t i = 0; i < decoded_nametable_memory.size (); i++)
+        (this -> nametable_memory)[i] = decoded_nametable_memory[i];
+    
+    auto decoded_palette_memory = base64::decode (saved_node["palette_memory"].as<std::string> ());
+    for (size_t i = 0; i < decoded_palette_memory.size (); i++)
+        (this -> palette_memory)[i] = decoded_palette_memory[i];
+
+    auto decoded_oam_memory = base64::decode (saved_node["oam_memory"].as<std::string> ());
+    for (size_t i = 0; i < decoded_oam_memory.size (); i++)
+        (this -> oam)[i] = decoded_oam_memory[i];
+
+
+    this -> control_register     = saved_node["control_register"].as <uint8_t> ();
+    this -> mask_register        = saved_node["mask_register"].as <uint8_t> ();
+    this -> status_register      = saved_node["status_register"].as <uint8_t> ();
+    this -> address_register     = saved_node["address_register"].as <uint8_t> ();
+    this -> data_register        = saved_node["data_register"].as <uint8_t> ();
+    this -> oam_address_register = saved_node["oam_address_register"].as <uint8_t> ();
+
+    this -> address_latch = saved_node["address_latch"].as <bool> ();
+
+    for (size_t i = 0; i < saved_node["color_palette"].size (); i++)
+    {
+        color_palette[i].r = saved_node["color_palette"][i]["r"].as <uint8_t> ();
+        color_palette[i].g = saved_node["color_palette"][i]["g"].as <uint8_t> ();
+        color_palette[i].b = saved_node["color_palette"][i]["b"].as <uint8_t> ();
+    }
+
+    this -> temporary_address.data = saved_node["temporary_address"].as <uint16_t> ();
+    this -> actual_address.data    = saved_node["actual_address"].as <uint16_t> ();
+
+    this -> fine_x = saved_node["fine_x"].as <uint8_t> ();
+
+    this -> scanline  = saved_node["scanline"].as <int> ();
+    this -> scandot   = saved_node["scandot"].as <int> ();
+    this -> odd_frame = saved_node["odd_frame"].as <bool> ();
+
+    this -> previous_data = saved_node["previous_data"].as <uint8_t> ();
+
+    for (size_t i = 0; i < saved_node["pixels"].size (); i += 4)
+    {
+        uint32_t pixel = 0x00000000;
+
+        pixel |= static_cast <uint32_t> (saved_node["pixels"][i + 0].as <uint8_t> () << 24);
+        pixel |= static_cast <uint32_t> (saved_node["pixels"][i + 1].as <uint8_t> () << 16);
+        pixel |= static_cast <uint32_t> (saved_node["pixels"][i + 2].as <uint8_t> () << 8);
+        pixel |= static_cast <uint32_t> (saved_node["pixels"][i + 3].as <uint8_t> () << 0);
+
+        this -> pixels[i / 4] = pixel;
+    }
+
+    auto decoded_pixels_small = base64::decode (saved_node["pixels_small"].as<std::string> ());
+    for (size_t i = 0; i < decoded_pixels_small.size (); i++)
+        (this -> pixels_small)[i] = decoded_pixels_small[i];
+
+    this -> next_background_low_byte  = saved_node["next_background_low_byte"].as <uint8_t> ();
+    this -> next_background_high_byte = saved_node["next_background_high_byte"].as <uint8_t> ();
+    this -> next_background_attribute = saved_node["next_background_attribute"].as <uint8_t> ();
+    this -> next_background_chr       = saved_node["next_background_chr"].as <uint8_t> ();
+
+    this -> background_shift_pattern_low_byte    = saved_node["background_shift_pattern_low_byte"].as <uint16_t> ();
+    this -> background_shift_pattern_high_byte   = saved_node["background_shift_pattern_high_byte"].as <uint16_t> ();
+    this -> background_shift_attribute_low_byte  = saved_node["background_shift_attribute_low_byte"].as <uint16_t> ();
+    this -> background_shift_attribute_high_byte = saved_node["background_shift_attribute_high_byte"].as <uint16_t> ();
+
+    this -> scanline_sprites_count = saved_node["scanline_sprites_count"].as <uint8_t> ();
+    for (size_t i = 0; i < saved_node["scanline_sprites"].size (); i++)
+    {
+        this -> scanline_sprites[i].chr_id    = saved_node["scanline_sprites"][i]["chr_id"].as <uint8_t> ();
+        this -> scanline_sprites[i].y         = saved_node["scanline_sprites"][i]["y"].as <uint8_t> ();
+        this -> scanline_sprites[i].attribute = saved_node["scanline_sprites"][i]["attribute"].as <uint8_t> ();
+        this -> scanline_sprites[i].x         = saved_node["scanline_sprites"][i]["x"].as <uint8_t> ();
+    }
+
+    for (size_t i = 0 ; i < saved_node["sprite_shift_pattern_low_byte"].size (); i++)
+        this -> sprite_shift_pattern_low_byte[i] = saved_node["sprite_shift_pattern_low_byte"][i].as <uint8_t> ();
+    for (size_t i = 0 ; i < saved_node["sprite_shift_pattern_high_byte"].size (); i++)
+        this -> sprite_shift_pattern_high_byte[i] = saved_node["sprite_shift_pattern_high_byte"][i].as <uint8_t> ();
+
+    this -> sprite_zero_included = saved_node["sprite_zero_included"].as <bool> ();
+    this -> drawing_sprite_zero  = saved_node["drawing_sprite_zero"].as <bool> ();
+
+    this -> frames_rendered = saved_node["frames_rendered"].as <long long> ();
+}

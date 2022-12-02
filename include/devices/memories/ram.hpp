@@ -18,6 +18,11 @@ public:
     void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
 
     uint8_t read (uint16_t address, bool to_parent_bus = true) override; // NOLINT
+
+
+    std::string save_state() override;
+
+    void        load_state (std::string saved_state) override;
 };
 
 #endif //RAM_HPP

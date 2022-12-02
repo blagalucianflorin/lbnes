@@ -29,7 +29,7 @@ public:
         return (internal_memory[address - (this -> lower_bound)]);
     }
 
-    std::string save_state (const std::string& name) override;
+    std::string save_state() override;
 
     void        load_state (std::string saved_state) override;
 

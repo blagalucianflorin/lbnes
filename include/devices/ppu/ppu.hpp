@@ -243,6 +243,11 @@ public:
     inline bool is_odd_frame () const { return (this -> odd_frame); }
 
     long long frames_rendered = 0;
+
+
+    std::string save_state() override;
+
+    void        load_state (std::string saved_state) override;
 };
 
 #endif //PPU_HPP

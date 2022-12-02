@@ -38,7 +38,7 @@ public:
 
     uint8_t     read (const uint16_t &address);
 
-    std::string save_state (const std::string& name) override;
+    std::string save_state() override;
 
     void        load_state (std::string saved_state) override;
 };

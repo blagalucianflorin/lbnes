@@ -13,3 +13,18 @@ uint8_t ram::read (uint16_t address, bool to_parent_bus) // NOLINT
 {
     return memory::read(address & 0x07FF, to_parent_bus);
 }
+
+std::string ram::save_state()
+{
+    YAML::Node final_node = YAML::Load (memory::save_state());
+
+    final_node["type"] = "ram";
+
+    return (YAML::Dump (final_node));
+}
+
+
+void ram::load_state (std::string saved_state)
+{
+    memory::load_state (saved_state);
+}

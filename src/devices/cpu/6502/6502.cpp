@@ -160,42 +160,42 @@ void cpu::dma (std::shared_ptr <ppu> target_ppu, uint8_t page)
     this -> cycles_left = 512;
 }
 
-std::string cpu::save_state (const std::string &name)
+std::string cpu::save_state ()
 {
-    YAML::Node base_device_node = YAML::Load (device::save_state ("base_device"));
+    YAML::Node base_device_node = YAML::Load (device::save_state());
     YAML::Node final_node;
 
-    final_node[name] = YAML::Node ();
+    final_node["type"] = "cpu";
+    final_node["data"] = YAML::Node ();
 
-    final_node[name]["accumulator_addressing"] = this -> accumulator_addressing;
-    final_node[name]["jump_relative_address"]  = this -> jump_relative_address;
-    final_node[name]["destination_address"]    = this -> destination_address;
+    final_node["data"]["base_device"] = base_device_node;
 
-    final_node[name]["flags_register"]  = this -> flags_register;
-    final_node[name]["accumulator"]     = this -> accumulator;
-    final_node[name]["x_register"]      = this -> x_register;
-    final_node[name]["y_register"]      = this -> y_register;
-    final_node[name]["program_counter"] = this -> program_counter;
-    final_node[name]["stack_pointer"]   = this -> stack_pointer;
+    final_node["data"]["accumulator_addressing"] = this -> accumulator_addressing;
+    final_node["data"]["jump_relative_address"]  = static_cast <size_t> (this -> jump_relative_address);
+    final_node["data"]["destination_address"]    = static_cast <size_t> (this -> destination_address);
 
-    final_node[name]["cycles_left"]    = this -> cycles_left;
-    final_node[name]["cycles_elapsed"] = this -> cycles_elapsed;
+    final_node["data"]["flags_register"]  = static_cast <size_t> (this -> flags_register);
+    final_node["data"]["accumulator"]     = static_cast <size_t> (this -> accumulator);
+    final_node["data"]["x_register"]      = static_cast <size_t> (this -> x_register);
+    final_node["data"]["y_register"]      = static_cast <size_t> (this -> y_register);
+    final_node["data"]["program_counter"] = static_cast <size_t> (this -> program_counter);
+    final_node["data"]["stack_pointer"]   = static_cast <size_t> (this -> stack_pointer);
 
-    final_node[name]["dma_active"] = this -> dma_active;
-    final_node[name]["dma_begin"]  = this -> dma_begin;
-    final_node[name]["dma_entry"]  = this -> dma_entry;
-    final_node[name]["dma_data"]   = this -> dma_data;
-    final_node[name]["dma_page"]   = this -> dma_page;
+    final_node["data"]["cycles_left"]    = this -> cycles_left;
+    final_node["data"]["cycles_elapsed"] = this -> cycles_elapsed;
 
-    for (auto pair : base_device_node["base_device"])
-        final_node[name]["base_device"][pair.first] = pair.second;
+    final_node["data"]["dma_active"] = this -> dma_active;
+    final_node["data"]["dma_begin"]  = this -> dma_begin;
+    final_node["data"]["dma_entry"]  = static_cast <size_t> (this -> dma_entry);
+    final_node["data"]["dma_data"]   = static_cast <size_t> (this -> dma_data);
+    final_node["data"]["dma_page"]   = static_cast <size_t> (this -> dma_page);
 
     return (YAML::Dump(final_node));
 }
 
 void cpu::load_state (std::string saved_state)
 {
-    YAML::Node saved_node = YAML::Load (saved_state.c_str ()).begin() -> second;
+    YAML::Node saved_node = YAML::Load (saved_state)["data"];
     device::load_state (YAML::Dump(saved_node["base_device"]));
 
     this -> accumulator_addressing = saved_node["accumulator_addressing"].as<bool>();

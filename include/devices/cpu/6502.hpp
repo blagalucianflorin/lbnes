@@ -143,7 +143,7 @@ public:
 
     void        dma (std::shared_ptr <ppu> target_ppu, uint8_t page);
 
-    std::string save_state (const std::string& name) override;
+    std::string save_state() override;
 
     void        load_state (std::string saved_state) override;
 };

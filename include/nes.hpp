@@ -32,6 +32,7 @@
 #include "options/configurator.hpp"
 #include "yaml-cpp/yaml.h"
 #include "misc/logger.hpp"
+#include "misc/state.h"
 
 #include "network/client.hpp"
 #include "network/server.hpp"
@@ -41,7 +42,7 @@
 #endif
 
 
-class nes : public std::enable_shared_from_this <nes>
+class nes : public std::enable_shared_from_this <nes>, public state
 {
 public:
     nes ();
@@ -148,6 +149,11 @@ private:
     void reload (const std::string& rom_file, bool initialize_controllers = false);
 
     void reset ();
+
+
+    std::string save_state() override;
+
+    void        load_state (std::string saved_state) override;
 };
 
 #endif //NES_HPP

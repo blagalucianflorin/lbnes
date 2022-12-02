@@ -50,7 +50,7 @@ void imgui_manager::draw_menu ()
     {
         ImGui::SetNextWindowPos (ImVec2 (0, 0));
 
-        float menu_height = 350;
+        float menu_height = 430;
         if (this -> my_nes -> options.is_client)
             menu_height = 250;
         else if (this -> my_nes -> options.is_server)
@@ -98,12 +98,76 @@ void imgui_manager::draw_menu ()
             if (ImGui::Button ("Load ROM"))
             {
                 LOGGER_INFO ("Loading ROM file from GUI.");
-                auto selection = pfd::open_file ("Select a file").result ();
+                auto selection = pfd::open_file ("Select a file", ".").result ();
 
                 if (!selection.empty ())
                 {
-                    LOGGER_INFO ("Trying to load '" + selection[0] + "'.");
+                    LOGGER_INFO ("Trying to load '" + selection[0] + "' ROM file.");
                     this -> my_nes -> reload (selection[0], this -> my_nes -> joypads.empty ());
+                }
+            }
+            ImGui::NewLine ();
+
+            if (ImGui::Button ("Save State"))
+            {
+                cross_platform_mkdir ("saves");
+
+                auto destination = pfd::save_file ("Select a file",
+#ifdef WIN32
+                                                   ".\\saves\\",
+#else
+                                                   "./saves/",
+#endif
+                                                   {"LBNES Save File (.lbnes_save)", "*.lbnes_save"},
+                                                   pfd::opt::force_overwrite).result ();
+                LOGGER_INFO (std::string ("Trying to save state to '") + destination + "'.");
+
+                if (!destination.empty ())
+                {
+                    size_t last_dot = destination.find_last_of ('.');
+
+                    if (last_dot == std::string::npos)
+                        destination += ".lbnes_save";
+                    else
+                        destination = destination.substr(0, last_dot) + ".lbnes_save";
+
+                    std::ofstream state_file (destination);
+
+                    state_file << this -> my_nes -> save_state ();
+
+                    state_file.close ();
+                }
+            }
+            ImGui::NewLine ();
+
+            if (ImGui::Button ("Load State"))
+            {
+                cross_platform_mkdir ("saves");
+
+                LOGGER_INFO ("Loading ROM file from GUI.");
+                auto selection = pfd::open_file ("Select a file",
+#ifdef WIN32
+                                                 ".\\saves\\",
+#else
+                                                 "./saves/",
+#endif
+                                                 {"LBNES Save File (.lbnes_save)", "*.lbnes_save"}).result ();
+
+                if (!selection.empty ())
+                {
+                    LOGGER_INFO ("Trying to load state from '" + selection[0] + "'.");
+
+                    std::ifstream fin (selection[0]);
+
+                    if (fin.good ())
+                    {
+                        fin.close ();
+                        this -> my_nes -> load_state (YAML::Dump (YAML::LoadFile (selection[0])));
+                    }
+                    else
+                    {
+                        LOGGER_ERROR ("State file doesn't exist.");
+                    }
                 }
             }
             ImGui::NewLine ();

@@ -16,18 +16,16 @@ memory::memory (uint16_t lower_bound, uint16_t upper_bound) : device (lower_boun
 }
 
 
-std::string memory::save_state (const std::string& name)
+std::string memory::save_state()
 {
-    YAML::Node base_device_node = YAML::Load (device::save_state ("base_device"));
+    YAML::Node base_device_node = YAML::Load (device::save_state());
     YAML::Node final_node;
 
-    final_node[name]                    = YAML::Node ();
-    final_node[name]["memory_device"]   = YAML::Node ();
-    final_node[name]["internal_memory"] = base64::encode (this -> internal_memory.data (),
-                                                          this -> upper_bound - this -> lower_bound);
-
-    for (auto pair : base_device_node["base_device"])
-        final_node[name]["base_device"][pair.first] = pair.second;
+    final_node["type"]                    = "memory";
+    final_node["data"]                    = YAML::Node ();
+    final_node["data"]["base_device"]     = base_device_node;
+    final_node["data"]["internal_memory"] = base64::encode (this -> internal_memory.data (),
+                                                            this -> upper_bound - this -> lower_bound);
 
     return (YAML::Dump (final_node));
 }
@@ -35,7 +33,7 @@ std::string memory::save_state (const std::string& name)
 
 void memory::load_state (std::string saved_state)
 {
-    YAML::Node saved_node     = YAML::Load (saved_state.c_str ()).begin() -> second;
+    YAML::Node saved_node     = YAML::Load (saved_state)["data"];
     auto       decoded_memory = base64::decode (saved_node["internal_memory"].as<std::string> ());
     device::load_state (YAML::Dump(saved_node["base_device"]));
 

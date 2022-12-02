@@ -230,10 +230,10 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
 {
     LOGGER_INFO ("Reloading my_nes.");
 
-    nes_cpu       = std::make_shared<cpu> ();
-    cpu_bus       = std::make_shared<bus> (0x0000, 0xFFFF);
-    ppu_bus       = std::make_shared<bus> (0x0000, 0x3FFF);
-    cpu_ram       = std::make_shared<ram> ();
+    nes_cpu       = std::make_shared <cpu> ();
+    cpu_bus       = std::make_shared <bus> (0x0000, 0xFFFF);
+    ppu_bus       = std::make_shared <bus> (0x0000, 0x3FFF);
+    cpu_ram       = std::make_shared <ram> ();
     nes_cartridge = std::make_shared <cartridge> (rom_file);
     nes_ppu       = std::make_shared <ppu> (this -> game_renderer);
 
@@ -272,6 +272,25 @@ void nes::process_events ()
             this -> options.show_menu = !this -> options.show_menu;
         else if (this -> game_input_event.type == SDL_DROPFILE)
             reload (game_input_event.drop.file, false);
+        else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_t)
+        {
+            std::ofstream state_file ("state.yml");
+
+            state_file << this -> save_state ();
+
+            state_file.close ();
+        }
+        else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_y)
+        {
+            std::ifstream fin ("state.yml");
+
+            if (fin.good ())
+            {
+                fin.close ();
+                this -> load_state (YAML::Dump (YAML::LoadFile ("state.yml")));
+            }
+
+        }
     }
 }
 
@@ -380,4 +399,56 @@ void nes::start_client ()
             configurator::get_instance ()["port"].as <short> ());
 
     LOGGER_INFO ("Connected.");
+}
+
+
+std::string nes::save_state()
+{
+    YAML::Node final_node;
+
+    final_node["type"] = "ppu";
+    final_node["data"] = YAML::Node ();
+
+    final_node["data"].push_back (YAML::Load (this -> nes_cpu -> save_state ()));
+    final_node["data"].push_back (YAML::Load (this -> nes_ppu -> save_state ()));
+    final_node["data"].push_back (YAML::Load (this -> cpu_ram -> save_state ()));
+
+    auto cpu_bus_state = this -> cpu_bus -> save_state ();
+    state::change_type (cpu_bus_state, "cpu_bus");
+    final_node["data"].push_back (YAML::Load (cpu_bus_state));
+
+    auto ppu_bus_state = this -> ppu_bus -> save_state ();
+    state::change_type (ppu_bus_state, "ppu_bus");
+    final_node["data"].push_back (YAML::Load (ppu_bus_state));
+
+    return (YAML::Dump (final_node));
+}
+
+void nes::load_state (std::string saved_state)
+{
+    YAML::Node saved_node = YAML::Load (saved_state)["data"];
+
+    for (auto new_device : saved_node)
+    {
+        if (new_device["type"].as <std::string> () == "cpu")
+        {
+            this -> nes_cpu -> load_state (YAML::Dump (new_device));
+        }
+        else if (new_device["type"].as <std::string> () == "ppu")
+        {
+            this -> nes_ppu -> load_state (YAML::Dump (new_device));
+        }
+        else if (new_device["type"].as <std::string> () == "ram")
+        {
+            this -> cpu_ram -> load_state (YAML::Dump (new_device));
+        }
+        else if (new_device["type"].as <std::string> () == "cpu_bus")
+        {
+            this -> cpu_bus -> load_state (YAML::Dump (new_device));
+        }
+        else if (new_device["type"].as <std::string> () == "ppu_bus")
+        {
+            this -> ppu_bus -> load_state (YAML::Dump (new_device));
+        }
+    }
 }
