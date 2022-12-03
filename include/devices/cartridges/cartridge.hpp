@@ -27,12 +27,6 @@ class cartridge : public device
 public:
     friend class ppu;
 
-    // Supported mapper types
-    enum MAPPER
-    {
-        NROM
-    };
-
     enum MIRRORING_TYPE
     {
         VERTICAL,
@@ -40,11 +34,29 @@ public:
         FOUR_SCREEN
     };
 
-#ifdef G_TESTING
-public:
-#else
-    private:
-#endif
+    explicit cartridge (const std::string &file_path);
+
+    ~cartridge () override = default;
+
+    void        write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
+
+    uint8_t     read (uint16_t address, bool from_parent_bus = true) override; // NOLINT
+
+    inline void reset () {};
+
+    std::string save_state() override;
+
+    void        load_state (std::string saved_state) override;
+
+    [[nodiscard]] inline MIRRORING_TYPE get_mirroring () const { return (this -> mirroring_type); }
+
+private:
+    // Supported mapper types
+    enum MAPPER
+    {
+        NROM
+    };
+
     std::vector<uint8_t> program_memory;
     std::vector<uint8_t> character_memory;
     std::vector<uint8_t> sram;
@@ -61,23 +73,6 @@ public:
         {".nes", &cartridge::read_ines},
         {".ines", &cartridge::read_ines}
     };
-
-public:
-    explicit cartridge (const std::string &file_path);
-
-    ~cartridge () override = default;
-
-    void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
-
-    uint8_t read (uint16_t address, bool from_parent_bus = true) override; // NOLINT
-
-    inline void reset () {};
-
-    [[nodiscard]] inline MIRRORING_TYPE get_mirroring () const { return (this -> mirroring_type); }
-
-    std::string save_state() override;
-
-    void        load_state (std::string saved_state) override;
 };
 
 #endif //CARTRIDGE_HPP

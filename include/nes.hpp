@@ -154,6 +154,9 @@ private:
     std::string save_state() override;
 
     void        load_state (std::string saved_state) override;
+
+
+    void handle_drop_file (const std::string& file_path);
 };
 
 #endif //NES_HPP

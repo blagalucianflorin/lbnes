@@ -15,6 +15,35 @@
 
 class cpu : public device
 {
+public:
+    cpu ();
+
+    inline bool responds_to (uint16_t /*address*/) override { return (false); }
+
+    void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
+
+    uint8_t read (uint16_t address, bool from_parent_bus = true) override; // NOLINT
+
+    void    reset ();
+
+    void    clock () noexcept;
+
+    void    step ();
+
+    void    interrupt (bool force);
+
+
+    inline void               wait (long cycles) { this -> cycles_left += cycles; }
+
+    [[nodiscard]] inline long get_cycles_elapsed () const { return (this -> cycles_elapsed); }
+
+
+    void        dma (std::shared_ptr <ppu> target_ppu, uint8_t page);
+
+    std::string save_state() override;
+
+    void        load_state (std::string saved_state) override;
+
 private:
     bool     accumulator_addressing = false;
     uint16_t jump_relative_address  = 0xFFFF;
@@ -117,35 +146,6 @@ private:
     uint8_t ARR (); uint8_t ANE (); uint8_t TAS (); uint8_t LAS ();
     uint8_t SBX (); uint8_t SHY (); uint8_t SHX (); uint8_t SHA ();
     uint8_t LXA ();
-
-public:
-    cpu ();
-
-    inline bool responds_to (uint16_t /*address*/) override { return (false); }
-
-    void    write (uint16_t address, uint8_t data, bool to_parent_bus = true) override; // NOLINT
-
-    uint8_t read (uint16_t address, bool from_parent_bus = true) override; // NOLINT
-
-    void    reset ();
-
-    void    clock () noexcept;
-
-    void    step ();
-
-    void    interrupt (bool force);
-
-
-    inline void               wait (long cycles) { this -> cycles_left += cycles; }
-
-    [[nodiscard]] inline long get_cycles_elapsed () const { return (this -> cycles_elapsed); }
-
-
-    void        dma (std::shared_ptr <ppu> target_ppu, uint8_t page);
-
-    std::string save_state() override;
-
-    void        load_state (std::string saved_state) override;
 };
 
 #endif //CPU_HPP

@@ -271,7 +271,7 @@ void nes::process_events ()
         else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_p)
             this -> options.show_menu = !this -> options.show_menu;
         else if (this -> game_input_event.type == SDL_DROPFILE)
-            reload (game_input_event.drop.file, false);
+            this -> handle_drop_file (game_input_event.drop.file);
     }
 }
 
@@ -406,6 +406,7 @@ std::string nes::save_state()
     return (YAML::Dump (final_node));
 }
 
+
 void nes::load_state (std::string saved_state)
 {
     YAML::Node saved_node = YAML::Load (saved_state)["data"];
@@ -428,4 +429,27 @@ void nes::load_state (std::string saved_state)
 
     this -> rom_loaded    = true;
     this -> emulate_frame = std::bind (&nes::emulate_frame_real, this); // NOLINT
+}
+
+
+void nes::handle_drop_file (const std::string& file_path)
+{
+    std::string extension = file_path.substr (file_path.find_last_of ('.'));
+
+    if (extension == ".nes" || extension == ".ines")
+        this -> reload (file_path, false);
+    else
+    {
+        LOGGER_INFO ("Trying to load state from '" + file_path + "'.");
+
+        std::ifstream fin (file_path);
+
+        if (fin.good ())
+        {
+            fin.close ();
+            this -> load_state (YAML::Dump (YAML::LoadFile (file_path)));
+        }
+        else
+            LOGGER_ERROR ("State file doesn't exist.");
+    }
 }

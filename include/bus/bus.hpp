@@ -17,18 +17,12 @@
 
 class bus: public state, public std::enable_shared_from_this <bus>
 {
-private:
-    uint16_t lower_bound = 0x0000;
-    uint16_t upper_bound = 0xFFFF;
-
-    std::vector <std::shared_ptr <device>> devices;
-
 public:
     bus () = default;
 
-    virtual ~bus () = default;
-
     bus (uint16_t lower_bound, uint16_t upper_bound) : lower_bound (lower_bound), upper_bound (upper_bound) {}
+
+    virtual ~bus () = default;
 
     void        add_device (const std::shared_ptr<device>& new_device);
 
@@ -41,6 +35,13 @@ public:
     std::string save_state() override;
 
     void        load_state (std::string saved_state) override;
+
+private:
+    uint16_t lower_bound = 0x0000;
+    uint16_t upper_bound = 0xFFFF;
+
+    std::vector <std::shared_ptr <device>> devices;
+
 };
 
 #endif //BUS_HPP

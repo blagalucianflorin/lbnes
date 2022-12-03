@@ -876,17 +876,6 @@ std::string ppu::save_state()
 
     final_node["data"]["previous_data"]   = static_cast <size_t> (this -> previous_data);
 
-    std::vector <uint8_t> pixels_bytes;
-    for (auto pixel : this -> pixels)
-    {
-        pixels_bytes.push_back (pixel & 0xFF000000 >> 24);
-        pixels_bytes.push_back (pixel & 0x00FF0000 >> 16);
-        pixels_bytes.push_back (pixel & 0x0000FF00 >> 8);
-        pixels_bytes.push_back (pixel & 0x000000FF >> 0);
-    }
-    final_node["data"]["pixels"] = base64::encode (pixels_bytes.data (), pixels_bytes.size ());
-    final_node["data"]["pixels_small"] = base64::encode (this -> pixels_small.data (), 240 * 256);
-
     final_node["data"]["next_background_low_byte"]  = static_cast <size_t> (this -> next_background_low_byte);
     final_node["data"]["next_background_high_byte"] = static_cast <size_t> (this -> next_background_high_byte);
     final_node["data"]["next_background_attribute"] = static_cast <size_t> (this -> next_background_attribute);
@@ -978,22 +967,6 @@ void        ppu::load_state (std::string saved_state)
     this -> odd_frame = saved_node["odd_frame"].as <bool> ();
 
     this -> previous_data = saved_node["previous_data"].as <uint8_t> ();
-
-    for (size_t i = 0; i < saved_node["pixels"].size (); i += 4)
-    {
-        uint32_t pixel = 0x00000000;
-
-        pixel |= static_cast <uint32_t> (saved_node["pixels"][i + 0].as <uint8_t> () << 24);
-        pixel |= static_cast <uint32_t> (saved_node["pixels"][i + 1].as <uint8_t> () << 16);
-        pixel |= static_cast <uint32_t> (saved_node["pixels"][i + 2].as <uint8_t> () << 8);
-        pixel |= static_cast <uint32_t> (saved_node["pixels"][i + 3].as <uint8_t> () << 0);
-
-        this -> pixels[i / 4] = pixel;
-    }
-
-    auto decoded_pixels_small = base64::decode (saved_node["pixels_small"].as<std::string> ());
-    for (size_t i = 0; i < decoded_pixels_small.size (); i++)
-        (this -> pixels_small)[i] = decoded_pixels_small[i];
 
     this -> next_background_low_byte  = saved_node["next_background_low_byte"].as <uint8_t> ();
     this -> next_background_high_byte = saved_node["next_background_high_byte"].as <uint8_t> ();
