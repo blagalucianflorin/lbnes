@@ -23,7 +23,7 @@ You can also build the emulator yourself, check out the 'Requirements, Clone & B
 - [x] **speed adjustment**
 - [x] **key mapping**
 - [x] **GUI**
-- [ ] save states (work in progress)
+- [x] **save states**
 - [ ] network play (work in progress)
 - [ ] sound
 - [ ] other mappers
