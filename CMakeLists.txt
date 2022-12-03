@@ -222,10 +222,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -fsanitize-undefined-trap-on-error -fstack-protector-strong -fPIE \
     ")
 
+# Seems fixed atm? Don't know why
 # Seems to break debug build rendering
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+#if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=bounds")
-endif()
+#endif()
 
 set_source_files_properties(${IMGUI_SOURCES} PROPERTIES COMPILE_FLAGS "-w")
 set_source_files_properties(src/misc/base64.cpp PROPERTIES COMPILE_FLAGS "-w")

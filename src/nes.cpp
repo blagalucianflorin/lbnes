@@ -272,25 +272,6 @@ void nes::process_events ()
             this -> options.show_menu = !this -> options.show_menu;
         else if (this -> game_input_event.type == SDL_DROPFILE)
             reload (game_input_event.drop.file, false);
-        else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_t)
-        {
-            std::ofstream state_file ("state.yml");
-
-            state_file << this -> save_state ();
-
-            state_file.close ();
-        }
-        else if (this -> game_input_event.type == SDL_KEYDOWN && this -> game_input_event.key.keysym.sym == SDLK_y)
-        {
-            std::ifstream fin ("state.yml");
-
-            if (fin.good ())
-            {
-                fin.close ();
-                this -> load_state (YAML::Dump (YAML::LoadFile ("state.yml")));
-            }
-
-        }
     }
 }
 
@@ -406,12 +387,13 @@ std::string nes::save_state()
 {
     YAML::Node final_node;
 
-    final_node["type"] = "ppu";
+    final_node["type"] = "nes";
     final_node["data"] = YAML::Node ();
 
     final_node["data"].push_back (YAML::Load (this -> nes_cpu -> save_state ()));
     final_node["data"].push_back (YAML::Load (this -> nes_ppu -> save_state ()));
     final_node["data"].push_back (YAML::Load (this -> cpu_ram -> save_state ()));
+    final_node["data"].push_back (YAML::Load (this -> nes_cartridge -> save_state ()));
 
     auto cpu_bus_state = this -> cpu_bus -> save_state ();
     state::change_type (cpu_bus_state, "cpu_bus");
@@ -431,24 +413,19 @@ void nes::load_state (std::string saved_state)
     for (auto new_device : saved_node)
     {
         if (new_device["type"].as <std::string> () == "cpu")
-        {
             this -> nes_cpu -> load_state (YAML::Dump (new_device));
-        }
         else if (new_device["type"].as <std::string> () == "ppu")
-        {
             this -> nes_ppu -> load_state (YAML::Dump (new_device));
-        }
         else if (new_device["type"].as <std::string> () == "ram")
-        {
             this -> cpu_ram -> load_state (YAML::Dump (new_device));
-        }
         else if (new_device["type"].as <std::string> () == "cpu_bus")
-        {
             this -> cpu_bus -> load_state (YAML::Dump (new_device));
-        }
         else if (new_device["type"].as <std::string> () == "ppu_bus")
-        {
             this -> ppu_bus -> load_state (YAML::Dump (new_device));
-        }
+        else if (new_device["type"].as <std::string> () == "cartridge")
+            this -> nes_cartridge -> load_state (YAML::Dump (new_device));
     }
+
+    this -> rom_loaded    = true;
+    this -> emulate_frame = std::bind (&nes::emulate_frame_real, this); // NOLINT
 }

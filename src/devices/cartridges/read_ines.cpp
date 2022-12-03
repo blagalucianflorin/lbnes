@@ -31,8 +31,8 @@ void cartridge::read_ines (const std::string& file_path)
     if (std::string (format_check) != "NES\x1A" || std::string (padding) != "\0\0\0\0\0\0\0\0") // NOLINT
         throw cartridge_exception ("iNES: Corrupted file header");
 
-    (this -> program_memory).reserve (std::max (static_cast <uint8_t> (program_size), static_cast <uint8_t> (2)) * 0x4000);
-    (this -> character_memory).reserve (static_cast <uint8_t> (character_size) * 0x2000);
+    (this -> program_memory).resize (std::max (static_cast <uint8_t> (program_size), static_cast <uint8_t> (2)) * 0x4000);
+    (this -> character_memory).resize (static_cast <uint8_t> (character_size) * 0x2000);
 
     if ((control_byte_two & 0b00001111) != 0)
         throw cartridge_exception ("iNES: Only iNES 1.0 is supported");

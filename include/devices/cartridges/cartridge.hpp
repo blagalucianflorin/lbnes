@@ -10,6 +10,7 @@
 
 #include "misc/macros.h"
 #include "misc/logger.hpp"
+#include "misc/base64.h"
 
 #include <string>
 #include <fstream>
@@ -19,6 +20,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+
 
 class cartridge : public device
 {
@@ -71,7 +73,11 @@ public:
 
     inline void reset () {};
 
-    inline MIRRORING_TYPE get_mirroring () { return (this -> mirroring_type); }
+    [[nodiscard]] inline MIRRORING_TYPE get_mirroring () const { return (this -> mirroring_type); }
+
+    std::string save_state() override;
+
+    void        load_state (std::string saved_state) override;
 };
 
 #endif //CARTRIDGE_HPP

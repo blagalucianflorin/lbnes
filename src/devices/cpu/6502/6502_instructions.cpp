@@ -416,8 +416,9 @@ void cpu::populate_operations ()
 
 uint8_t cpu::UNK () // NOLINT
 {
-    std::string message = "CPU: Stall. Unknown instruction! (";
-//    message += to_hexa (this -> opcode, 2, true) + ")";
+    std::string message = "CPU: Stall. Unknown instruction!";
+
+    LOGGER_CRITICAL_STD("Hit unknown instruction!");
 
     throw std::invalid_argument (message.c_str ());
 }

@@ -928,6 +928,8 @@ std::string ppu::save_state()
 
     final_node["data"]["frames_rendered"] = static_cast <size_t> (this -> frames_rendered);
 
+    final_node["data"]["mirroring_type"] = static_cast <size_t> (this -> mirroring_type);
+
     return (YAML::Dump(final_node));
 }
 
@@ -1021,4 +1023,7 @@ void        ppu::load_state (std::string saved_state)
     this -> drawing_sprite_zero  = saved_node["drawing_sprite_zero"].as <bool> ();
 
     this -> frames_rendered = saved_node["frames_rendered"].as <long long> ();
+
+    auto aux_mirroring_type = saved_node["mirroring_type"].as <size_t> ();
+    this -> mirroring_type  = static_cast <cartridge::MIRRORING_TYPE> (aux_mirroring_type);
 }
