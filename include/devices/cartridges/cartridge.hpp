@@ -34,6 +34,8 @@ public:
         FOUR_SCREEN
     };
 
+    inline explicit cartridge () : device (0x4020, 0xFFFF) {};
+
     explicit cartridge (const std::string &file_path);
 
     ~cartridge () override = default;

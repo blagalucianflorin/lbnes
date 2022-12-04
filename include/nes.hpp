@@ -148,6 +148,8 @@ private:
 
     void reload (const std::string& rom_file, bool initialize_controllers = false);
 
+    void reload_no_rom ();
+
     void reset ();
 
 

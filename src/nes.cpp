@@ -261,6 +261,35 @@ void nes::reload (const std::string &rom_file, bool initialize_controllers)
 }
 
 
+void nes::reload_no_rom ()
+{
+    LOGGER_INFO ("Reloading my_nes.");
+
+    nes_cpu       = std::make_shared <cpu> ();
+    cpu_bus       = std::make_shared <bus> (0x0000, 0xFFFF);
+    ppu_bus       = std::make_shared <bus> (0x0000, 0x3FFF);
+    cpu_ram       = std::make_shared <ram> ();
+    nes_cartridge = std::make_shared <cartridge> ();
+    nes_ppu       = std::make_shared <ppu> (this -> game_renderer);
+
+    this -> nes_ppu -> attach (this -> nes_cpu);
+    this -> nes_ppu -> attach (this -> nes_cartridge);
+    this -> nes_ppu -> set_child_bus (this -> ppu_bus);
+    this -> cpu_bus -> add_devices ({this -> nes_ppu, this -> nes_cartridge, this -> cpu_ram, this -> nes_cpu});
+
+    this -> joypads.clear ();
+    for (size_t i = 0; i < 2; i++)
+    {
+        this -> joypads.push_back (std::make_unique <joypad> ());
+        this -> cpu_bus -> add_device (this -> joypads[i]);
+    }
+    this -> load_joypads ();
+
+    this -> reset ();
+}
+
+
+
 void nes::process_events ()
 {
     while (SDL_PollEvent (&this -> game_input_event) == 1)
@@ -411,6 +440,13 @@ void nes::load_state (std::string saved_state)
 {
     YAML::Node saved_node = YAML::Load (saved_state)["data"];
 
+    if (!this -> rom_loaded)
+    {
+        this -> reload_no_rom ();
+        this -> rom_loaded    = true;
+        this -> emulate_frame = std::bind (&nes::emulate_frame_real, this); // NOLINT
+    }
+
     for (auto new_device : saved_node)
     {
         if (new_device["type"].as <std::string> () == "cpu")
@@ -447,6 +483,12 @@ void nes::handle_drop_file (const std::string& file_path)
         if (fin.good ())
         {
             fin.close ();
+            if (!this -> rom_loaded)
+            {
+                this -> reload_no_rom ();
+                this -> rom_loaded    = true;
+                this -> emulate_frame = std::bind (&nes::emulate_frame_real, this); // NOLINT
+            }
             this -> load_state (YAML::Dump (YAML::LoadFile (file_path)));
         }
         else
