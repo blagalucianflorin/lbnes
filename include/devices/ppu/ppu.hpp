@@ -210,15 +210,15 @@ public:
 
     uint8_t  read (uint16_t address, bool from_parent_bus = true) override; // NOLINT
 
-    [[maybe_unused]] uint8_t  set_control_flag (CONTROL_FLAG flag, uint8_t value);
+    [[maybe_unused]] void set_control_flag (CONTROL_FLAG flag, uint8_t value);
 
     uint8_t  get_control_flag (CONTROL_FLAG flag) const;
 
-    [[maybe_unused]] uint8_t  set_mask_flag (MASK_FLAG flag, uint8_t value);
+    [[maybe_unused]] void set_mask_flag (MASK_FLAG flag, uint8_t value);
 
     uint8_t  get_mask_flag (MASK_FLAG flag) const;
 
-    uint8_t  set_status_flag (STATUS_FLAG flag, uint8_t value);
+    void set_status_flag (STATUS_FLAG flag, uint8_t value);
 
     uint8_t  get_status_flag (STATUS_FLAG flag) const;
 

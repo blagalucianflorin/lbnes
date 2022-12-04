@@ -91,14 +91,9 @@ private:
         F_NEGATIVE          = 7
     };
 
-    inline uint8_t set_flag (FLAG flag, uint8_t value)
+    inline void set_flag (FLAG flag, uint8_t value)
     {
-        value = value ? 1 : 0;
-
-        if (this -> get_flag (flag) != value)
-            this -> flags_register ^= 1 << flag;
-
-        return (this -> flags_register);
+        this -> flags_register = (this -> flags_register & ~(1 << flag)) | (value << flag);
     }
 
     [[nodiscard]] inline uint8_t get_flag (FLAG flag) const

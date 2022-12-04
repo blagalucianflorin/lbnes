@@ -256,17 +256,12 @@ uint8_t ppu::read (uint16_t address, bool from_parent_bus) // NOLINT
     return (result);
 }
 
-uint8_t ppu::set_control_flag (ppu::CONTROL_FLAG flag, uint8_t value)
+void ppu::set_control_flag (ppu::CONTROL_FLAG flag, uint8_t value)
 {
-    value = value ? 1 : 0;
+    this -> control_register = (this -> control_register & ~(1 << flag)) | (value << flag);
 
-    if (this -> get_control_flag (flag) != value)
-        this -> control_register ^= 1 << flag;
-
-    if (flag == F_NMI_ON_VBLANK && value == 1 && this -> scanline >= 241)
+    if (flag == F_NMI_ON_VBLANK && value != 0 && this -> scanline >= 241)
         this -> cpu -> interrupt (true);
-
-    return (this -> control_register);
 }
 
 uint8_t ppu::get_control_flag (ppu::CONTROL_FLAG flag) const
@@ -274,14 +269,9 @@ uint8_t ppu::get_control_flag (ppu::CONTROL_FLAG flag) const
     return (((this -> control_register) >> flag) & 1);
 }
 
-uint8_t ppu::set_mask_flag (ppu::MASK_FLAG flag, uint8_t value)
+void ppu::set_mask_flag (ppu::MASK_FLAG flag, uint8_t value)
 {
-    value = value ? 1 : 0;
-
-    if (this -> get_mask_flag (flag) != value)
-        this -> mask_register ^= 1 << flag;
-
-    return (this -> mask_register);
+    this -> mask_register = (this -> mask_register & ~(1 << flag)) | (value << flag);
 }
 
 uint8_t ppu::get_mask_flag (ppu::MASK_FLAG flag) const
@@ -289,14 +279,9 @@ uint8_t ppu::get_mask_flag (ppu::MASK_FLAG flag) const
     return (((this -> mask_register) >> flag) & 1);
 }
 
-uint8_t ppu::set_status_flag (ppu::STATUS_FLAG flag, uint8_t value)
+void ppu::set_status_flag (ppu::STATUS_FLAG flag, uint8_t value)
 {
-    value = value ? 1 : 0;
-
-    if (this -> get_status_flag (flag) != value)
-        this -> status_register ^= 1 << flag;
-
-    return (this -> status_register);
+    this -> status_register = (this -> status_register & ~(1 << flag)) | (value << flag);
 }
 
 uint8_t ppu::get_status_flag (ppu::STATUS_FLAG flag) const
@@ -446,22 +431,6 @@ void ppu::clock ()
 {
     if (IS_BETWEEN (-1, this -> scanline, 239))
     {
-        if (this -> scanline == 0 && this -> scandot == 0 && this -> odd_frame)
-            this -> scandot = 1;
-
-        if (this -> scanline == -1 && this -> scandot == 1)
-        {
-            this -> set_status_flag (STATUS_FLAG::F_VBLANK_STARTED, 0);
-            this -> set_status_flag (STATUS_FLAG::F_SPRITE_OVERFLOW, 0);
-            this -> set_status_flag (STATUS_FLAG::F_SPRITE_ZERO_HIT, 0);
-
-            for (uint8_t i = 0; i < 8; i++)
-            {
-                (this -> sprite_shift_pattern_low_byte)[i]  = 0x00;
-                (this -> sprite_shift_pattern_high_byte)[i] = 0x00;
-            }
-        }
-
         if (IS_BETWEEN (2, this -> scandot, 257) || IS_BETWEEN (321, this -> scandot, 337))
         {
             uint16_t address;
@@ -511,60 +480,77 @@ void ppu::clock ()
             }
         }
 
+        else if (this -> scanline == 0 && this -> scandot == 0 && this -> odd_frame)
+            this -> scandot = 1;
+
+        else if (this -> scanline == -1 && this -> scandot == 1)
+        {
+            this -> set_status_flag (STATUS_FLAG::F_VBLANK_STARTED, 0);
+            this -> set_status_flag (STATUS_FLAG::F_SPRITE_OVERFLOW, 0);
+            this -> set_status_flag (STATUS_FLAG::F_SPRITE_ZERO_HIT, 0);
+
+            for (uint8_t i = 0; i < 8; i++)
+            {
+                (this -> sprite_shift_pattern_low_byte)[i]  = 0x00;
+                (this -> sprite_shift_pattern_high_byte)[i] = 0x00;
+            }
+        }
+
         if (this -> scandot == 256)
             this -> increment_coarse_fine_y ();
 
-        if (this -> scandot == 257)
+        else if (this -> scandot == 257)
         {
             this -> build_shifters ();
             this -> move_x_data ();
+
+            if (this -> scanline >= 0)
+            {
+                for (uint8_t i = 0; i < 8; i++)
+                {
+                    this -> scanline_sprites[i].y             = 0xFF;
+                    this -> scanline_sprites[i].chr_id        = 0xFF;
+                    this -> scanline_sprites[i].attribute     = 0xFF;
+                    this -> scanline_sprites[i].x             = 0xFF;
+                    this -> sprite_shift_pattern_low_byte[i]  = 0x00;
+                    this -> sprite_shift_pattern_high_byte[i] = 0x00;
+                }
+                this -> scanline_sprites_count = 0x00;
+                this -> sprite_zero_included   = false;
+
+                for (uint8_t i = 0; i < 64 && this -> scanline_sprites_count < 9; i++)
+                {
+                    int difference  = static_cast <int> (this -> scanline) - static_cast <int> (this -> get_oam_property (i, OE_Y));
+                    int upper_bound = this -> get_control_flag (CONTROL_FLAG::F_SPRITE_SIZE) ? 15 : 7;
+
+                    if (IS_BETWEEN (0, difference, upper_bound) && this -> scanline_sprites_count < 8)
+                    {
+                        this -> scanline_sprites[this -> scanline_sprites_count].y         =
+                                this -> get_oam_property (i, OE_Y);
+                        this -> scanline_sprites[this -> scanline_sprites_count].chr_id    =
+                                this -> get_oam_property (i, OE_CHR);
+                        this -> scanline_sprites[this -> scanline_sprites_count].attribute =
+                                this -> get_oam_property (i, OE_ATTRIBUTE);
+                        this -> scanline_sprites[this -> scanline_sprites_count].x         =
+                                this -> get_oam_property (i, OE_X);
+
+                        if (i == 0)
+                            this -> sprite_zero_included = true;
+
+                        this -> scanline_sprites_count += 1;
+                    }
+                }
+                this -> set_status_flag (STATUS_FLAG::F_SPRITE_OVERFLOW, this -> scanline_sprites_count > 8);
+            }
         }
 
-        if (this -> scandot == 338 || this -> scandot == 340)
+        else if (this -> scandot == 338 || this -> scandot == 340)
             this -> next_background_chr = this -> read (0x2000 | (this -> actual_address.data & 0x0FFF), false);
 
-        if (this -> scanline == -1 && IS_BETWEEN (280, this -> scandot, 304))
+        else if (this -> scanline == -1 && IS_BETWEEN (280, this -> scandot, 304))
             this -> move_y_data ();
 
         // Foreground sprite evaluation
-        if (this -> scanline >= 0 && this -> scandot == 257)
-        {
-            for (uint8_t i = 0; i < 8; i++)
-            {
-                this -> scanline_sprites[i].y             = 0xFF;
-                this -> scanline_sprites[i].chr_id        = 0xFF;
-                this -> scanline_sprites[i].attribute     = 0xFF;
-                this -> scanline_sprites[i].x             = 0xFF;
-                this -> sprite_shift_pattern_low_byte[i]  = 0x00;
-                this -> sprite_shift_pattern_high_byte[i] = 0x00;
-            }
-            this -> scanline_sprites_count = 0x00;
-            this -> sprite_zero_included   = false;
-
-            for (uint8_t i = 0; i < 64 && this -> scanline_sprites_count < 9; i++)
-            {
-                int difference  = static_cast <int> (this -> scanline) - static_cast <int> (this -> get_oam_property (i, OE_Y));
-                int upper_bound = this -> get_control_flag (CONTROL_FLAG::F_SPRITE_SIZE) ? 15 : 7;
-
-                if (IS_BETWEEN (0, difference, upper_bound) && this -> scanline_sprites_count < 8)
-                {
-                    this -> scanline_sprites[this -> scanline_sprites_count].y         =
-                            this -> get_oam_property (i, OE_Y);
-                    this -> scanline_sprites[this -> scanline_sprites_count].chr_id    =
-                            this -> get_oam_property (i, OE_CHR);
-                    this -> scanline_sprites[this -> scanline_sprites_count].attribute =
-                            this -> get_oam_property (i, OE_ATTRIBUTE);
-                    this -> scanline_sprites[this -> scanline_sprites_count].x         =
-                            this -> get_oam_property (i, OE_X);
-
-                    if (i == 0)
-                        this -> sprite_zero_included = true;
-
-                    this -> scanline_sprites_count += 1;
-                }
-            }
-            this -> set_status_flag (STATUS_FLAG::F_SPRITE_OVERFLOW, this -> scanline_sprites_count > 8);
-        }
 
         if (this -> scandot == 340)
         {
@@ -698,8 +684,7 @@ void ppu::clock ()
                     if (IS_BETWEEN (1, this -> scandot, 257))
                         this -> set_status_flag (STATUS_FLAG::F_SPRITE_ZERO_HIT, 1);
                 }
-                else
-                if (IS_BETWEEN (9, this -> scandot, 257))
+                else if (IS_BETWEEN (9, this -> scandot, 257))
                     this -> set_status_flag (STATUS_FLAG::F_SPRITE_ZERO_HIT, 1);
             }
 
