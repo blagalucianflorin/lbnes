@@ -245,6 +245,9 @@ public:
     long long frames_rendered = 0;
 
 
+    void draw_frame ();
+
+
     std::string save_state() override;
 
     void        load_state (std::string saved_state) override;

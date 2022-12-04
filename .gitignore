@@ -53,6 +53,10 @@ bin
 lib/googletest-master/*
 lib/*
 lib
+lib/CppSockets*
+lib/imgui*
+lib/portable-file-dialogs*
+lib/yaml-cpp*
 
 # Emulator files
 logs

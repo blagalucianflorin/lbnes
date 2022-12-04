@@ -50,7 +50,7 @@ void imgui_manager::draw_menu ()
     {
         ImGui::SetNextWindowPos (ImVec2 (0, 0));
 
-        float menu_height = 430;
+        float menu_height = 465;
         if (this -> my_nes -> options.is_client)
             menu_height = 250;
         else if (this -> my_nes -> options.is_server)
@@ -93,12 +93,45 @@ void imgui_manager::draw_menu ()
         }
 
 
+        if (!this -> my_nes -> options.is_client && this -> my_nes -> rom_loaded)
+        {
+            if (!this -> my_nes -> options.paused)
+            {
+                if (ImGui::Button("Pause"))
+                {
+                    LOGGER_INFO ("Paused game.");
+                    this -> my_nes -> options.paused = true;
+                    this -> my_nes -> emulate_frame = std::bind (&nes::emulate_frame_paused, my_nes); // NOLINT
+                }
+            }
+            else
+            {
+                if (ImGui::Button("Resume"))
+                {
+                    LOGGER_INFO ("Resumed game.");
+                    this -> my_nes -> options.paused = false;
+                    this -> my_nes -> emulate_frame = std::bind (&nes::emulate_frame_real, my_nes); // NOLINT
+                }
+            }
+            ImGui::NewLine();
+        }
+
+
         if (!this -> my_nes -> options.is_client)
         {
             if (ImGui::Button ("Load ROM"))
             {
+                cross_platform_mkdir ("games");
+
                 LOGGER_INFO ("Loading ROM file from GUI.");
-                auto selection = pfd::open_file ("Select a file", ".").result ();
+                auto selection = pfd::open_file ("Select a file",
+
+#ifdef WIN32
+                                                 ".\\games\\",
+#else
+                                                 "./games/",
+#endif
+                                                 {"NES ROM (.nes)", "*.nes *.ines"}).result ();
 
                 if (!selection.empty ())
                 {
@@ -144,7 +177,7 @@ void imgui_manager::draw_menu ()
             {
                 cross_platform_mkdir ("saves");
 
-                LOGGER_INFO ("Loading ROM file from GUI.");
+                LOGGER_INFO ("Loading save state file from GUI.");
                 auto selection = pfd::open_file ("Select a file",
 #ifdef WIN32
                                                  ".\\saves\\",
@@ -163,6 +196,7 @@ void imgui_manager::draw_menu ()
                     {
                         fin.close ();
                         this -> my_nes -> load_state (YAML::Dump (YAML::LoadFile (selection[0])));
+                        this -> my_nes -> options.paused = false;
                     }
                     else
                     {

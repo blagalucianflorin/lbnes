@@ -721,12 +721,19 @@ void ppu::clock ()
             this -> odd_frame       = !(this -> odd_frame);
             this -> frames_rendered += 1;
 
-            SDL_DestroyTexture (this -> screen);
-            this -> screen = SDL_CreateTextureFromSurface (this -> renderer, this -> screen_surface);
-            SDL_RenderCopy (this -> renderer, this -> screen, nullptr, nullptr);
+            this -> draw_frame ();
         }
     }
 }
+
+
+void ppu::draw_frame ()
+{
+    SDL_DestroyTexture (this -> screen);
+    this -> screen = SDL_CreateTextureFromSurface (this -> renderer, this -> screen_surface);
+    SDL_RenderCopy (this -> renderer, this -> screen, nullptr, nullptr);
+}
+
 
 void ppu::get_background_pixel (uint8_t &pixel, uint8_t &palette) const
 {

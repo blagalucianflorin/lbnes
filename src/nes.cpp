@@ -105,6 +105,12 @@ void nes::emulate_frame_real ()
 }
 
 
+void nes::emulate_frame_paused ()
+{
+    this -> nes_ppu -> draw_frame ();
+}
+
+
 const std::array <uint32_t, 240 * 256> &nes::render_frame ()
 {
     SDL_SetRenderDrawColor (this -> game_renderer, 128, 128, 128, 255);

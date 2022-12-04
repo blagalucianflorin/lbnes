@@ -92,6 +92,7 @@ private:
         int  speed {};
         bool is_server = false;
         bool is_client = false;
+        bool paused    = false;
     } options {};
 
     struct rgb_triplet
@@ -129,6 +130,8 @@ private:
 
 
     void                                   emulate_frame_real ();
+
+    void                                   emulate_frame_paused ();
 
     std::function <void ()>                emulate_frame = [] () {};
 
