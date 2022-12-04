@@ -47,7 +47,7 @@ class nes : public std::enable_shared_from_this <nes>, public state
 public:
     nes ();
 
-    ~nes ();
+    virtual ~nes ();
 
     void start ();
 

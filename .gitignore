@@ -53,3 +53,7 @@ bin
 lib/googletest-master/*
 lib/*
 lib
+
+# Emulator files
+logs
+saves
